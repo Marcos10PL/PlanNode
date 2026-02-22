@@ -15,12 +15,6 @@
 
 - **Supabase** - Backend-as-a-Service (PostgreSQL, Auth, Storage)
 
-### Environment Variables
-
-```env
-
-```
-
 ## Getting Started
 
 ```bash
@@ -39,17 +33,3 @@ pnpm build
 # Start production server
 pnpm start
 ```
-
-## Project Structure
-
-```
-├── app/                    # Główna aplikacja
-├── layers/                 # Warstwy Nuxt
-│   ├── auth/              # Warstwa autoryzacji
-│   ├── base/              # Warstwa bazowa
-│   ├── common/            # Warstwa publiczna
-│   ├── profile/           # Warstwa profilu użytkownika
-│   ├── marketplace/       # Warstwa marketplace
-│   └── admin/             # Warstwa administracyjna
-├── public/                # Zasoby statyczne
-└── server/                # Server-side kod
