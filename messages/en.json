@@ -1,0 +1,97 @@
+{
+  "logo": "PlanNode",
+  "footer": {
+    "all_rights_reserved": "PlanNode. All rights reserved."
+  },
+  "auth": {
+    "sign_up": "Sign up",
+    "sign_in": "Sign in"
+  },
+  "metadata": {
+    "title": "PlanNode - Project Planning Application",
+    "description": "PlanNode is an innovative project planning application that helps teams manage tasks, deadlines, and resources efficiently and clearly."
+  },
+  "themeSwitcher": {
+    "system": "System",
+    "dark": "Dark",
+    "light": "Light"
+  },
+  "landing": {
+    "hero": {
+      "badge": "Available in PL & EN",
+      "headline": "Plan projects.\nDeliver results.",
+      "subheadline": "PlanNode helps your team manage tasks, deadlines, and resources — clearly and efficiently.",
+      "cta_primary": "Get started for free",
+      "cta_secondary": "Learn more",
+      "free_note": "Always free · No credit card required"
+    },
+    "problemSolution": {
+      "title": "What does PlanNode offer?",
+      "before_label": "Without PlanNode",
+      "after_label": "With PlanNode",
+      "before_items": [
+        "Tasks scattered across emails and spreadsheets",
+        "Hard to tell who is responsible for what",
+        "Deadlines slip without any warning",
+        "No single source of truth for the team"
+      ],
+      "after_items": [
+        "All tasks in one organized place",
+        "Clear ownership and accountability",
+        "Reminders before deadlines are missed",
+        "One shared hub for the whole team"
+      ]
+    },
+    "features": {
+      "title": "Everything your team needs",
+      "items": [
+        {
+          "icon": "layout",
+          "title": "Visual project boards",
+          "description": "Organize tasks with drag-and-drop boards. See the full picture at a glance."
+        },
+        {
+          "icon": "clock",
+          "title": "Deadline tracking",
+          "description": "Set milestones and get notified before deadlines slip. Stay on schedule."
+        },
+        {
+          "icon": "users",
+          "title": "Team collaboration",
+          "description": "Assign tasks, leave comments, and keep everyone in sync — in one place."
+        },
+        {
+          "icon": "globe",
+          "title": "Polish & English",
+          "description": "Fully bilingual interface. Switch between PL and EN at any time without losing context."
+        }
+      ]
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "items": [
+        {
+          "question": "Is PlanNode really free?",
+          "answer": "Yes — PlanNode is completely free. No credit card, no hidden fees, no trial period."
+        },
+        {
+          "question": "Which languages does the app support?",
+          "answer": "The interface is available in Polish and English. You can switch languages at any time without losing any data."
+        },
+        {
+          "question": "How many people can collaborate on a project?",
+          "answer": "You can invite as many team members as you need to your projects — there is no limit."
+        },
+        {
+          "question": "Is my data secure?",
+          "answer": "Yes. Your data is stored in a secure infrastructure with encryption in transit and at rest."
+        }
+      ]
+    },
+    "cta": {
+      "title": "Ready to bring order to your projects?",
+      "subtitle": "Join teams that plan smarter with PlanNode.",
+      "button": "Start for free"
+    }
+  }
+}

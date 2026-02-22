@@ -1,0 +1,97 @@
+{
+  "logo": "PlanNode",
+  "footer": {
+    "all_rights_reserved": "PlanNode. Wszelkie prawa zastrzeżone."
+  },
+  "auth": {
+    "sign_up": "Zarejestruj się",
+    "sign_in": "Zaloguj się"
+  },
+  "metadata": {
+    "title": "PlanNode - Aplikacja do planowania projektów",
+    "description": "PlanNode to innowacyjna aplikacja do planowania projektów, która pomaga zespołom zarządzać zadaniami, terminami i zasobami w sposób efektywny i przejrzysty."
+  },
+  "themeSwitcher": {
+    "system": "System",
+    "dark": "Ciemny",
+    "light": "Jasny"
+  },
+  "landing": {
+    "hero": {
+      "badge": "Dostępne w PL i EN",
+      "headline": "Planuj projekty.\nDostarczaj wyniki.",
+      "subheadline": "PlanNode pomaga Twojemu zespołowi zarządzać zadaniami, terminami i zasobami — przejrzyście i efektywnie.",
+      "cta_primary": "Zacznij za darmo",
+      "cta_secondary": "Dowiedz się więcej",
+      "free_note": "Zawsze za darmo · Bez karty kredytowej"
+    },
+    "problemSolution": {
+      "title": "Co daje PlanNode?",
+      "before_label": "Bez PlanNode",
+      "after_label": "Z PlanNode",
+      "before_items": [
+        "Zadania rozrzucone po mailach i arkuszach",
+        "Trudno ustalić, kto za co odpowiada",
+        "Terminy uciekają bez żadnego ostrzeżenia",
+        "Brak jednego miejsca z aktualnym stanem projektu"
+      ],
+      "after_items": [
+        "Wszystkie zadania w jednym, uporządkowanym miejscu",
+        "Jasno określona odpowiedzialność każdego członka",
+        "Przypomnienia zanim przekroczysz deadline",
+        "Jeden wspólny hub dla całego zespołu"
+      ]
+    },
+    "features": {
+      "title": "Wszystko, czego potrzebuje Twój zespół",
+      "items": [
+        {
+          "icon": "layout",
+          "title": "Wizualne tablice projektów",
+          "description": "Organizuj zadania na tablicach z przeciąganiem. Miej pełny obraz na jednym ekranie."
+        },
+        {
+          "icon": "clock",
+          "title": "Śledzenie terminów",
+          "description": "Ustawiaj kamienie milowe i otrzymuj powiadomienia zanim przekroczysz deadline. Bądź na bieżąco."
+        },
+        {
+          "icon": "users",
+          "title": "Współpraca zespołowa",
+          "description": "Przypisuj zadania, zostawiaj komentarze i synchronizuj cały zespół — w jednym miejscu."
+        },
+        {
+          "icon": "globe",
+          "title": "Polski i angielski",
+          "description": "W pełni dwujęzyczny interfejs. Przełącz się między PL a EN w dowolnej chwili bez utraty kontekstu."
+        }
+      ]
+    },
+    "faq": {
+      "title": "Najczęściej zadawane pytania",
+      "items": [
+        {
+          "question": "Czy PlanNode jest naprawdę za darmo?",
+          "answer": "Tak — PlanNode jest całkowicie bezpłatny. Żadnej karty kredytowej, ukrytych opłat ani okresu próbnego."
+        },
+        {
+          "question": "Jakie języki obsługuje aplikacja?",
+          "answer": "Interfejs jest dostępny w języku polskim i angielskim. Możesz przełączyć język w dowolnym momencie bez utraty danych."
+        },
+        {
+          "question": "Ile osób może współpracować przy projekcie?",
+          "answer": "Możesz zapraszać tylu członków zespołu, ilu potrzebujesz — bez żadnych limitów."
+        },
+        {
+          "question": "Czy moje dane są bezpieczne?",
+          "answer": "Tak. Dane są przechowywane w bezpiecznej infrastrukturze z szyfrowaniem podczas przesyłania i przechowywania."
+        }
+      ]
+    },
+    "cta": {
+      "title": "Gotowy, by zapanować nad swoimi projektami?",
+      "subtitle": "Dołącz do zespołów, które planują mądrzej z PlanNode.",
+      "button": "Zacznij za darmo"
+    }
+  }
+}
