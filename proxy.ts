@@ -6,7 +6,9 @@ import { type NextRequest } from "next/server";
 const intlMiddleware = createMiddleware(routing);
 
 export default async function middleware(request: NextRequest) {
-  await updateSession(request);
+  const sessionResponse = await updateSession(request);
+
+  if (sessionResponse.status !== 200) return sessionResponse;
 
   return intlMiddleware(request);
 }

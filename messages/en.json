@@ -5,7 +5,60 @@
   },
   "auth": {
     "sign_up": "Sign up",
-    "sign_in": "Sign in"
+    "sign_in": "Sign in",
+    "login": {
+      "title": "Login",
+      "description": "Enter your email below to login to your account",
+      "email": "Email",
+      "password": "Password",
+      "forgot_password": "Forgot your password?",
+      "submit": "Login",
+      "submitting": "Logging in...",
+      "no_account": "Don't have an account?",
+      "error_generic": "An error occurred"
+    },
+    "signUp": {
+      "title": "Sign up",
+      "description": "Create a new account",
+      "email": "Email",
+      "password": "Password",
+      "repeat_password": "Repeat Password",
+      "passwords_mismatch": "Passwords do not match",
+      "submit": "Sign up",
+      "submitting": "Creating an account...",
+      "have_account": "Already have an account?",
+      "error_generic": "An error occurred"
+    },
+    "forgotPassword": {
+      "title": "Reset Your Password",
+      "description": "Type in your email and we'll send you a link to reset your password",
+      "email": "Email",
+      "submit": "Send reset email",
+      "submitting": "Sending...",
+      "have_account": "Already have an account?",
+      "error_generic": "An error occurred",
+      "success_title": "Check Your Email",
+      "success_description": "Password reset instructions sent",
+      "success_message": "If you registered using your email and password, you will receive a password reset email."
+    },
+    "updatePassword": {
+      "title": "Reset Your Password",
+      "description": "Please enter your new password below.",
+      "new_password": "New password",
+      "submit": "Save new password",
+      "submitting": "Saving...",
+      "error_generic": "An error occurred"
+    },
+    "signUpSuccess": {
+      "title": "Thank you for signing up!",
+      "description": "Check your email to confirm",
+      "message": "You've successfully signed up. Please check your email to confirm your account before signing in."
+    },
+    "error": {
+      "title": "Sorry, something went wrong.",
+      "code_error": "Code error: {error}",
+      "unspecified": "An unspecified error occurred."
+    }
   },
   "metadata": {
     "title": "PlanNode - Project Planning Application",

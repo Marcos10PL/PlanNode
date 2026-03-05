@@ -5,7 +5,60 @@
   },
   "auth": {
     "sign_up": "Zarejestruj się",
-    "sign_in": "Zaloguj się"
+    "sign_in": "Zaloguj się",
+    "login": {
+      "title": "Logowanie",
+      "description": "Wpisz swój email, aby zalogować się do konta",
+      "email": "Email",
+      "password": "Hasło",
+      "forgot_password": "Zapomniałeś hasła?",
+      "submit": "Zaloguj się",
+      "submitting": "Logowanie...",
+      "no_account": "Nie masz konta?",
+      "error_generic": "Wystąpił błąd"
+    },
+    "signUp": {
+      "title": "Rejestracja",
+      "description": "Utwórz nowe konto",
+      "email": "Email",
+      "password": "Hasło",
+      "repeat_password": "Powtórz hasło",
+      "passwords_mismatch": "Hasła nie są identyczne",
+      "submit": "Zarejestruj się",
+      "submitting": "Tworzenie konta...",
+      "have_account": "Masz już konto?",
+      "error_generic": "Wystąpił błąd"
+    },
+    "forgotPassword": {
+      "title": "Zresetuj hasło",
+      "description": "Podaj swój email, a wyślemy Ci link do resetowania hasła",
+      "email": "Email",
+      "submit": "Wyślij email resetujący",
+      "submitting": "Wysyłanie...",
+      "have_account": "Masz już konto?",
+      "error_generic": "Wystąpił błąd",
+      "success_title": "Sprawdź swoją skrzynkę",
+      "success_description": "Instrukcje resetowania hasła zostały wysłane",
+      "success_message": "Jeśli rejestrowałeś się przy pomocy emaila i hasła, otrzymasz wiadomość z linkiem do resetowania hasła."
+    },
+    "updatePassword": {
+      "title": "Zresetuj hasło",
+      "description": "Wprowadź nowe hasło poniżej.",
+      "new_password": "Nowe hasło",
+      "submit": "Zapisz nowe hasło",
+      "submitting": "Zapisywanie...",
+      "error_generic": "Wystąpił błąd"
+    },
+    "signUpSuccess": {
+      "title": "Dziękujemy za rejestrację!",
+      "description": "Sprawdź email, aby potwierdzić konto",
+      "message": "Rejestracja przebiegła pomyślnie. Sprawdź swoją skrzynkę i potwierdź konto przed zalogowaniem."
+    },
+    "error": {
+      "title": "Coś poszło nie tak.",
+      "code_error": "Kod błędu: {error}",
+      "unspecified": "Wystąpił nieokreślony błąd."
+    }
   },
   "metadata": {
     "title": "PlanNode - Aplikacja do planowania projektów",

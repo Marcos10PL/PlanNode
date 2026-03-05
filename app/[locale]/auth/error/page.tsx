@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 
 async function ErrorContent({
@@ -6,18 +7,17 @@ async function ErrorContent({
 }: {
   searchParams: Promise<{ error: string }>;
 }) {
+  const t = await getTranslations("auth.error");
   const params = await searchParams;
 
   return (
     <>
       {params?.error ? (
         <p className="text-sm text-muted-foreground">
-          Code error: {params.error}
+          {t("code_error", { error: params.error })}
         </p>
       ) : (
-        <p className="text-sm text-muted-foreground">
-          An unspecified error occurred.
-        </p>
+        <p className="text-sm text-muted-foreground">{t("unspecified")}</p>
       )}
     </>
   );
@@ -35,7 +35,7 @@ export default function Page({
           <Card>
             <CardHeader>
               <CardTitle className="text-2xl">
-                Sorry, something went wrong.
+                <TitleContent />
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -48,4 +48,9 @@ export default function Page({
       </div>
     </div>
   );
+}
+
+async function TitleContent() {
+  const t = await getTranslations("auth.error");
+  return t("title");
 }

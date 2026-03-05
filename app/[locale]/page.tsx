@@ -1,4 +1,4 @@
-import Navigation from "@/components/navigation";
+import Navigation from "@/components/app-navigation";
 import { HeroSection } from "@/components/landing/hero-section";
 import { ProblemSolutionSection } from "@/components/landing/problem-solution-section";
 import { FeaturesSection } from "@/components/landing/features-section";

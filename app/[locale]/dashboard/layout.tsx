@@ -1,41 +1,43 @@
-import { AuthButton } from "@/components/auth/auth-button";
-import { ThemeSwitcher } from "@/components/theme-switcher";
+import { AppSidebar } from "@/components/app-sidebar";
+import Navigation from "@/components/app-navigation";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { routing } from "@/i18n/routing";
+import { hasLocale } from "next-intl";
+import { setRequestLocale } from "next-intl/server";
+import { notFound } from "next/dist/client/components/navigation";
 import { Suspense } from "react";
+import NavButtons from "@/components/elements/nav-buttons";
 
-export default function ProtectedLayout({
+export function generateStaticParams() {
+  return routing.locales.map(locale => ({ locale }));
+}
+
+export default async function DashboardLayout({
   children,
+  params,
 }: {
   children: React.ReactNode;
+  params: Promise<{ locale: string }>;
 }) {
-  return (
-    <main className="min-h-screen flex flex-col items-center">
-      <div className="flex-1 w-full flex flex-col gap-20 items-center">
-        <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
-          <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
-            <Suspense>
-              <AuthButton />
-            </Suspense>
-          </div>
-        </nav>
-        <div className="flex-1 flex flex-col gap-20 max-w-5xl p-5">
-          {children}
-        </div>
+  const { locale } = await params;
 
-        <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-8 py-16">
-          <p>
-            Powered by{" "}
-            <a
-              href="https://supabase.com/?utm_source=create-next-app&utm_medium=template&utm_term=nextjs"
-              target="_blank"
-              className="font-bold hover:underline"
-              rel="noreferrer"
-            >
-              Supabase
-            </a>
-          </p>
-          <ThemeSwitcher />
-        </footer>
+  if (!hasLocale(routing.locales, locale)) {
+    notFound();
+  }
+
+  setRequestLocale(locale);
+
+  return (
+    <SidebarProvider>
+      <AppSidebar />
+
+      <div className="w-full">
+        <div className="flex justify-between items-center border-b p-2">
+          <SidebarTrigger />
+          <NavButtons />
+        </div>
+        <div className="p-2">{children}</div>
       </div>
-    </main>
+    </SidebarProvider>
   );
 }
