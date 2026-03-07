@@ -14,7 +14,10 @@
       "forgot_password": "Zapomniałeś hasła?",
       "submit": "Zaloguj się",
       "submitting": "Logowanie...",
+      "logged_in_successfully": "Zalogowano pomyślnie",
       "no_account": "Nie masz konta?",
+      "invalid_credentials": "Nieprawidłowy email lub hasło",
+      "login_failed": "Logowanie nie powiodło się. Spróbuj ponownie.",
       "error_generic": "Wystąpił błąd"
     },
     "signUp": {
@@ -27,6 +30,8 @@
       "submit": "Zarejestruj się",
       "submitting": "Tworzenie konta...",
       "have_account": "Masz już konto?",
+      "user_already_exists": "Konto z tym adresem email już istnieje",
+      "sign_up_failed": "Rejestracja nie powiodła się. Spróbuj ponownie.",
       "error_generic": "Wystąpił błąd"
     },
     "forgotPassword": {
@@ -60,6 +65,13 @@
       "unspecified": "Wystąpił nieokreślony błąd."
     }
   },
+  "fields": {
+    "errors": {
+      "invalid_email": "Podaj poprawny adres e-mail",
+      "password_too_short": "Hasło musi mieć co najmniej 6 znaków",
+      "passwords_do_not_match": "Hasła nie są takie same"
+    }
+  },
   "metadata": {
     "title": "PlanNode - Aplikacja do planowania projektów",
     "description": "PlanNode to innowacyjna aplikacja do planowania projektów, która pomaga zespołom zarządzać zadaniami, terminami i zasobami w sposób efektywny i przejrzysty."
@@ -68,6 +80,38 @@
     "system": "System",
     "dark": "Ciemny",
     "light": "Jasny"
+  },
+  "passwordInput": {
+    "show": "Pokaż hasło",
+    "hide": "Ukryj hasło"
+  },
+  "profileSettings": {
+    "title": "Ustawienia profilu",
+    "description": "Zarządzaj danymi profilu",
+    "full_name": "Imię i nazwisko",
+    "email": "Email",
+    "pending_email": "Oczekujący nowy email",
+    "new_email": "Nowy email",
+    "role": "Rola",
+    "id": "ID",
+    "created_at": "Utworzono",
+    "updated_at": "Zaktualizowano",
+    "new_password": "Nowe hasło",
+    "password": "Hasło",
+    "password_change_placeholder": "Uzupełnij, żeby zmienić",
+    "submit": "Zapisz zmiany",
+    "submitting": "Zapisywanie...",
+    "update_email": "Zmień email",
+    "updating_email": "Zmiana emaila...",
+    "update_password": "Zmień hasło",
+    "updating_password": "Zmiana hasła...",
+    "saved_successfully": "Profil został zapisany",
+    "save_failed": "Nie udało się zapisać profilu",
+    "email_update_success": "Zlecono zmianę emaila. Sprawdź skrzynkę.",
+    "email_update_failed": "Nie udało się zmienić emaila",
+    "pending_email_info": "Zmiana emaila na {pendingEmail} czeka na potwierdzenie. Do tego czasu loguj się obecnym emailem: {currentEmail}.",
+    "password_update_success": "Hasło zostało zmienione",
+    "password_update_failed": "Nie udało się zmienić hasła"
   },
   "landing": {
     "hero": {

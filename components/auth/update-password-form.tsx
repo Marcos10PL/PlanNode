@@ -10,36 +10,45 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { LINKS } from "@/const";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  createUpdatePasswordSchema,
+  type UpdatePasswordSchema,
+} from "@/schema";
+import { ControlledPasswordField } from "@/components/ui/controlled-password-field";
+import { toast } from "sonner";
 
 export function UpdatePasswordForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
   const t = useTranslations("auth.updatePassword");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const handleForgotPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const form = useForm<UpdatePasswordSchema>({
+    resolver: zodResolver(
+      createUpdatePasswordSchema(useTranslations("fields.errors")),
+    ),
+    defaultValues: {
+      password: "",
+    },
+  });
+
+  const handleUpdatePassword = async (data: UpdatePasswordSchema) => {
     const supabase = createClient();
-    setIsLoading(true);
-    setError(null);
 
     try {
-      const { error } = await supabase.auth.updateUser({ password });
+      const { error } = await supabase.auth.updateUser({
+        password: data.password,
+      });
       if (error) throw error;
-      router.push("/protected");
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : t("error_generic"));
-    } finally {
-      setIsLoading(false);
+      router.replace(LINKS.dashboard);
+    } catch {
+      toast.error(t("error_generic"));
     }
   };
 
@@ -51,24 +60,25 @@ export function UpdatePasswordForm({
           <CardDescription>{t("description")}</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleForgotPassword}>
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="password">{t("new_password")}</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder={t("new_password")}
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-              {error && <p className="text-sm text-red-500">{error}</p>}
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? t("submitting") : t("submit")}
-              </Button>
-            </div>
+          <form
+            onSubmit={form.handleSubmit(handleUpdatePassword)}
+            className="flex flex-col gap-4"
+          >
+            <ControlledPasswordField
+              control={form.control}
+              name="password"
+              label={t("new_password")}
+              placeholder={t("new_password")}
+              autoComplete="new-password"
+            />
+
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={form.formState.isSubmitting}
+            >
+              {form.formState.isSubmitting ? t("submitting") : t("submit")}
+            </Button>
           </form>
         </CardContent>
       </Card>

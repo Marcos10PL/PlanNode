@@ -43,8 +43,8 @@ export async function updateSession(request: NextRequest) {
   const pathWithoutLocale =
     pathname.replace(new RegExp(`^/${locale}`), "") || "/";
 
-  const protectedRoutes = [LINKS.dashboard];
-  const guestOnlyRoutes = [LINKS.home];
+  const protectedRoutes = [LINKS.app];
+  const guestOnlyRoutes = [LINKS.home, LINKS.login, LINKS.signUp, LINKS.forgotPassword];
 
   const isProtected = protectedRoutes.some(
     route =>

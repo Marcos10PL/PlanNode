@@ -11,7 +11,6 @@ import { Separator } from "@/components/ui/separator";
 export default function LandingPage({ params }: { params: LocaleProp }) {
   const { locale } = use(params);
   setRequestLocale(locale);
-
   return (
     <>
       <Navigation />

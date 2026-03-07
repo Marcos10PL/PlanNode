@@ -14,7 +14,10 @@
       "forgot_password": "Forgot your password?",
       "submit": "Login",
       "submitting": "Logging in...",
+      "logged_in_successfully": "Logged in successfully",
       "no_account": "Don't have an account?",
+      "invalid_credentials": "Invalid email or password",
+      "login_failed": "Login failed. Please try again.",
       "error_generic": "An error occurred"
     },
     "signUp": {
@@ -27,6 +30,8 @@
       "submit": "Sign up",
       "submitting": "Creating an account...",
       "have_account": "Already have an account?",
+      "user_already_exists": "An account with this email already exists",
+      "sign_up_failed": "Sign up failed. Please try again.",
       "error_generic": "An error occurred"
     },
     "forgotPassword": {
@@ -60,6 +65,13 @@
       "unspecified": "An unspecified error occurred."
     }
   },
+  "fields": {
+    "errors": {
+      "invalid_email": "Please enter a valid email address",
+      "password_too_short": "Password must be at least 6 characters",
+      "passwords_do_not_match": "Passwords do not match"
+    }
+  },
   "metadata": {
     "title": "PlanNode - Project Planning Application",
     "description": "PlanNode is an innovative project planning application that helps teams manage tasks, deadlines, and resources efficiently and clearly."
@@ -68,6 +80,38 @@
     "system": "System",
     "dark": "Dark",
     "light": "Light"
+  },
+  "passwordInput": {
+    "show": "Show password",
+    "hide": "Hide password"
+  },
+  "profileSettings": {
+    "title": "Profile settings",
+    "description": "Manage your profile data",
+    "full_name": "Full name",
+    "email": "Email",
+    "pending_email": "Pending new email",
+    "new_email": "New email",
+    "role": "Role",
+    "id": "ID",
+    "created_at": "Created at",
+    "updated_at": "Updated at",
+    "new_password": "New password",
+    "password": "Password",
+    "password_change_placeholder": "Fill in to change",
+    "submit": "Save changes",
+    "submitting": "Saving...",
+    "update_email": "Change email",
+    "updating_email": "Changing email...",
+    "update_password": "Change password",
+    "updating_password": "Changing password...",
+    "saved_successfully": "Profile saved successfully",
+    "save_failed": "Could not save profile",
+    "email_update_success": "Email update requested. Check your inbox.",
+    "email_update_failed": "Could not update email",
+    "pending_email_info": "Email change to {pendingEmail} is waiting for confirmation. Until then, sign in using your current email: {currentEmail}.",
+    "password_update_success": "Password updated successfully",
+    "password_update_failed": "Could not update password"
   },
   "landing": {
     "hero": {

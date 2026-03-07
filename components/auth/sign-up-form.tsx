@@ -10,13 +10,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Link } from "@/i18n/navigation";
 import { LINKS } from "@/const";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { useForm } from "react-hook-form";
+import { createRegisterSchema, RegisterSchema } from "@/schema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import { ControlledInputField } from "@/components/ui/controlled-input-field";
+import { ControlledPasswordField } from "@/components/ui/controlled-password-field";
 
 export function SignUpForm({
   className,
@@ -24,41 +27,41 @@ export function SignUpForm({
 }: React.ComponentPropsWithoutRef<"div">) {
   const t = useTranslations("auth.signUp");
   const tAuth = useTranslations("auth");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [repeatPassword, setRepeatPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+
   const router = useRouter();
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const supabase = createClient();
-    setIsLoading(true);
-    setError(null);
+  const form = useForm<RegisterSchema>({
+    resolver: zodResolver(
+      createRegisterSchema(useTranslations("fields.errors")),
+    ),
+    defaultValues: {
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+  });
 
-    if (password !== repeatPassword) {
-      setError(t("passwords_mismatch"));
-      setIsLoading(false);
-      return;
-    }
+  async function onSubmit(data: RegisterSchema) {
+    const supabase = createClient();
 
     try {
       const { error } = await supabase.auth.signUp({
-        email,
-        password,
+        email: data.email,
+        password: data.password,
         options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
+          emailRedirectTo: `${window.location.origin}${LINKS.dashboard}`,
         },
       });
       if (error) throw error;
-      router.push(LINKS.signUpSuccess);
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : t("error_generic"));
-    } finally {
-      setIsLoading(false);
+      router.replace(LINKS.signUpSuccess);
+    } catch (error: any) {
+      if (error.code === "user_already_exists") {
+        toast.error(t("user_already_exists"));
+      } else {
+        toast.error(t("sign_up_failed"));
+      }
     }
-  };
+  }
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -68,44 +71,41 @@ export function SignUpForm({
           <CardDescription>{t("description")}</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSignUp}>
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="email">{t("email")}</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="password">{t("password")}</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="repeat-password">{t("repeat_password")}</Label>
-                <Input
-                  id="repeat-password"
-                  type="password"
-                  required
-                  value={repeatPassword}
-                  onChange={e => setRepeatPassword(e.target.value)}
-                />
-              </div>
-              {error && <p className="text-sm text-red-500">{error}</p>}
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? t("submitting") : t("submit")}
-              </Button>
-            </div>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex flex-col gap-4"
+          >
+            <ControlledInputField
+              control={form.control}
+              name="email"
+              label={t("email")}
+              type="email"
+              placeholder="m@example.com"
+              autoComplete="email"
+            />
+
+            <ControlledPasswordField
+              control={form.control}
+              name="password"
+              label={t("password")}
+              autoComplete="new-password"
+            />
+
+            <ControlledPasswordField
+              control={form.control}
+              name="confirmPassword"
+              label={t("repeat_password")}
+              autoComplete="new-password"
+            />
+
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={form.formState.isSubmitting}
+            >
+              {form.formState.isSubmitting ? t("submitting") : t("submit")}
+            </Button>
+
             <div className="mt-4 text-center text-sm">
               {t("have_account")}{" "}
               <Link href={LINKS.login} className="underline underline-offset-4">
