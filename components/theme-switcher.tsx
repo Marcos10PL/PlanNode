@@ -9,14 +9,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Laptop, Moon, Sun } from "lucide-react";
-import { useTranslations } from "next-intl"
+import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
 const ThemeSwitcher = () => {
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
-  const t = useTranslations("themeSwitcher");
+  const t = useTranslations("theme_switcher");
 
   useEffect(() => {
     setMounted(true);

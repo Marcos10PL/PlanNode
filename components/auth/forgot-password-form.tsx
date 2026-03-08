@@ -28,7 +28,7 @@ export function ForgotPasswordForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
-  const t = useTranslations("auth.forgotPassword");
+  const t = useTranslations("auth.forgot_password");
   const tAuth = useTranslations("auth");
   const [success, setSuccess] = useState(false);
 

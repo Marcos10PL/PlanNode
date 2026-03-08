@@ -1,34 +1,30 @@
 import { ProfileSettingsForm } from "@/components/profile-settings-form";
 import { LINKS } from "@/const";
-import { createClient } from "@/lib/supabase/server";
+import { getProfile } from "@/lib/data";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
-export default function ProfileSettingsPage() {
+export default async function ProfileSettingsPage() {
   return (
     <Suspense>
-      <ProfileSettingsContent />
+      <Content />
     </Suspense>
   );
 }
 
-async function ProfileSettingsContent() {
-  const supabase = await createClient();
+async function Content() {
+  const data = await getProfile();
 
-  const [authRes, profileRes] = await Promise.all([
-    supabase.auth.getUser(),
-    supabase.from("profiles").select("*").single(),
-  ]);
+  if (!data) {
+    redirect(LINKS.login);
+  }
 
-  const user = authRes.data.user;
-  const profile = profileRes.data;
-
-  if (!user) redirect(LINKS.login);
+  const { profile, user } = data;
 
   return (
     <ProfileSettingsForm
       profile={profile}
-      pendingEmail={user.new_email ?? null}
+      pendingEmail={user?.new_email ?? null}
     />
   );
 }

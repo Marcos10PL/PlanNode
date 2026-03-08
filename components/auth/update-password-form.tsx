@@ -26,7 +26,7 @@ export function UpdatePasswordForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
-  const t = useTranslations("auth.updatePassword");
+  const t = useTranslations("auth.update_password");
   const router = useRouter();
 
   const form = useForm<UpdatePasswordSchema>({

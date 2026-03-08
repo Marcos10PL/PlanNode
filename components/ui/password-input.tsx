@@ -19,7 +19,7 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
     { className, showLabel, hideLabel, buttonClassName, disabled, ...props },
     ref,
   ) => {
-    const t = useTranslations("passwordInput");
+    const t = useTranslations("password_input");
     const [isVisible, setIsVisible] = React.useState(false);
 
     return (

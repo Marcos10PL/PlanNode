@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Link } from "@/i18n/navigation";
+import { Link } from "../ui/link";
 import { LINKS } from "@/const";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -25,7 +25,7 @@ export function SignUpForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
-  const t = useTranslations("auth.signUp");
+  const t = useTranslations("auth.sign_up_form");
   const tAuth = useTranslations("auth");
 
   const router = useRouter();
@@ -53,7 +53,9 @@ export function SignUpForm({
         },
       });
       if (error) throw error;
-      router.replace(LINKS.signUpSuccess);
+      router.replace(
+        `${LINKS.signUpSuccess}?email=${encodeURIComponent(data.email)}`,
+      );
     } catch (error: any) {
       if (error.code === "user_already_exists") {
         toast.error(t("user_already_exists"));
@@ -108,9 +110,7 @@ export function SignUpForm({
 
             <div className="mt-4 text-center text-sm">
               {t("have_account")}{" "}
-              <Link href={LINKS.login} className="underline underline-offset-4">
-                {tAuth("sign_in")}
-              </Link>
+              <Link href={LINKS.login}>{tAuth("sign_in")}</Link>
             </div>
           </form>
         </CardContent>

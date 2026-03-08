@@ -10,7 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Link } from "@/i18n/navigation";
 import { LINKS } from "@/const";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -21,6 +20,7 @@ import { FieldError } from "../ui/field";
 import { toast } from "sonner";
 import { ControlledInputField } from "@/components/ui/controlled-input-field";
 import { ControlledPasswordField } from "@/components/ui/controlled-password-field";
+import { Link } from "../ui/link";
 
 export function LoginForm({
   className,
@@ -38,6 +38,25 @@ export function LoginForm({
     },
   });
 
+  async function resendConfirmationEmail(email: string) {
+    const supabase = createClient();
+
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}${LINKS.dashboard}`,
+      },
+    });
+
+    if (error) {
+      toast.error(t("resend_email_failed"));
+      return;
+    }
+
+    toast.success(t("resend_email_success"));
+  }
+
   async function onSubmit(data: LoginSchema) {
     const supabase = createClient();
 
@@ -50,8 +69,18 @@ export function LoginForm({
       toast.success(t("logged_in_successfully"));
       router.replace(LINKS.dashboard);
     } catch (error: any) {
+      console.log(error.code);
       if (error.code === "invalid_credentials") {
         toast.error(t("invalid_credentials"));
+      } else if (error.code === "email_not_confirmed") {
+        toast.error(t("email_not_confirmed"), {
+          action: {
+            label: t("resend_email"),
+            onClick: async () => {
+              await resendConfirmationEmail(data.email);
+            },
+          },
+        });
       } else {
         toast.error(t("login_failed"));
       }
@@ -85,10 +114,7 @@ export function LoginForm({
               label={t("password")}
               autoComplete="current-password"
               labelRight={
-                <Link
-                  href={LINKS.forgotPassword}
-                  className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                >
+                <Link href={LINKS.forgotPassword} className="ml-auto text-sm">
                   {t("forgot_password")}
                 </Link>
               }
@@ -108,12 +134,7 @@ export function LoginForm({
 
             <div className="mt-4 text-center text-sm">
               {t("no_account")}{" "}
-              <Link
-                href={LINKS.signUp}
-                className="underline underline-offset-4"
-              >
-                {tAuth("sign_up")}
-              </Link>
+              <Link href={LINKS.signUp}>{tAuth("sign_up")}</Link>
             </div>
           </form>
         </CardContent>

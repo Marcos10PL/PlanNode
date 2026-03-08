@@ -17,10 +17,14 @@
       "logged_in_successfully": "Zalogowano pomyślnie",
       "no_account": "Nie masz konta?",
       "invalid_credentials": "Nieprawidłowy email lub hasło",
+      "email_not_confirmed": "Potwierdź adres email przed zalogowaniem",
+      "resend_email": "Wyślij ponownie",
+      "resend_email_success": "Wysłaliśmy ponownie email potwierdzający",
+      "resend_email_failed": "Nie udało się wysłać emaila potwierdzającego",
       "login_failed": "Logowanie nie powiodło się. Spróbuj ponownie.",
       "error_generic": "Wystąpił błąd"
     },
-    "signUp": {
+    "sign_up_form": {
       "title": "Rejestracja",
       "description": "Utwórz nowe konto",
       "email": "Email",
@@ -34,7 +38,7 @@
       "sign_up_failed": "Rejestracja nie powiodła się. Spróbuj ponownie.",
       "error_generic": "Wystąpił błąd"
     },
-    "forgotPassword": {
+    "forgot_password": {
       "title": "Zresetuj hasło",
       "description": "Podaj swój email, a wyślemy Ci link do resetowania hasła",
       "email": "Email",
@@ -46,7 +50,7 @@
       "success_description": "Instrukcje resetowania hasła zostały wysłane",
       "success_message": "Jeśli rejestrowałeś się przy pomocy emaila i hasła, otrzymasz wiadomość z linkiem do resetowania hasła."
     },
-    "updatePassword": {
+    "update_password": {
       "title": "Zresetuj hasło",
       "description": "Wprowadź nowe hasło poniżej.",
       "new_password": "Nowe hasło",
@@ -54,10 +58,14 @@
       "submitting": "Zapisywanie...",
       "error_generic": "Wystąpił błąd"
     },
-    "signUpSuccess": {
+    "sign_up_success": {
       "title": "Dziękujemy za rejestrację!",
       "description": "Sprawdź email, aby potwierdzić konto",
-      "message": "Rejestracja przebiegła pomyślnie. Sprawdź swoją skrzynkę i potwierdź konto przed zalogowaniem."
+      "message": "Rejestracja przebiegła pomyślnie. Sprawdź swoją skrzynkę i potwierdź konto przed zalogowaniem.",
+      "resend_email": "Wyślij email ponownie",
+      "resending_email": "Wysyłanie...",
+      "resend_email_success": "Wysłaliśmy ponownie email potwierdzający",
+      "resend_email_failed": "Nie udało się wysłać emaila potwierdzającego"
     },
     "error": {
       "title": "Coś poszło nie tak.",
@@ -76,16 +84,16 @@
     "title": "PlanNode - Aplikacja do planowania projektów",
     "description": "PlanNode to innowacyjna aplikacja do planowania projektów, która pomaga zespołom zarządzać zadaniami, terminami i zasobami w sposób efektywny i przejrzysty."
   },
-  "themeSwitcher": {
+  "theme_switcher": {
     "system": "System",
     "dark": "Ciemny",
     "light": "Jasny"
   },
-  "passwordInput": {
+  "password_input": {
     "show": "Pokaż hasło",
     "hide": "Ukryj hasło"
   },
-  "profileSettings": {
+  "profile_settings": {
     "title": "Ustawienia profilu",
     "description": "Zarządzaj danymi profilu",
     "full_name": "Imię i nazwisko",
@@ -122,7 +130,7 @@
       "cta_secondary": "Dowiedz się więcej",
       "free_note": "Zawsze za darmo · Bez karty kredytowej"
     },
-    "problemSolution": {
+    "problem_solution": {
       "title": "Co daje PlanNode?",
       "before_label": "Bez PlanNode",
       "after_label": "Z PlanNode",
@@ -190,5 +198,9 @@
       "subtitle": "Dołącz do zespołów, które planują mądrzej z PlanNode.",
       "button": "Zacznij za darmo"
     }
+  },
+  "my_account": {
+    "settings": "Ustawienia",
+    "sign_out": "Wyloguj się"
   }
 }

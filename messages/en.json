@@ -17,10 +17,14 @@
       "logged_in_successfully": "Logged in successfully",
       "no_account": "Don't have an account?",
       "invalid_credentials": "Invalid email or password",
+      "email_not_confirmed": "Please confirm your email before signing in",
+      "resend_email": "Resend email",
+      "resend_email_success": "Confirmation email has been resent",
+      "resend_email_failed": "Could not resend confirmation email",
       "login_failed": "Login failed. Please try again.",
       "error_generic": "An error occurred"
     },
-    "signUp": {
+    "sign_up_form": {
       "title": "Sign up",
       "description": "Create a new account",
       "email": "Email",
@@ -34,7 +38,7 @@
       "sign_up_failed": "Sign up failed. Please try again.",
       "error_generic": "An error occurred"
     },
-    "forgotPassword": {
+    "forgot_password": {
       "title": "Reset Your Password",
       "description": "Type in your email and we'll send you a link to reset your password",
       "email": "Email",
@@ -46,7 +50,7 @@
       "success_description": "Password reset instructions sent",
       "success_message": "If you registered using your email and password, you will receive a password reset email."
     },
-    "updatePassword": {
+    "update_password": {
       "title": "Reset Your Password",
       "description": "Please enter your new password below.",
       "new_password": "New password",
@@ -54,10 +58,14 @@
       "submitting": "Saving...",
       "error_generic": "An error occurred"
     },
-    "signUpSuccess": {
+    "sign_up_success": {
       "title": "Thank you for signing up!",
       "description": "Check your email to confirm",
-      "message": "You've successfully signed up. Please check your email to confirm your account before signing in."
+      "message": "You've successfully signed up. Please check your email to confirm your account before signing in.",
+      "resend_email": "Resend confirmation email",
+      "resending_email": "Sending...",
+      "resend_email_success": "Confirmation email has been resent",
+      "resend_email_failed": "Could not resend confirmation email"
     },
     "error": {
       "title": "Sorry, something went wrong.",
@@ -76,16 +84,16 @@
     "title": "PlanNode - Project Planning Application",
     "description": "PlanNode is an innovative project planning application that helps teams manage tasks, deadlines, and resources efficiently and clearly."
   },
-  "themeSwitcher": {
+  "theme_switcher": {
     "system": "System",
     "dark": "Dark",
     "light": "Light"
   },
-  "passwordInput": {
+  "password_input": {
     "show": "Show password",
     "hide": "Hide password"
   },
-  "profileSettings": {
+  "profile_settings": {
     "title": "Profile settings",
     "description": "Manage your profile data",
     "full_name": "Full name",
@@ -122,7 +130,7 @@
       "cta_secondary": "Learn more",
       "free_note": "Always free · No credit card required"
     },
-    "problemSolution": {
+    "problem_solution": {
       "title": "What does PlanNode offer?",
       "before_label": "Without PlanNode",
       "after_label": "With PlanNode",
@@ -190,5 +198,9 @@
       "subtitle": "Join teams that plan smarter with PlanNode.",
       "button": "Start for free"
     }
+  },
+  "my_account": {
+    "settings": "Settings",
+    "sign_out": "Sign out"
   }
 }

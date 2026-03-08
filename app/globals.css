@@ -128,7 +128,7 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-.dark [data-sonner-toast] {
+html.dark [data-sonner-toast] {
   box-shadow:
     0 0 0 1px hsl(var(--border)),
     0 6px 6px -10px hsl(0 0% 100% / 0.12);

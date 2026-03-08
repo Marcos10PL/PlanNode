@@ -40,7 +40,7 @@ export function ProfileSettingsForm({
   >;
   pendingEmail: string | null;
 }) {
-  const t = useTranslations("profileSettings");
+  const t = useTranslations("profile_settings");
   const [pendingEmailState, setPendingEmail] = useState(pendingEmail);
 
   const form = useForm<ProfileAccountSchema>({
@@ -53,16 +53,9 @@ export function ProfileSettingsForm({
       new_password: "",
     },
   });
+
   async function onSubmit(data: ProfileAccountSchema) {
     const result = await updateProfileAction(data);
-
-    if (result.error) {
-      console.log(result);
-      toast.error(t("save_failed"));
-    } else {
-      toast.success(t("saved_successfully"));
-      form.reset({ ...data, new_password: "" }); // Resetujesz tylko hasło
-    }
   }
 
   // async function onSubmit(data: ProfileAccountSchema) {
@@ -168,7 +161,9 @@ export function ProfileSettingsForm({
           <Button
             type="submit"
             className="w-full"
-            disabled={form.formState.isSubmitting}
+            disabled={
+              form.formState.isSubmitting || form.formState.isDirty === false
+            }
           >
             {form.formState.isSubmitting ? t("submitting") : t("submit")}
           </Button>

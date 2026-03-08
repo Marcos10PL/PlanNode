@@ -6,7 +6,8 @@ import { hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/dist/client/components/navigation";
 import { Suspense } from "react";
-import NavButtons from "@/components/elements/nav-buttons";
+import NavButtons from "@/components/nav/nav-buttons";
+import { MyAccount } from "@/components/nav/my-account"
 
 export function generateStaticParams() {
   return routing.locales.map(locale => ({ locale }));
@@ -34,7 +35,7 @@ export default async function DashboardLayout({
       <div className="w-full">
         <div className="flex justify-between items-center border-b p-2">
           <SidebarTrigger />
-          <NavButtons />
+          <MyAccount />
         </div>
         <div className="p-2">{children}</div>
       </div>

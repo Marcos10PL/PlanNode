@@ -3,7 +3,7 @@ import { useTranslations } from "next-intl";
 import { XCircle, CheckCircle2 } from "lucide-react";
 
 export function ProblemSolutionSection() {
-  const t = useTranslations("landing.problemSolution");
+  const t = useTranslations("landing.problem_solution");
 
   const beforeItems: string[] = [
     t("before_items.0"),
