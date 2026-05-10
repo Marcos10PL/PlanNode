@@ -9,24 +9,22 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import {
-  CreditCardIcon,
-  LogOutIcon,
-  SettingsIcon,
-  UserIcon,
-} from "lucide-react";
+import { LogOutIcon, SettingsIcon } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { LINKS } from "@/const";
 import { useTranslations } from "next-intl";
 import { Avatar, AvatarFallback } from "../ui/avatar";
-import { logout } from "@/actions/auth";
+import { logout } from "@/actions/auth/logout";
 import { useTransition } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { useUser } from "../providers/user-provider";
 
 export function MyAccount() {
   const router = useRouter();
   const pathname = usePathname();
+
+  const user = useUser();
 
   const t = useTranslations("my_account");
 
@@ -54,7 +52,9 @@ export function MyAccount() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="rounded-full">
           <Avatar className="border-2 border-gray-400">
-            <AvatarFallback>MK</AvatarFallback>
+            <AvatarFallback>
+              {user.profile.full_name?.charAt(0).toUpperCase()}
+            </AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
@@ -68,10 +68,6 @@ export function MyAccount() {
             {t("settings")}
           </Link>
         </DropdownMenuItem>
-        {/* <Link href={LINKS.dashboard} className={cn(isActive(LINKS.dashboard))}>
-          <LayoutDashboard className="mr-2" />
-          Dashboard
-        </Link> */}
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={logOut} disabled={isPending}>
           <LogOutIcon />

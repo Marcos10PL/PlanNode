@@ -41,8 +41,8 @@ export function HeroSection() {
             <ArrowRight className="ml-2 h-4 w-4" />
           </Link>
         </Button>
-        <Button size="lg" variant="outline">
-          {t("cta_secondary")}
+        <Button size="lg" variant="outline" asChild>
+          <a href="#more">{t("cta_secondary")}</a>
         </Button>
       </div>
     </Container>

@@ -27,6 +27,7 @@
     "sign_up_form": {
       "title": "Rejestracja",
       "description": "Utwórz nowe konto",
+      "full_name": "Imię i nazwisko",
       "email": "Email",
       "password": "Hasło",
       "repeat_password": "Powtórz hasło",
@@ -54,6 +55,7 @@
       "title": "Zresetuj hasło",
       "description": "Wprowadź nowe hasło poniżej.",
       "new_password": "Nowe hasło",
+      "confirm_password": "Potwierdź hasło",
       "submit": "Zapisz nowe hasło",
       "submitting": "Zapisywanie...",
       "error_generic": "Wystąpił błąd"
@@ -77,7 +79,8 @@
     "errors": {
       "invalid_email": "Podaj poprawny adres e-mail",
       "password_too_short": "Hasło musi mieć co najmniej 6 znaków",
-      "passwords_do_not_match": "Hasła nie są takie same"
+      "passwords_do_not_match": "Hasła nie są takie same",
+      "full_name_required": "Imię i nazwisko jest wymagane"
     }
   },
   "metadata": {
@@ -106,6 +109,7 @@
     "updated_at": "Zaktualizowano",
     "new_password": "Nowe hasło",
     "password": "Hasło",
+    "confirm_password": "Potwierdź hasło",
     "password_change_placeholder": "Uzupełnij, żeby zmienić",
     "submit": "Zapisz zmiany",
     "submitting": "Zapisywanie...",
@@ -119,7 +123,9 @@
     "email_update_failed": "Nie udało się zmienić emaila",
     "pending_email_info": "Zmiana emaila na {pendingEmail} czeka na potwierdzenie. Do tego czasu loguj się obecnym emailem: {currentEmail}.",
     "password_update_success": "Hasło zostało zmienione",
-    "password_update_failed": "Nie udało się zmienić hasła"
+    "password_update_failed": "Nie udało się zmienić hasła",
+    "password_same_as_old": "Nowe hasło musi różnić się od obecnego",
+    "cancel_email_change": "Anuluj zmianę emaila"
   },
   "landing": {
     "hero": {

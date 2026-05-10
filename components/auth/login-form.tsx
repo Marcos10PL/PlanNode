@@ -14,7 +14,7 @@ import { LINKS } from "@/const";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
-import { createLoginSchema, LoginSchema } from "@/schema";
+import { loginSchema, LoginSchema } from "@/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FieldError } from "../ui/field";
 import { toast } from "sonner";
@@ -31,7 +31,7 @@ export function LoginForm({
   const router = useRouter();
 
   const form = useForm<LoginSchema>({
-    resolver: zodResolver(createLoginSchema(useTranslations("fields.errors"))),
+    resolver: zodResolver(loginSchema(useTranslations("fields.errors"))),
     defaultValues: {
       email: "",
       password: "",

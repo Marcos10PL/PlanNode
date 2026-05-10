@@ -1,13 +1,13 @@
 import { AppSidebar } from "@/components/app-sidebar";
-import Navigation from "@/components/app-navigation";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { routing } from "@/i18n/routing";
 import { hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/dist/client/components/navigation";
-import { Suspense } from "react";
-import NavButtons from "@/components/nav/nav-buttons";
-import { MyAccount } from "@/components/nav/my-account"
+import { MyAccount } from "@/components/nav/my-account";
+import { UserProvider } from "@/components/providers/user-provider";
+import { getProfile } from "@/lib/data";
+import { Card } from "@/components/ui/card";
 
 export function generateStaticParams() {
   return routing.locales.map(locale => ({ locale }));
@@ -28,17 +28,21 @@ export default async function DashboardLayout({
 
   setRequestLocale(locale);
 
-  return (
-    <SidebarProvider>
-      <AppSidebar />
+  const { profile, user } = await getProfile();
 
-      <div className="w-full">
-        <div className="flex justify-between items-center border-b p-2">
-          <SidebarTrigger />
-          <MyAccount />
+  return (
+    <UserProvider profile={profile} user={user}>
+      <SidebarProvider>
+        <AppSidebar />
+
+        <div className="w-full flex flex-col h-screen">
+          <div className="flex justify-between items-center border-b p-2">
+            <SidebarTrigger />
+            <MyAccount />
+          </div>
+          <Card className="flex flex-1 m-2">{children}</Card>
         </div>
-        <div className="p-2">{children}</div>
-      </div>
-    </SidebarProvider>
+      </SidebarProvider>
+    </UserProvider>
   );
 }

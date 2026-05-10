@@ -1,23 +1,19 @@
+import { cache } from "react";
 import { Profile } from "@/types/entities";
 import { createClient } from "../supabase/server";
-import { cacheTag } from "next/cache";
 import { User } from "@supabase/supabase-js";
 
-export const getProfile = async (): Promise<{
+export const getProfile = cache(async (): Promise<{
   profile: Profile;
   user: User;
-} | null> => {
-  "use cache: private";
-
+}> => {
   const supabase = await createClient();
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    return null;
-  }
+  if (!user) throw new Error("Unauthorized");
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -25,7 +21,5 @@ export const getProfile = async (): Promise<{
     .eq("id", user.id)
     .single();
 
-  cacheTag(`profile-${user.id}`);
-
   return { profile, user };
-};
+});

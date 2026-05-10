@@ -27,6 +27,7 @@
     "sign_up_form": {
       "title": "Sign up",
       "description": "Create a new account",
+      "full_name": "Full name",
       "email": "Email",
       "password": "Password",
       "repeat_password": "Repeat Password",
@@ -54,6 +55,7 @@
       "title": "Reset Your Password",
       "description": "Please enter your new password below.",
       "new_password": "New password",
+      "confirm_password": "Confirm password",
       "submit": "Save new password",
       "submitting": "Saving...",
       "error_generic": "An error occurred"
@@ -77,7 +79,8 @@
     "errors": {
       "invalid_email": "Please enter a valid email address",
       "password_too_short": "Password must be at least 6 characters",
-      "passwords_do_not_match": "Passwords do not match"
+      "passwords_do_not_match": "Passwords do not match",
+      "full_name_required": "Full name is required"
     }
   },
   "metadata": {
@@ -106,6 +109,7 @@
     "updated_at": "Updated at",
     "new_password": "New password",
     "password": "Password",
+    "confirm_password": "Confirm password",
     "password_change_placeholder": "Fill in to change",
     "submit": "Save changes",
     "submitting": "Saving...",
@@ -119,7 +123,9 @@
     "email_update_failed": "Could not update email",
     "pending_email_info": "Email change to {pendingEmail} is waiting for confirmation. Until then, sign in using your current email: {currentEmail}.",
     "password_update_success": "Password updated successfully",
-    "password_update_failed": "Could not update password"
+    "password_update_failed": "Could not update password",
+    "password_same_as_old": "New password must be different from the current one",
+    "cancel_email_change": "Cancel email change"
   },
   "landing": {
     "hero": {

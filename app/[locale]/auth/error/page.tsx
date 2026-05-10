@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 
@@ -12,6 +12,7 @@ async function ErrorContent({
 
   return (
     <>
+      <CardTitle className="text-2xl">{t("title")}</CardTitle>
       {params?.error ? (
         <p className="text-sm text-muted-foreground">
           {t("code_error", { error: params.error })}
@@ -31,22 +32,12 @@ export default function Page({
   return (
     <div className="flex flex-col gap-6">
       <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">
-            <TitleContent />
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Suspense>
+        <Suspense>
+          <CardHeader>
             <ErrorContent searchParams={searchParams} />
-          </Suspense>
-        </CardContent>
+          </CardHeader>
+        </Suspense>
       </Card>
     </div>
   );
-}
-
-async function TitleContent() {
-  const t = await getTranslations("auth.error");
-  return t("title");
 }

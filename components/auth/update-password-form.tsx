@@ -16,7 +16,7 @@ import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  createUpdatePasswordSchema,
+  updatePasswordSchema,
   type UpdatePasswordSchema,
 } from "@/schema";
 import { ControlledPasswordField } from "@/components/ui/controlled-password-field";
@@ -31,10 +31,11 @@ export function UpdatePasswordForm({
 
   const form = useForm<UpdatePasswordSchema>({
     resolver: zodResolver(
-      createUpdatePasswordSchema(useTranslations("fields.errors")),
+      updatePasswordSchema(useTranslations("fields.errors")),
     ),
     defaultValues: {
       password: "",
+      confirmPassword: "",
     },
   });
 
@@ -69,6 +70,14 @@ export function UpdatePasswordForm({
               name="password"
               label={t("new_password")}
               placeholder={t("new_password")}
+              autoComplete="new-password"
+            />
+
+            <ControlledPasswordField
+              control={form.control}
+              name="confirmPassword"
+              label={t("confirm_password")}
+              placeholder={t("confirm_password")}
               autoComplete="new-password"
             />
 

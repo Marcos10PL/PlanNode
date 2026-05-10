@@ -15,7 +15,7 @@ import { LINKS } from "@/const";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
-import { createRegisterSchema, RegisterSchema } from "@/schema";
+import { registerSchema, RegisterSchema } from "@/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { ControlledInputField } from "@/components/ui/controlled-input-field";
@@ -32,9 +32,10 @@ export function SignUpForm({
 
   const form = useForm<RegisterSchema>({
     resolver: zodResolver(
-      createRegisterSchema(useTranslations("fields.errors")),
+      registerSchema(useTranslations("fields.errors")),
     ),
     defaultValues: {
+      full_name: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -50,6 +51,7 @@ export function SignUpForm({
         password: data.password,
         options: {
           emailRedirectTo: `${window.location.origin}${LINKS.dashboard}`,
+          data: { full_name: data.full_name },
         },
       });
       if (error) throw error;
@@ -77,6 +79,14 @@ export function SignUpForm({
             onSubmit={form.handleSubmit(onSubmit)}
             className="flex flex-col gap-4"
           >
+            <ControlledInputField
+              control={form.control}
+              name="full_name"
+              label={t("full_name")}
+              placeholder={t("full_name")}
+              autoComplete="name"
+            />
+
             <ControlledInputField
               control={form.control}
               name="email"

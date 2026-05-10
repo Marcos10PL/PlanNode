@@ -19,7 +19,7 @@ import {
 import { Link } from "@/i18n/navigation";
 import { LINKS } from "@/const";
 import {
-  createForgotPasswordSchema,
+  forgotPasswordSchema,
   type ForgotPasswordSchema,
 } from "@/schema";
 import { ControlledInputField } from "@/components/ui/controlled-input-field";
@@ -34,7 +34,7 @@ export function ForgotPasswordForm({
 
   const form = useForm<ForgotPasswordSchema>({
     resolver: zodResolver(
-      createForgotPasswordSchema(useTranslations("fields.errors")),
+      forgotPasswordSchema(useTranslations("fields.errors")),
     ),
     defaultValues: {
       email: "",

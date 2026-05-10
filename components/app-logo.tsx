@@ -23,12 +23,12 @@ export default function AppLogo({ size = "xl" }: Props) {
       href="/"
       className="flex flex-col items-start leading-none select-none max-w-fit"
     >
-      <div className={`font-bold tracking-tighter ${mainSizeMap[size]}`}>
-        <span className="text-neutral-400 font-bold">Plan</span>
+      <div className={`font-semibold tracking-tighter italic ${mainSizeMap[size]}`}>
+        <span className="text-muted-foreground">Plan</span>
         <span className="text-primary">Node</span>
       </div>
 
-      <div className="h-1 w-full bg-linear-to-r from-primary to-transparent rounded-full mt-0.5" />
+      <div className="h-1 w-full bg-linear-to-l from-primary to-transparent rounded-full mt-0.5" />
     </Link>
   );
 }

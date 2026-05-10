@@ -37,7 +37,7 @@ export function FeaturesSection() {
 
   return (
     <Container as="section" className="flex flex-col gap-12 py-16">
-      <h2 className="text-2xl md:text-3xl font-semibold text-center">
+      <h2 id="more" className="text-2xl md:text-3xl font-semibold text-center">
         {t("title")}
       </h2>
 
