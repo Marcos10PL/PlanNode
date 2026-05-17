@@ -1,17 +1,17 @@
 import { z } from "zod";
-import { defaultFields, type Transalations } from "./defaults";
+import { defaultFields, type Translations } from "./defaults";
 
-export const profileAccountSchema = (t?: Transalations) =>
+export const profileAccountSchema = (t?: Translations) =>
   z.object({
     full_name: defaultFields(t).full_name,
   });
 
-export const updateEmailSchema = (t?: Transalations) =>
+export const updateEmailSchema = (t?: Translations) =>
   z.object({
     email: defaultFields(t).email,
   });
 
-export const updatePasswordSchema = (t?: Transalations) =>
+export const updatePasswordSchema = (t?: Translations) =>
   z
     .object({
       password: defaultFields(t).password,
@@ -22,7 +22,7 @@ export const updatePasswordSchema = (t?: Transalations) =>
       path: ["confirmPassword"],
     });
 
-export const profileSettingsSchema = (t?: Transalations) => {
+export const profileSettingsSchema = (t?: Translations) => {
   const fields = defaultFields(t);
   return z
     .object({

@@ -1,8 +1,8 @@
 import z from "zod";
 
-export type Transalations = (key: string) => string;
+export type Translations = (key: string) => string;
 
-export const defaultFields = (t?: Transalations) => {
+export const defaultFields = (t?: Translations) => {
   return {
     email: z.email(t?.("invalid_email")),
     password: z.string().min(6, t?.("password_too_short")),

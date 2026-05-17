@@ -1,5 +1,6 @@
+import { LINKS } from "@/const";
 import { redirect } from "next/navigation";
 
 export default function Page() {
-  return redirect("/auth/login");
+  return redirect(LINKS.login);
 }

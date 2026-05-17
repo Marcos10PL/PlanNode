@@ -19,8 +19,6 @@ export async function updateEmailAction(data: UpdateEmailSchema) {
     email: parsed.data.email,
   });
 
-  console.log(error);
-
   if (error) return { error: ERRORS.serverError };
 
   return { success: true };

@@ -69,7 +69,6 @@ export function LoginForm({
       toast.success(t("logged_in_successfully"));
       router.replace(LINKS.dashboard);
     } catch (error: any) {
-      console.log(error.code);
       if (error.code === "invalid_credentials") {
         toast.error(t("invalid_credentials"));
       } else if (error.code === "email_not_confirmed") {

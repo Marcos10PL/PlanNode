@@ -3,7 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { profileAccountSchema, ProfileAccountSchema } from "@/schema";
-import { ERRORS } from "@/const";
+import { ERRORS, LINKS } from "@/const";
 
 export async function updateProfileAction(data: ProfileAccountSchema) {
   const parsed = profileAccountSchema().safeParse(data);
@@ -23,6 +23,6 @@ export async function updateProfileAction(data: ProfileAccountSchema) {
 
   if (error) return { error: ERRORS.serverError };
 
-  revalidatePath("/app/profile/settings");
+  revalidatePath(LINKS.profileSettings);
   return { success: true };
 }

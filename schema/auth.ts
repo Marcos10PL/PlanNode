@@ -1,14 +1,14 @@
 import { z } from "zod";
-import { defaultFields, Transalations } from "./defaults";
+import { defaultFields, Translations } from "./defaults";
 
-export const loginSchema = (t?: Transalations) => {
+export const loginSchema = (t?: Translations) => {
   return z.object({
     email: defaultFields(t).email,
     password: defaultFields(t).password,
   });
 };
 
-export const registerSchema = (t?: Transalations) => {
+export const registerSchema = (t?: Translations) => {
   return z
     .object({
       full_name: defaultFields(t).full_name,
@@ -22,7 +22,7 @@ export const registerSchema = (t?: Transalations) => {
     });
 };
 
-export const forgotPasswordSchema = (t?: Transalations) => {
+export const forgotPasswordSchema = (t?: Translations) => {
   return z.object({
     email: defaultFields(t).email,
   });
@@ -30,4 +30,6 @@ export const forgotPasswordSchema = (t?: Transalations) => {
 
 export type LoginSchema = z.infer<ReturnType<typeof loginSchema>>;
 export type RegisterSchema = z.infer<ReturnType<typeof registerSchema>>;
-export type ForgotPasswordSchema = z.infer<ReturnType<typeof forgotPasswordSchema>>;
+export type ForgotPasswordSchema = z.infer<
+  ReturnType<typeof forgotPasswordSchema>
+>;

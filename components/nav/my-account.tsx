@@ -34,7 +34,7 @@ export function MyAccount() {
     startTransition(async () => {
       await logout();
       router.refresh();
-      router.replace("/auth/login");
+      router.replace(LINKS.login);
     });
   };
 
