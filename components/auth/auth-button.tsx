@@ -1,7 +1,5 @@
 import { Link } from "@/i18n/navigation";
 import { Button } from "../ui/button";
-import { createClient } from "@/lib/supabase/server";
-import { LogoutButton } from "./logout-button";
 import { getTranslations } from "next-intl/server";
 import { LINKS } from "@/const";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
@@ -9,17 +7,7 @@ import { Suspense } from "react";
 import { Menu } from "lucide-react";
 
 export async function AuthButton() {
-  const supabase = await createClient();
-
-  const { data } = await supabase.auth.getClaims();
-
-  const user = data?.claims;
-
-  return user ? (
-    <div className="flex items-center gap-4">
-      <LogoutButton />
-    </div>
-  ) : (
+  return (
     <>
       <div className="md:hidden flex items-center gap-2">
         <Popover>

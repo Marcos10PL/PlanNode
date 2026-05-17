@@ -1,5 +1,5 @@
 import Logo from "./app-logo";
-import NavButtons from "./elements/nav-buttons";
+import NavButtons from "./nav/nav-buttons";
 import Container from "./ui/container";
 
 export default function AppNavigation() {

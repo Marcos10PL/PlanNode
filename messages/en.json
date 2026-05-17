@@ -14,12 +14,20 @@
       "forgot_password": "Forgot your password?",
       "submit": "Login",
       "submitting": "Logging in...",
+      "logged_in_successfully": "Logged in successfully",
       "no_account": "Don't have an account?",
+      "invalid_credentials": "Invalid email or password",
+      "email_not_confirmed": "Please confirm your email before signing in",
+      "resend_email": "Resend email",
+      "resend_email_success": "Confirmation email has been resent",
+      "resend_email_failed": "Could not resend confirmation email",
+      "login_failed": "Login failed. Please try again.",
       "error_generic": "An error occurred"
     },
-    "signUp": {
+    "sign_up_form": {
       "title": "Sign up",
       "description": "Create a new account",
+      "full_name": "Full name",
       "email": "Email",
       "password": "Password",
       "repeat_password": "Repeat Password",
@@ -27,9 +35,11 @@
       "submit": "Sign up",
       "submitting": "Creating an account...",
       "have_account": "Already have an account?",
+      "user_already_exists": "An account with this email already exists",
+      "sign_up_failed": "Sign up failed. Please try again.",
       "error_generic": "An error occurred"
     },
-    "forgotPassword": {
+    "forgot_password": {
       "title": "Reset Your Password",
       "description": "Type in your email and we'll send you a link to reset your password",
       "email": "Email",
@@ -41,18 +51,23 @@
       "success_description": "Password reset instructions sent",
       "success_message": "If you registered using your email and password, you will receive a password reset email."
     },
-    "updatePassword": {
+    "update_password": {
       "title": "Reset Your Password",
       "description": "Please enter your new password below.",
       "new_password": "New password",
+      "confirm_password": "Confirm password",
       "submit": "Save new password",
       "submitting": "Saving...",
       "error_generic": "An error occurred"
     },
-    "signUpSuccess": {
+    "sign_up_success": {
       "title": "Thank you for signing up!",
       "description": "Check your email to confirm",
-      "message": "You've successfully signed up. Please check your email to confirm your account before signing in."
+      "message": "You've successfully signed up. Please check your email to confirm your account before signing in.",
+      "resend_email": "Resend confirmation email",
+      "resending_email": "Sending...",
+      "resend_email_success": "Confirmation email has been resent",
+      "resend_email_failed": "Could not resend confirmation email"
     },
     "error": {
       "title": "Sorry, something went wrong.",
@@ -60,14 +75,57 @@
       "unspecified": "An unspecified error occurred."
     }
   },
+  "fields": {
+    "errors": {
+      "invalid_email": "Please enter a valid email address",
+      "password_too_short": "Password must be at least 6 characters",
+      "passwords_do_not_match": "Passwords do not match",
+      "full_name_required": "Full name is required"
+    }
+  },
   "metadata": {
     "title": "PlanNode - Project Planning Application",
     "description": "PlanNode is an innovative project planning application that helps teams manage tasks, deadlines, and resources efficiently and clearly."
   },
-  "themeSwitcher": {
+  "theme_switcher": {
     "system": "System",
     "dark": "Dark",
     "light": "Light"
+  },
+  "password_input": {
+    "show": "Show password",
+    "hide": "Hide password"
+  },
+  "profile_settings": {
+    "title": "Profile settings",
+    "description": "Manage your profile data",
+    "full_name": "Full name",
+    "email": "Email",
+    "pending_email": "Pending new email",
+    "new_email": "New email",
+    "role": "Role",
+    "id": "ID",
+    "created_at": "Created at",
+    "updated_at": "Updated at",
+    "new_password": "New password",
+    "password": "Password",
+    "confirm_password": "Confirm password",
+    "password_change_placeholder": "Fill in to change",
+    "submit": "Save changes",
+    "submitting": "Saving...",
+    "update_email": "Change email",
+    "updating_email": "Changing email...",
+    "update_password": "Change password",
+    "updating_password": "Changing password...",
+    "saved_successfully": "Profile saved successfully",
+    "save_failed": "Could not save profile",
+    "email_update_success": "Email update requested. Check your inbox.",
+    "email_update_failed": "Could not update email",
+    "pending_email_info": "Email change to {pendingEmail} is waiting for confirmation. Until then, sign in using your current email: {currentEmail}.",
+    "password_update_success": "Password updated successfully",
+    "password_update_failed": "Could not update password",
+    "password_same_as_old": "New password must be different from the current one",
+    "cancel_email_change": "Cancel email change"
   },
   "landing": {
     "hero": {
@@ -78,7 +136,7 @@
       "cta_secondary": "Learn more",
       "free_note": "Always free · No credit card required"
     },
-    "problemSolution": {
+    "problem_solution": {
       "title": "What does PlanNode offer?",
       "before_label": "Without PlanNode",
       "after_label": "With PlanNode",
@@ -146,5 +204,9 @@
       "subtitle": "Join teams that plan smarter with PlanNode.",
       "button": "Start for free"
     }
+  },
+  "my_account": {
+    "settings": "Settings",
+    "sign_out": "Sign out"
   }
 }

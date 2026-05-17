@@ -14,7 +14,11 @@ import { usePathname, useRouter } from "@/i18n/navigation";
 import { Button } from "./ui/button";
 import { PL, US } from "country-flag-icons/react/3x2";
 
-export default function LanguageSwitcher() {
+type Props = {
+  iconOnly?: boolean;
+};
+
+export default function LanguageSwitcher({ iconOnly = false }: Props) {
   const currentLocale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
@@ -26,8 +30,8 @@ export default function LanguageSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="secondary" size={"sm"}>
-          {currentLocale.toUpperCase()}
+        <Button variant="secondary" size={iconOnly ? "icon" : "sm"}>
+          {!iconOnly ? currentLocale.toUpperCase() : null}
           {getFlagIcon(currentLocale)}
         </Button>
       </DropdownMenuTrigger>

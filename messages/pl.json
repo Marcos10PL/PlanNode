@@ -14,12 +14,20 @@
       "forgot_password": "Zapomniałeś hasła?",
       "submit": "Zaloguj się",
       "submitting": "Logowanie...",
+      "logged_in_successfully": "Zalogowano pomyślnie",
       "no_account": "Nie masz konta?",
+      "invalid_credentials": "Nieprawidłowy email lub hasło",
+      "email_not_confirmed": "Potwierdź adres email przed zalogowaniem",
+      "resend_email": "Wyślij ponownie",
+      "resend_email_success": "Wysłaliśmy ponownie email potwierdzający",
+      "resend_email_failed": "Nie udało się wysłać emaila potwierdzającego",
+      "login_failed": "Logowanie nie powiodło się. Spróbuj ponownie.",
       "error_generic": "Wystąpił błąd"
     },
-    "signUp": {
+    "sign_up_form": {
       "title": "Rejestracja",
       "description": "Utwórz nowe konto",
+      "full_name": "Imię i nazwisko",
       "email": "Email",
       "password": "Hasło",
       "repeat_password": "Powtórz hasło",
@@ -27,9 +35,11 @@
       "submit": "Zarejestruj się",
       "submitting": "Tworzenie konta...",
       "have_account": "Masz już konto?",
+      "user_already_exists": "Konto z tym adresem email już istnieje",
+      "sign_up_failed": "Rejestracja nie powiodła się. Spróbuj ponownie.",
       "error_generic": "Wystąpił błąd"
     },
-    "forgotPassword": {
+    "forgot_password": {
       "title": "Zresetuj hasło",
       "description": "Podaj swój email, a wyślemy Ci link do resetowania hasła",
       "email": "Email",
@@ -41,18 +51,23 @@
       "success_description": "Instrukcje resetowania hasła zostały wysłane",
       "success_message": "Jeśli rejestrowałeś się przy pomocy emaila i hasła, otrzymasz wiadomość z linkiem do resetowania hasła."
     },
-    "updatePassword": {
+    "update_password": {
       "title": "Zresetuj hasło",
       "description": "Wprowadź nowe hasło poniżej.",
       "new_password": "Nowe hasło",
+      "confirm_password": "Potwierdź hasło",
       "submit": "Zapisz nowe hasło",
       "submitting": "Zapisywanie...",
       "error_generic": "Wystąpił błąd"
     },
-    "signUpSuccess": {
+    "sign_up_success": {
       "title": "Dziękujemy za rejestrację!",
       "description": "Sprawdź email, aby potwierdzić konto",
-      "message": "Rejestracja przebiegła pomyślnie. Sprawdź swoją skrzynkę i potwierdź konto przed zalogowaniem."
+      "message": "Rejestracja przebiegła pomyślnie. Sprawdź swoją skrzynkę i potwierdź konto przed zalogowaniem.",
+      "resend_email": "Wyślij email ponownie",
+      "resending_email": "Wysyłanie...",
+      "resend_email_success": "Wysłaliśmy ponownie email potwierdzający",
+      "resend_email_failed": "Nie udało się wysłać emaila potwierdzającego"
     },
     "error": {
       "title": "Coś poszło nie tak.",
@@ -60,14 +75,57 @@
       "unspecified": "Wystąpił nieokreślony błąd."
     }
   },
+  "fields": {
+    "errors": {
+      "invalid_email": "Podaj poprawny adres e-mail",
+      "password_too_short": "Hasło musi mieć co najmniej 6 znaków",
+      "passwords_do_not_match": "Hasła nie są takie same",
+      "full_name_required": "Imię i nazwisko jest wymagane"
+    }
+  },
   "metadata": {
     "title": "PlanNode - Aplikacja do planowania projektów",
     "description": "PlanNode to innowacyjna aplikacja do planowania projektów, która pomaga zespołom zarządzać zadaniami, terminami i zasobami w sposób efektywny i przejrzysty."
   },
-  "themeSwitcher": {
+  "theme_switcher": {
     "system": "System",
     "dark": "Ciemny",
     "light": "Jasny"
+  },
+  "password_input": {
+    "show": "Pokaż hasło",
+    "hide": "Ukryj hasło"
+  },
+  "profile_settings": {
+    "title": "Ustawienia profilu",
+    "description": "Zarządzaj danymi profilu",
+    "full_name": "Imię i nazwisko",
+    "email": "Email",
+    "pending_email": "Oczekujący nowy email",
+    "new_email": "Nowy email",
+    "role": "Rola",
+    "id": "ID",
+    "created_at": "Utworzono",
+    "updated_at": "Zaktualizowano",
+    "new_password": "Nowe hasło",
+    "password": "Hasło",
+    "confirm_password": "Potwierdź hasło",
+    "password_change_placeholder": "Uzupełnij, żeby zmienić",
+    "submit": "Zapisz zmiany",
+    "submitting": "Zapisywanie...",
+    "update_email": "Zmień email",
+    "updating_email": "Zmiana emaila...",
+    "update_password": "Zmień hasło",
+    "updating_password": "Zmiana hasła...",
+    "saved_successfully": "Profil został zapisany",
+    "save_failed": "Nie udało się zapisać profilu",
+    "email_update_success": "Zlecono zmianę emaila. Sprawdź skrzynkę.",
+    "email_update_failed": "Nie udało się zmienić emaila",
+    "pending_email_info": "Zmiana emaila na {pendingEmail} czeka na potwierdzenie. Do tego czasu loguj się obecnym emailem: {currentEmail}.",
+    "password_update_success": "Hasło zostało zmienione",
+    "password_update_failed": "Nie udało się zmienić hasła",
+    "password_same_as_old": "Nowe hasło musi różnić się od obecnego",
+    "cancel_email_change": "Anuluj zmianę emaila"
   },
   "landing": {
     "hero": {
@@ -78,7 +136,7 @@
       "cta_secondary": "Dowiedz się więcej",
       "free_note": "Zawsze za darmo · Bez karty kredytowej"
     },
-    "problemSolution": {
+    "problem_solution": {
       "title": "Co daje PlanNode?",
       "before_label": "Bez PlanNode",
       "after_label": "Z PlanNode",
@@ -146,5 +204,9 @@
       "subtitle": "Dołącz do zespołów, które planują mądrzej z PlanNode.",
       "button": "Zacznij za darmo"
     }
+  },
+  "my_account": {
+    "settings": "Ustawienia",
+    "sign_out": "Wyloguj się"
   }
 }

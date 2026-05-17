@@ -6,6 +6,8 @@ import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { Toaster } from "@/components/ui/sonner";
+import AppFooter from "@/components/app-footer";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("metadata");
@@ -56,6 +58,8 @@ export default async function RootLayout({ children, params }: Props) {
         >
           <NextIntlClientProvider locale={locale}>
             {children}
+            <Toaster />
+            <AppFooter />
           </NextIntlClientProvider>
         </ThemeProvider>
       </body>

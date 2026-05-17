@@ -1,10 +1,10 @@
+"use client";
+
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -16,9 +16,25 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { ChevronDown, Plus } from "lucide-react";
+import { ChartNoAxesGantt, ChevronDown, LayoutDashboard } from "lucide-react";
+import { ThemeSwitcher } from "./theme-switcher";
+import LanguageSwitcher from "./language-switcher";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { usePathname } from "@/i18n/navigation";
+import { LINKS } from "@/const";
 
 export function AppSidebar() {
+  const pathname = usePathname();
+
+  const isActive = (href: string) => {
+    const cleanPathname = pathname.replace(/^\/[a-z]{2}(?=\/|$)/, "");
+
+    return (
+      cleanPathname === href &&
+      "bg-accent text-accent-foreground cursor-default!"
+    );
+  };
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
@@ -27,7 +43,8 @@ export function AppSidebar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>
-                  Select Workspace
+                  <ChartNoAxesGantt className="mr-2" />
+                  <span className="line-clamp-1">Select Workspace</span>
                   <ChevronDown className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
@@ -41,6 +58,20 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <Link
+                href={LINKS.dashboard}
+                className={cn(isActive(LINKS.dashboard))}
+              >
+                <LayoutDashboard className="mr-2" />
+                Dashboard
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarGroup>
+
+        {/* <SidebarGroup>
           <SidebarGroupLabel>Projects</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -52,16 +83,18 @@ export function AppSidebar() {
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
-        </SidebarGroup>
+        </SidebarGroup> */}
       </SidebarContent>
-      <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton>
-              Moje konto
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+      <SidebarFooter className="border-t">
+        <div className="flex items-center gap-2 group-data-[collapsible=icon]:hidden">
+          <LanguageSwitcher />
+          <ThemeSwitcher />
+        </div>
+
+        <div className="hidden items-center justify-center gap-2 group-data-[collapsible=icon]:flex flex-col">
+          <LanguageSwitcher iconOnly />
+          <ThemeSwitcher />
+        </div>
       </SidebarFooter>
     </Sidebar>
   );
