@@ -80,7 +80,8 @@
       "invalid_email": "Podaj poprawny adres e-mail",
       "password_too_short": "Hasło musi mieć co najmniej 6 znaków",
       "passwords_do_not_match": "Hasła nie są takie same",
-      "full_name_required": "Imię i nazwisko jest wymagane"
+      "full_name_required": "Imię i nazwisko jest wymagane",
+      "field_required": "To pole jest wymagane"
     }
   },
   "metadata": {
@@ -208,5 +209,38 @@
   "my_account": {
     "settings": "Ustawienia",
     "sign_out": "Wyloguj się"
+  },
+  "workspace": {
+    "workspaces": {
+      "title": "Przestrzenie robocze",
+      "settings": "Ustawienia"
+    },
+    "create": {
+      "title": "Utwórz przestrzeń roboczą",
+      "name_label": "Nazwa",
+      "name_placeholder": "Mój zespół",
+      "description_label": "Opis",
+      "description_placeholder": "Do czego służy ta przestrzeń?",
+      "description": "Wypełnij szczegóły swojej nowej przestrzeni roboczej.",
+      "submit": "Utwórz",
+      "submitting": "Tworzenie...",
+      "success": "Przestrzeń robocza została utworzona",
+      "error": "Nie udało się utworzyć przestrzeni roboczej",
+      "set_active_title": "Ustawić jako aktywną?",
+      "set_active_description": "Czy chcesz teraz przełączyć się na \"{name}\"?",
+      "set_active_yes": "Tak, przełącz",
+      "set_active_no": "Nie"
+    }
+  },
+  "no_workspace_banner": {
+    "title": "Utwórz swoją pierwszą przestrzeń roboczą",
+    "description": "Przestrzeń robocza to wspólne miejsce dla Twojego zespołu do zarządzania projektami i zadaniami.",
+    "cta": "Utwórz przestrzeń"
+  },
+  "profile_workspaces": {
+    "title": "Przestrzenie robocze",
+    "description": "Zarządzaj swoimi przestrzeniami roboczymi",
+    "create_workspace": "Nowa przestrzeń",
+    "no_workspaces": "Nie masz jeszcze żadnych przestrzeni roboczych."
   }
 }

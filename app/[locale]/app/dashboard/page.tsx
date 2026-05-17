@@ -1,7 +1,9 @@
-export default async function DashboardPage() {
+import { NoWorkspaceBanner } from "@/components/workspaces/no-workspace-banner";
+
+export default function DashboardPage() {
   return (
-    <div>
-      <h1 className="text-2xl font-bold">Dashboard</h1>
+    <div className="w-full flex flex-col justify-center items-center gap-6 p-6">
+      <NoWorkspaceBanner />
     </div>
   );
 }

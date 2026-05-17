@@ -1,41 +1,44 @@
 import { z } from "zod";
-import { defaultFields, type Translations } from "./defaults";
+import {
+  emailField,
+  passwordField,
+  fullNameField,
+  type Translations,
+} from "./defaults";
 
 export const profileAccountSchema = (t?: Translations) =>
   z.object({
-    full_name: defaultFields(t).full_name,
+    full_name: fullNameField(t),
   });
 
 export const updateEmailSchema = (t?: Translations) =>
   z.object({
-    email: defaultFields(t).email,
+    email: emailField(t),
   });
 
 export const updatePasswordSchema = (t?: Translations) =>
   z
     .object({
-      password: defaultFields(t).password,
-      confirmPassword: defaultFields(t).password,
+      password: passwordField(t),
+      confirmPassword: passwordField(t),
     })
     .refine(data => data.password === data.confirmPassword, {
-      message: t?.("passwords_do_not_match") ?? "passwords_do_not_match",
+      message: t?.("passwords_do_not_match"),
       path: ["confirmPassword"],
     });
 
-export const profileSettingsSchema = (t?: Translations) => {
-  const fields = defaultFields(t);
-  return z
+export const profileSettingsSchema = (t?: Translations) =>
+  z
     .object({
-      full_name: fields.full_name,
-      email: fields.email,
-      password: z.union([fields.password, z.literal("")]),
+      full_name: fullNameField(t),
+      email: emailField(t),
+      password: z.union([passwordField(t), z.literal("")]),
       confirmPassword: z.string(),
     })
     .refine(data => !data.password || data.password === data.confirmPassword, {
-      message: t?.("passwords_do_not_match") ?? "passwords_do_not_match",
+      message: t?.("passwords_do_not_match"),
       path: ["confirmPassword"],
     });
-};
 
 export type ProfileAccountSchema = z.infer<
   ReturnType<typeof profileAccountSchema>

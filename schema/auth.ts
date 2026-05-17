@@ -1,20 +1,20 @@
 import { z } from "zod";
-import { defaultFields, Translations } from "./defaults";
+import { emailField, passwordField, fullNameField, Translations } from "./defaults";
 
 export const loginSchema = (t?: Translations) => {
   return z.object({
-    email: defaultFields(t).email,
-    password: defaultFields(t).password,
+    email: emailField(t),
+    password: passwordField(t),
   });
 };
 
 export const registerSchema = (t?: Translations) => {
   return z
     .object({
-      full_name: defaultFields(t).full_name,
-      email: defaultFields(t).email,
-      password: defaultFields(t).password,
-      confirmPassword: defaultFields(t).password,
+      full_name: fullNameField(t),
+      email: emailField(t),
+      password: passwordField(t),
+      confirmPassword: passwordField(t),
     })
     .refine(data => data.password === data.confirmPassword, {
       message: t?.("passwords_do_not_match") ?? "passwords_do_not_match",
@@ -24,7 +24,7 @@ export const registerSchema = (t?: Translations) => {
 
 export const forgotPasswordSchema = (t?: Translations) => {
   return z.object({
-    email: defaultFields(t).email,
+    email: emailField(t),
   });
 };
 

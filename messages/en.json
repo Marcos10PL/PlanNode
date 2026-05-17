@@ -80,7 +80,8 @@
       "invalid_email": "Please enter a valid email address",
       "password_too_short": "Password must be at least 6 characters",
       "passwords_do_not_match": "Passwords do not match",
-      "full_name_required": "Full name is required"
+      "full_name_required": "Full name is required",
+      "field_required": "This field is required"
     }
   },
   "metadata": {
@@ -208,5 +209,38 @@
   "my_account": {
     "settings": "Settings",
     "sign_out": "Sign out"
+  },
+  "workspace": {
+    "workspaces": {
+      "title": "Workspaces",
+      "settings": "Settings"
+    },
+    "create": {
+      "title": "Create workspace",
+      "name_label": "Name",
+      "name_placeholder": "My team",
+      "description_label": "Description",
+      "description_placeholder": "What is this workspace for?",
+      "description": "Fill in the details for your new workspace.",
+      "submit": "Create",
+      "submitting": "Creating...",
+      "success": "Workspace created",
+      "error": "Could not create workspace",
+      "set_active_title": "Set as active workspace?",
+      "set_active_description": "Do you want to switch to \"{name}\" right now?",
+      "set_active_yes": "Yes, switch",
+      "set_active_no": "No"
+    }
+  },
+  "no_workspace_banner": {
+    "title": "Create your first workspace",
+    "description": "A workspace is a shared space for your team to manage projects and tasks.",
+    "cta": "Create workspace"
+  },
+  "profile_workspaces": {
+    "title": "Workspaces",
+    "description": "Manage your workspaces",
+    "create_workspace": "New workspace",
+    "no_workspaces": "You don't have any workspaces yet."
   }
 }

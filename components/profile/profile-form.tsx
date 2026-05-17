@@ -23,6 +23,7 @@ import { updatePasswordAction } from "@/actions/profile/update-password";
 import { useUser } from "@/components/providers/user-provider";
 import { formatDate } from "@/lib/utils";
 import { ERRORS } from "@/const";
+import { VALIDATION_MAX } from "@/const";
 
 export function ProfileForm() {
   const { profile, user } = useUser();
@@ -102,6 +103,7 @@ export function ProfileForm() {
             name="full_name"
             label={t("full_name")}
             placeholder={t("full_name")}
+            maxLength={VALIDATION_MAX.FULL_NAME}
             autoComplete="name"
           />
 
