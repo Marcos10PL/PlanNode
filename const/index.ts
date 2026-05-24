@@ -10,8 +10,8 @@ export const LINKS = {
 
   app: "/app",
   dashboard: "/app/dashboard",
-  profileSettings: "/app/profile/settings",
-  profileWorkspaces: "/app/profile/workspaces",
+  profileSettings: "/app/settings/profile",
+  profileWorkspaces: "/app/settings/workspaces",
 } as const;
 
 export const USER_ROLES = {
@@ -24,11 +24,12 @@ export const ERRORS = {
   invalidData: "invalid_data",
   serverError: "server_error",
   samePassword: "same_password",
+  workspaceLimitReached: "workspace_limit_reached",
 } as const;
 
 export const VALIDATION_MAX = {
   FULL_NAME: 100,
-  WORKSPACE_NAME: 100,
+  WORKSPACE_NAME: 50,
   WORKSPACE_DESCRIPTION: 500,
 } as const;
 

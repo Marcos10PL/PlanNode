@@ -226,11 +226,39 @@
       "submitting": "Tworzenie...",
       "success": "Przestrzeń robocza została utworzona",
       "error": "Nie udało się utworzyć przestrzeni roboczej",
+      "limit_reached": "Osiągnąłeś maksymalną liczbę przestrzeni roboczych",
       "set_active_title": "Ustawić jako aktywną?",
       "set_active_description": "Czy chcesz teraz przełączyć się na \"{name}\"?",
       "set_active_yes": "Tak, przełącz",
       "set_active_no": "Nie"
+    },
+    "edit": {
+      "title": "Edytuj przestrzeń roboczą",
+      "description": "Zaktualizuj szczegóły swojej przestrzeni roboczej.",
+      "name_label": "Nazwa",
+      "name_placeholder": "Mój zespół",
+      "description_label": "Opis",
+      "description_placeholder": "Do czego służy ta przestrzeń?",
+      "submit": "Zapisz zmiany",
+      "submitting": "Zapisywanie...",
+      "success": "Przestrzeń robocza zaktualizowana",
+      "error": "Nie udało się zaktualizować przestrzeni roboczej",
+      "cancel": "Anuluj"
+    },
+    "delete": {
+      "title": "Usuń przestrzeń roboczą",
+      "description": "Tej operacji nie można cofnąć. Wpisz nazwę swojej przestrzeni roboczej, aby potwierdzić.",
+      "confirm_label": "Nazwa przestrzeni roboczej",
+      "submit": "Usuń przestrzeń roboczą",
+      "submitting": "Usuwanie...",
+      "success": "Przestrzeń robocza została usunięta",
+      "error": "Nie udało się usunąć przestrzeni roboczej",
+      "cancel": "Anuluj"
     }
+  },
+  "settings": {
+    "profile": "Profil",
+    "workspace": "Przestrzenie robocze"
   },
   "no_workspace_banner": {
     "title": "Utwórz swoją pierwszą przestrzeń roboczą",
@@ -241,6 +269,8 @@
     "title": "Przestrzenie robocze",
     "description": "Zarządzaj swoimi przestrzeniami roboczymi",
     "create_workspace": "Nowa przestrzeń",
-    "no_workspaces": "Nie masz jeszcze żadnych przestrzeni roboczych."
+    "no_workspaces": "Nie masz jeszcze żadnych przestrzeni roboczych.",
+    "edit": "Edytuj",
+    "delete": "Usuń"
   }
 }

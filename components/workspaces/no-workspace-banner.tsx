@@ -2,8 +2,8 @@
 
 import { useWorkspaces } from "@/components/providers/workspace-provider";
 import { CreateWorkspaceModal } from "@/components/workspaces/create-workspace-modal";
-import { useTranslations } from "next-intl";
 import { ChartNoAxesGantt } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export function NoWorkspaceBanner() {
   const { workspaces } = useWorkspaces();

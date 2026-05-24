@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useTranslations } from "next-intl";
-import { toast } from "sonner";
+import { createWorkspaceAction } from "@/actions/workspace/create-workspace";
+import { useWorkspaces } from "@/components/providers/workspace-provider";
+import { Button } from "@/components/ui/button";
+import { ControlledInputField } from "@/components/ui/controlled-input-field";
+import { ControlledTextareaField } from "@/components/ui/controlled-textarea-field";
 import {
   Dialog,
   DialogContent,
@@ -13,14 +13,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { ControlledInputField } from "@/components/ui/controlled-input-field";
-import { ControlledTextareaField } from "@/components/ui/controlled-textarea-field";
+import { ERRORS, VALIDATION_MAX } from "@/const";
 import { createWorkspaceSchema, CreateWorkspaceSchema } from "@/schema";
-import { createWorkspaceAction } from "@/actions/workspace/create-workspace";
-import { VALIDATION_MAX } from "@/const";
-import { useWorkspaces } from "@/components/providers/workspace-provider";
 import { Workspace } from "@/types/entities";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 type Step = "form" | "confirm-active";
 
@@ -38,31 +38,36 @@ export function CreateWorkspaceModal() {
     defaultValues: { name: "", description: "" },
   });
 
-  function handleClose() {
-    setOpen(false);
+  const handleClose = () => setOpen(false);
+
+  const resetState = () => {
     setStep("form");
     setCreated(null);
     form.reset();
-  }
+  };
 
-  async function onSubmit(data: CreateWorkspaceSchema) {
+  const onSubmit = async (data: CreateWorkspaceSchema) => {
     const result = await createWorkspaceAction(data);
 
-    if ("error" in result) {
-      toast.error(t("create.error"));
+    if (result.error) {
+      toast.error(
+        result.error === ERRORS.workspaceLimitReached
+          ? t("create.limit_reached")
+          : t("create.error"),
+      );
       return;
     }
 
     toast.success(t("create.success"));
 
     if (workspaces.length === 0) {
-      // setActiveWorkspace(result.workspace);
+      setActiveWorkspace(result.workspace);
       handleClose();
     } else {
       setCreated(result.workspace);
       setStep("confirm-active");
     }
-  }
+  };
 
   return (
     <Dialog
@@ -75,7 +80,11 @@ export function CreateWorkspaceModal() {
       <DialogTrigger asChild>
         <Button>{tProfile("create_workspace")}</Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent
+        onAnimationEnd={() => {
+          if (!open) resetState();
+        }}
+      >
         {step === "form" ? (
           <>
             <DialogHeader>

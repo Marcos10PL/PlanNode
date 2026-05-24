@@ -7,7 +7,6 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Toaster } from "@/components/ui/sonner";
-import AppFooter from "@/components/app-footer";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("metadata");
@@ -48,7 +47,7 @@ export default async function RootLayout({ children, params }: Props) {
   setRequestLocale(locale);
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning data-scroll-behavior="smooth">
       <body className={`${geistSans.className} antialiased`}>
         <ThemeProvider
           attribute="class"
@@ -59,7 +58,6 @@ export default async function RootLayout({ children, params }: Props) {
           <NextIntlClientProvider locale={locale}>
             {children}
             <Toaster />
-            <AppFooter />
           </NextIntlClientProvider>
         </ThemeProvider>
       </body>

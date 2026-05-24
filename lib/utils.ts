@@ -5,6 +5,11 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export function isActivePath(pathname: string, href: string) {
+  const clean = pathname.replace(/^\/[a-z]{2}(?=\/|$)/, "");
+  return clean === href;
+}
+
 export function formatDate(value: string | null, locale: string) {
   if (!value) return "--";
 

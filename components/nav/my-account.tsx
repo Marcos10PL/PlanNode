@@ -17,7 +17,7 @@ import { Avatar, AvatarFallback } from "../ui/avatar";
 import { logout } from "@/actions/auth/logout";
 import { useTransition } from "react";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { cn, isActivePath } from "@/lib/utils";
 import { useUser } from "../providers/user-provider";
 
 export function MyAccount() {
@@ -38,14 +38,8 @@ export function MyAccount() {
     });
   };
 
-  const isActive = (href: string) => {
-    const cleanPathname = pathname.replace(/^\/[a-z]{2}(?=\/|$)/, "");
-
-    return (
-      cleanPathname === href &&
-      "bg-accent text-accent-foreground cursor-default!"
-    );
-  };
+  const isActive = (href: string) =>
+    isActivePath(pathname, href) && "bg-accent text-accent-foreground cursor-default!";
 
   return (
     <DropdownMenu>

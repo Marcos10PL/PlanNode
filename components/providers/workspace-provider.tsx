@@ -1,8 +1,8 @@
 "use client";
 
-import { createContext, useContext, useState, useTransition } from "react";
-import { Workspace } from "@/types/entities";
 import { setActiveWorkspaceAction } from "@/actions/workspace/set-active-workspace";
+import { Workspace } from "@/types/entities";
+import { createContext, useContext, useState, useTransition } from "react";
 
 type WorkspaceContextValue = {
   workspaces: Workspace[];
@@ -28,10 +28,10 @@ export function WorkspaceProvider({
   const [activeWorkspace, setActive] = useState<Workspace | null>(initial);
   const [isPending, startTransition] = useTransition();
 
-  function setActiveWorkspace(workspace: Workspace) {
+  const setActiveWorkspace = (workspace: Workspace) => {
     setActive(workspace);
     startTransition(() => setActiveWorkspaceAction(workspace.id));
-  }
+  };
 
   return (
     <WorkspaceContext

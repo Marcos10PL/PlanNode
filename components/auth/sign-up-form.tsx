@@ -31,9 +31,7 @@ export function SignUpForm({
   const router = useRouter();
 
   const form = useForm<RegisterSchema>({
-    resolver: zodResolver(
-      registerSchema(useTranslations("fields.errors")),
-    ),
+    resolver: zodResolver(registerSchema(useTranslations("fields.errors"))),
     defaultValues: {
       full_name: "",
       email: "",
@@ -62,6 +60,7 @@ export function SignUpForm({
       if (error.code === "user_already_exists") {
         toast.error(t("user_already_exists"));
       } else {
+        console.log(error);
         toast.error(t("sign_up_failed"));
       }
     }

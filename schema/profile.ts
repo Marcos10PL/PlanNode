@@ -1,10 +1,6 @@
+import { Translations } from "@/types";
 import { z } from "zod";
-import {
-  emailField,
-  passwordField,
-  fullNameField,
-  type Translations,
-} from "./defaults";
+import { emailField, fullNameField, passwordField } from "./defaults";
 
 export const profileAccountSchema = (t?: Translations) =>
   z.object({

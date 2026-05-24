@@ -7,6 +7,10 @@ export type Workspace = {
   updated_at: string;
 };
 
+export type AppConfig = {
+  max_workspaces_per_user: number;
+};
+
 export type Profile = {
   id: string;
   full_name: string;

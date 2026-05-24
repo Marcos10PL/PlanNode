@@ -226,11 +226,39 @@
       "submitting": "Creating...",
       "success": "Workspace created",
       "error": "Could not create workspace",
+      "limit_reached": "You have reached the maximum number of workspaces",
       "set_active_title": "Set as active workspace?",
       "set_active_description": "Do you want to switch to \"{name}\" right now?",
       "set_active_yes": "Yes, switch",
       "set_active_no": "No"
+    },
+    "edit": {
+      "title": "Edit workspace",
+      "description": "Update your workspace details.",
+      "name_label": "Name",
+      "name_placeholder": "My team",
+      "description_label": "Description",
+      "description_placeholder": "What is this workspace for?",
+      "submit": "Save changes",
+      "submitting": "Saving...",
+      "success": "Workspace updated",
+      "error": "Could not update workspace",
+      "cancel": "Cancel"
+    },
+    "delete": {
+      "title": "Delete workspace",
+      "description": "This action cannot be undone. Type the workspace name to confirm.",
+      "confirm_label": "Workspace name",
+      "submit": "Delete workspace",
+      "submitting": "Deleting...",
+      "success": "Workspace deleted",
+      "error": "Could not delete workspace",
+      "cancel": "Cancel"
     }
+  },
+  "settings": {
+    "profile": "Profile",
+    "workspace": "Workspaces"
   },
   "no_workspace_banner": {
     "title": "Create your first workspace",
@@ -241,6 +269,8 @@
     "title": "Workspaces",
     "description": "Manage your workspaces",
     "create_workspace": "New workspace",
-    "no_workspaces": "You don't have any workspaces yet."
+    "no_workspaces": "You don't have any workspaces yet.",
+    "edit": "Edit",
+    "delete": "Delete"
   }
 }

@@ -1,7 +1,6 @@
 import { VALIDATION_MAX } from "@/const";
+import { Translations } from "@/types"
 import z from "zod";
-
-export type Translations = (key: string) => string;
 
 export const emailField = (t?: Translations) => z.email(t?.("invalid_email"));
 
