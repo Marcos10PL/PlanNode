@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 import Link from "next/link";
 
 type Sizes = "sm" | "md" | "xl" | "lg" | "2xl" | "3xl" | "4xl" | "5xl";

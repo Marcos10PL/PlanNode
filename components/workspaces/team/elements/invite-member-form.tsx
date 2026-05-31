@@ -1,0 +1,72 @@
+"use client";
+
+import { inviteMemberAction } from "@/actions/workspace/invite-member";
+import { Button } from "@/components/ui/button";
+import { ControlledInputField } from "@/components/ui/controlled-input-field";
+import { ControlledSelectField } from "@/components/ui/controlled-select-field";
+import { ERRORS, INVITABLE_ROLES, WORKSPACE_ROLES } from "@/const";
+import { inviteMemberSchema, InviteMemberSchema } from "@/schema";
+import { getRoleLabel } from "@/utils";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+
+export function InviteMemberForm({ workspaceId }: { workspaceId: string }) {
+  const t = useTranslations();
+  const tErrors = useTranslations("fields.errors");
+
+  const form = useForm<InviteMemberSchema>({
+    resolver: zodResolver(inviteMemberSchema(tErrors)),
+    defaultValues: { email: "", role: WORKSPACE_ROLES.MEMBER },
+  });
+
+  const roleOptions = INVITABLE_ROLES.map(r => ({
+    value: r,
+    label: getRoleLabel(r, t),
+  }));
+
+  const onSubmit = async (data: InviteMemberSchema) => {
+    const result = await inviteMemberAction(workspaceId, data);
+    if (result?.error === ERRORS.alreadyMember) {
+      toast.error(t("team.invite_already_member"));
+    } else if (result?.error) {
+      toast.error(t("team.invite_error"));
+    } else {
+      toast.success(t("team.invite_success"));
+      form.reset();
+    }
+  };
+
+  const isPending = form.formState.isSubmitting;
+
+  return (
+    <form
+      onSubmit={form.handleSubmit(onSubmit)}
+      className="flex flex-col gap-2 border rounded-md p-4"
+    >
+      <div className="flex-1">
+        <ControlledInputField
+          control={form.control}
+          name="email"
+          type="email"
+          label={t("team.invite_email_label")}
+          placeholder={t("team.invite_email_placeholder")}
+          disabled={isPending}
+        />
+      </div>
+      <div className="flex gap-2 mt-2 items-end">
+        <ControlledSelectField
+          control={form.control}
+          name="role"
+          label={t("team.invite_role_label")}
+          options={roleOptions}
+          disabled={isPending}
+        />
+        <Button type="submit" disabled={isPending} className=" min-w-1/4">
+          {isPending ? t("team.invite_submitting") : t("team.invite_submit")}
+        </Button>
+      </div>
+    </form>
+  );
+}

@@ -1,15 +1,9 @@
-"use client";
-
-import { useWorkspaces } from "@/components/providers/workspace-provider";
 import { CreateWorkspaceModal } from "@/components/workspaces/create-workspace-modal";
 import { ChartNoAxesGantt } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 export function NoWorkspaceBanner() {
-  const { workspaces } = useWorkspaces();
   const t = useTranslations("no_workspace_banner");
-
-  if (workspaces.length > 0) return null;
 
   return (
     <div className="flex flex-col items-center justify-center gap-4 text-center px-4">

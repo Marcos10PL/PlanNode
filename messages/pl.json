@@ -258,7 +258,8 @@
   },
   "settings": {
     "profile": "Profil",
-    "workspace": "Przestrzenie robocze"
+    "workspace": "Przestrzenie robocze",
+    "team": "Zespół"
   },
   "no_workspace_banner": {
     "title": "Utwórz swoją pierwszą przestrzeń roboczą",
@@ -271,6 +272,62 @@
     "create_workspace": "Nowa przestrzeń",
     "no_workspaces": "Nie masz jeszcze żadnych przestrzeni roboczych.",
     "edit": "Edytuj",
-    "delete": "Usuń"
+    "delete": "Usuń",
+    "leave": "Opuść przestrzeń",
+    "cannot_leave_as_owner": "Właściciel nie może opuścić przestrzeni roboczej. Usuń ją lub przekaż własność.",
+    "leave_success": "Opuściłeś przestrzeń roboczą",
+    "leave_error": "Nie udało się opuścić przestrzeni roboczej"
+  },
+  "team": {
+    "title": "Zespół",
+    "workspace_context": "Dotyczy wybranej przestrzeni: {name}",
+    "no_active_workspace": "Brak aktywnej przestrzeni roboczej. Najpierw wybierz przestrzeń.",
+    "members_section": "Członkowie",
+    "invitations_section": "Oczekujące zaproszenia",
+    "no_members": "Brak członków.",
+    "no_invitations": "Brak oczekujących zaproszeń.",
+    "invite_email_label": "Adres e-mail",
+    "invite_email_placeholder": "kolega@firma.pl",
+    "invite_role_label": "Rola",
+    "invite_submit": "Zaproś",
+    "invite_submitting": "Zapraszanie...",
+    "invite_success": "Zaproszenie wysłane",
+    "invite_error": "Nie udało się wysłać zaproszenia",
+    "invite_already_member": "Ta osoba jest już członkiem lub ma oczekujące zaproszenie",
+    "revoke": "Cofnij",
+    "revoke_success": "Zaproszenie cofnięte",
+    "revoke_error": "Nie udało się cofnąć zaproszenia",
+    "remove_member": "Usuń",
+    "remove_member_success": "Członek usunięty",
+    "remove_member_error": "Nie udało się usunąć członka",
+    "change_role": "Zmień rolę",
+    "change_role_submit": "Zapisz",
+    "change_role_success": "Rola zaktualizowana",
+    "change_role_error": "Nie udało się zaktualizować roli",
+    "role_owner": "Właściciel",
+    "role_admin": "Administrator",
+    "role_member": "Członek",
+    "role_guest": "Gość"
+  },
+  "notifications": {
+    "title": "Powiadomienia",
+    "mark_all_read": "Oznacz wszystkie jako przeczytane",
+    "delete_all": "Usuń wszystkie",
+    "empty": "Brak powiadomień",
+    "new_badge": "Nowe",
+    "delete": "Usuń",
+    "view": "Przejdź"
+  },
+  "invite_page": {
+    "title": "Zaproszenie do przestrzeni roboczej",
+    "invited_by": "{name} zaprasza Cię do",
+    "role_label": "Twoja rola",
+    "accept": "Akceptuj",
+    "decline": "Odrzuć",
+    "accepting": "Akceptowanie...",
+    "declining": "Odrzucanie...",
+    "error_not_found": "To zaproszenie nie istnieje lub zostało już wykorzystane.",
+    "error_expired": "To zaproszenie wygasło.",
+    "error_email_mismatch": "To zaproszenie zostało wysłane na inny adres e-mail."
   }
 }

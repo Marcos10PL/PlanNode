@@ -2,8 +2,8 @@
 
 import { LINKS } from "@/const";
 import { usePathname } from "@/i18n/navigation";
-import { cn, isActivePath } from "@/lib/utils";
 import { Translations } from "@/types";
+import { cn, isActivePath } from "@/utils";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 
@@ -15,6 +15,10 @@ const navItems = (t: Translations) => [
   {
     label: t("settings.workspace"),
     href: LINKS.profileWorkspaces,
+  },
+  {
+    label: t("settings.team"),
+    href: LINKS.team,
   },
 ];
 

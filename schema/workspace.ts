@@ -12,7 +12,7 @@ export const createWorkspaceSchema = (t?: Translations) =>
 export const inviteMemberSchema = (t?: Translations) =>
   z.object({
     email: emailField(t),
-    role: z.enum(WORKSPACE_ROLES).default(WORKSPACE_ROLES.MEMBER),
+    role: z.enum(WORKSPACE_ROLES),
   });
 
 export const updateMemberRoleSchema = () =>

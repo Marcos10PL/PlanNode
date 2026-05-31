@@ -11,8 +11,8 @@ import {
 } from "@/components/ui/card";
 import { ControlledPasswordField } from "@/components/ui/controlled-password-field";
 import { LINKS } from "@/const";
-import { cn } from "@/lib/utils";
 import { updatePasswordSchema, type UpdatePasswordSchema } from "@/schema";
+import { cn } from "@/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";

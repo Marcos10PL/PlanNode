@@ -12,8 +12,8 @@ import {
 import { ControlledInputField } from "@/components/ui/controlled-input-field";
 import { ControlledPasswordField } from "@/components/ui/controlled-password-field";
 import { ERRORS, LINKS } from "@/const";
-import { cn } from "@/lib/utils";
 import { registerSchema, RegisterSchema } from "@/schema";
+import { cn } from "@/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";

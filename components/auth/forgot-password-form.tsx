@@ -18,8 +18,8 @@ import {
 import { ControlledInputField } from "@/components/ui/controlled-input-field";
 import { LINKS } from "@/const";
 import { Link } from "@/i18n/navigation";
-import { cn } from "@/lib/utils";
 import { forgotPasswordSchema, type ForgotPasswordSchema } from "@/schema";
+import { cn } from "@/utils";
 
 export function ForgotPasswordForm({
   className,

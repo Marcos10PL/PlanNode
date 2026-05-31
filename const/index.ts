@@ -12,6 +12,8 @@ export const LINKS = {
   dashboard: "/app/dashboard",
   profileSettings: "/app/settings/profile",
   profileWorkspaces: "/app/settings/workspaces",
+  team: "/app/settings/team",
+  notifications: "/app/notifications",
 } as const;
 
 export const USER_ROLES = {
@@ -28,6 +30,13 @@ export const ERRORS = {
   invalidCredentials: "invalid_credentials",
   emailNotConfirmed: "email_not_confirmed",
   userAlreadyExists: "user_already_exists",
+  invitationNotFound: "invitation_not_found",
+  invitationExpired: "invitation_expired",
+  invitationEmailMismatch: "invitation_email_mismatch",
+  alreadyMember: "already_member",
+  insufficientRole: "insufficient_role",
+  cannotRemoveOwner: "cannot_remove_owner",
+  cannotLeaveAsOwner: "cannot_leave_as_owner",
 } as const;
 
 export const VALIDATION_MAX = {
@@ -45,4 +54,24 @@ export const WORKSPACE_ROLES = {
   ADMIN: "admin",
   MEMBER: "member",
   GUEST: "guest",
+} as const;
+
+export const INVITABLE_ROLES = [
+  WORKSPACE_ROLES.ADMIN,
+  WORKSPACE_ROLES.MEMBER,
+  WORKSPACE_ROLES.GUEST,
+] as const;
+
+export const INVITATION_STATUSES = {
+  PENDING: "pending",
+  ACCEPTED: "accepted",
+  DECLINED: "declined",
+} as const;
+
+export const EMAIL_TEMPLATES = {
+  WORKSPACE_INVITATION: "workspace_invitation",
+} as const;
+
+export const NOTIFICATION_TYPES = {
+  WORKSPACE_INVITATION: "workspace_invitation",
 } as const;

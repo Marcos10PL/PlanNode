@@ -1,9 +1,9 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import { MyAccount } from "@/components/nav/my-account";
+import { NotificationsIndicator } from "@/components/notifications/notifications-indicator";
 import { AppConfigProvider } from "@/components/providers/app-config-provider";
 import { UserProvider } from "@/components/providers/user-provider";
 import { WorkspaceProvider } from "@/components/providers/workspace-provider";
-import { Card } from "@/components/ui/card";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { COOKIES } from "@/const";
 import { getAppConfig, getProfile, getWorkspaces } from "@/lib/data";
@@ -34,14 +34,15 @@ export async function DashboardShell({
           <SidebarProvider>
             <AppSidebar />
 
-            <div className="w-full flex flex-col h-screen">
+            <div className="flex-1 min-w-0 flex flex-col h-screen">
               <div className="flex justify-between items-center border-b p-2">
                 <SidebarTrigger />
-                <MyAccount />
+                <div className="flex items-center gap-2">
+                  <NotificationsIndicator />
+                  <MyAccount />
+                </div>
               </div>
-              <div className="flex-1 overflow-y-auto pb-6">
-                {children}
-              </div>
+              <div className="flex-1 overflow-y-auto overflow-x-hidden pb-6">{children}</div>
             </div>
           </SidebarProvider>
         </WorkspaceProvider>

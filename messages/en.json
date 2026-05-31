@@ -258,7 +258,8 @@
   },
   "settings": {
     "profile": "Profile",
-    "workspace": "Workspaces"
+    "workspace": "Workspaces",
+    "team": "Team"
   },
   "no_workspace_banner": {
     "title": "Create your first workspace",
@@ -271,6 +272,62 @@
     "create_workspace": "New workspace",
     "no_workspaces": "You don't have any workspaces yet.",
     "edit": "Edit",
-    "delete": "Delete"
+    "delete": "Delete",
+    "leave": "Leave workspace",
+    "cannot_leave_as_owner": "Owner cannot leave the workspace. Delete it or transfer ownership first.",
+    "leave_success": "You have left the workspace",
+    "leave_error": "Could not leave the workspace"
+  },
+  "team": {
+    "title": "Team",
+    "workspace_context": "Regarding the selected workspace: {name}",
+    "no_active_workspace": "No active workspace selected. Switch to a workspace first.",
+    "members_section": "Members",
+    "invitations_section": "Pending invitations",
+    "no_members": "No members yet.",
+    "no_invitations": "No pending invitations.",
+    "invite_email_label": "Email address",
+    "invite_email_placeholder": "colleague@example.com",
+    "invite_role_label": "Role",
+    "invite_submit": "Invite",
+    "invite_submitting": "Inviting...",
+    "invite_success": "Invitation sent",
+    "invite_error": "Could not send invitation",
+    "invite_already_member": "This person is already a member or has a pending invitation",
+    "revoke": "Revoke",
+    "revoke_success": "Invitation revoked",
+    "revoke_error": "Could not revoke invitation",
+    "remove_member": "Remove",
+    "remove_member_success": "Member removed",
+    "remove_member_error": "Could not remove member",
+    "change_role": "Change role",
+    "change_role_submit": "Save",
+    "change_role_success": "Role updated",
+    "change_role_error": "Could not update role",
+    "role_owner": "Owner",
+    "role_admin": "Admin",
+    "role_member": "Member",
+    "role_guest": "Guest"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "mark_all_read": "Mark all as read",
+    "delete_all": "Delete all",
+    "empty": "No notifications",
+    "new_badge": "New",
+    "delete": "Delete",
+    "view": "View"
+  },
+  "invite_page": {
+    "title": "Workspace invitation",
+    "invited_by": "{name} is inviting you to",
+    "role_label": "Your role",
+    "accept": "Accept",
+    "decline": "Decline",
+    "accepting": "Accepting...",
+    "declining": "Declining...",
+    "error_not_found": "This invitation does not exist or has already been used.",
+    "error_expired": "This invitation has expired.",
+    "error_email_mismatch": "This invitation was sent to a different email address."
   }
 }

@@ -13,7 +13,7 @@ CREATE TABLE public.workspaces (
 );
 
 CREATE TABLE public.workspace_members (
-  id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   workspace_id uuid NOT NULL REFERENCES public.workspaces(id) ON DELETE CASCADE,
   role public.workspace_role DEFAULT 'member' NOT NULL,
   invited_by_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,
@@ -100,6 +100,21 @@ WITH CHECK (
   public.get_workspace_member_role(workspace_id, (SELECT auth.uid())) IN ('owner', 'admin')
 );
 
+-- Allows invited users to accept their invitation by inserting their own membership
+CREATE POLICY "Invited users can join workspace"
+ON public.workspace_members FOR INSERT
+WITH CHECK (
+  id = (SELECT auth.uid())
+  AND EXISTS (
+    SELECT 1 FROM public.workspace_invitations wi
+    JOIN public.profiles p ON p.email = wi.email
+    WHERE wi.workspace_id = workspace_members.workspace_id
+      AND p.id = (SELECT auth.uid())
+      AND wi.status = 'pending'
+      AND wi.expires_at > now()
+  )
+);
+
 CREATE POLICY "Admins/owners can update members"
 ON public.workspace_members FOR UPDATE
 USING (
@@ -110,6 +125,13 @@ CREATE POLICY "Admins/owners can remove members"
 ON public.workspace_members FOR DELETE
 USING (
   public.get_workspace_member_role(workspace_id, (SELECT auth.uid())) IN ('owner', 'admin')
+);
+
+CREATE POLICY "Members can leave workspace"
+ON public.workspace_members FOR DELETE
+USING (
+  id = (SELECT auth.uid())
+  AND role != 'owner'::public.workspace_role
 );
 
 -- Policies: workspace_invitations
@@ -123,6 +145,21 @@ USING (
 CREATE POLICY "Admins/owners can create invitations"
 ON public.workspace_invitations FOR INSERT
 WITH CHECK (
+  public.get_workspace_member_role(workspace_id, (SELECT auth.uid())) IN ('owner', 'admin')
+);
+
+CREATE POLICY "Invited users can update their invitation status"
+ON public.workspace_invitations FOR UPDATE
+USING (
+  email = (SELECT email FROM public.profiles WHERE id = (SELECT auth.uid()))
+)
+WITH CHECK (
+  email = (SELECT email FROM public.profiles WHERE id = (SELECT auth.uid()))
+);
+
+CREATE POLICY "Admins/owners can revoke invitations"
+ON public.workspace_invitations FOR DELETE
+USING (
   public.get_workspace_member_role(workspace_id, (SELECT auth.uid())) IN ('owner', 'admin')
 );
 

@@ -1,15 +1,20 @@
+"use client";
+
+import { leaveWorkspaceAction } from "@/actions/workspace/leave-workspace";
 import { useUser } from "@/components/providers/user-provider";
 import { Button } from "@/components/ui/button";
 import {
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { ERRORS } from "@/const";
 import { Workspace } from "@/types/entities";
-import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { LogOut, Pencil, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { toast } from "sonner";
 import { DeleteWorkspaceModal } from "../delete-workspace-modal";
 import { EditWorkspaceModal } from "../edit-workspace-modal";
 
@@ -19,31 +24,73 @@ export function WorkspaceActions({ workspace }: { workspace: Workspace }) {
 
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [isLeaving, setIsLeaving] = useState(false);
+
+  const isOwner = workspace.owner_id === user?.id;
+
+  const handleLeave = async () => {
+    setIsLeaving(true);
+    const result = await leaveWorkspaceAction(workspace.id);
+    setIsLeaving(false);
+    if (result?.error === ERRORS.cannotLeaveAsOwner) {
+      toast.error(t("cannot_leave_as_owner"));
+    } else if (result?.error) {
+      toast.error(t("leave_error"));
+    } else {
+      toast.success(t("leave_success"));
+    }
+  };
 
   return (
     <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon">
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => setEditOpen(true)}>
-            <Pencil className="mr-2 h-4 w-4" />
-            {t("edit")}
-          </DropdownMenuItem>
-          {workspace.owner_id === user?.id && (
-            <DropdownMenuItem
-              className="text-destructive focus:text-destructive"
-              onClick={() => setDeleteOpen(true)}
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              {t("delete")}
-            </DropdownMenuItem>
+      <TooltipProvider>
+        <div className="flex items-center gap-1">
+          {isOwner ? (
+            <>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setEditOpen(true)}
+                    className="text-info"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>{t("edit")}</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setDeleteOpen(true)}
+                    className="text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>{t("delete")}</TooltipContent>
+              </Tooltip>
+            </>
+          ) : (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleLeave}
+                  disabled={isLeaving}
+                >
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{t("leave")}</TooltipContent>
+            </Tooltip>
           )}
-        </DropdownMenuContent>
-      </DropdownMenu>
+        </div>
+      </TooltipProvider>
 
       <EditWorkspaceModal
         workspace={workspace}
