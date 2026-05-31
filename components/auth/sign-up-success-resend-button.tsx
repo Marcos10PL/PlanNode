@@ -1,7 +1,6 @@
 "use client";
 
-import { LINKS } from "@/const";
-import { createClient } from "@/lib/supabase/client";
+import { resendConfirmationAction } from "@/actions/auth/resend-confirmation";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
@@ -17,27 +16,19 @@ export function SignUpSuccessResendButton({
   const t = useTranslations("auth.sign_up_success");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  async function handleResend() {
+  const handleResend = async () => {
     setIsSubmitting(true);
-    const supabase = createClient();
-
-    const { error } = await supabase.auth.resend({
-      type: "signup",
-      email,
-      options: {
-        emailRedirectTo: `${window.location.origin}${LINKS.dashboard}`,
-      },
-    });
-
-    if (error) {
-      toast.error(t("resend_email_failed"));
+    try {
+      const result = await resendConfirmationAction(email);
+      if (result.error) {
+        toast.error(t("resend_email_failed"));
+        return;
+      }
+      toast.success(t("resend_email_success"));
+    } finally {
       setIsSubmitting(false);
-      return;
     }
-
-    toast.success(t("resend_email_success"));
-    setIsSubmitting(false);
-  }
+  };
 
   return (
     <Button

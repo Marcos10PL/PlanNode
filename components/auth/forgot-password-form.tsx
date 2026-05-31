@@ -1,13 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { useTranslations } from "next-intl";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
+import { forgotPasswordAction } from "@/actions/auth/forgot-password";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -16,13 +15,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Link } from "@/i18n/navigation";
-import { LINKS } from "@/const";
-import {
-  forgotPasswordSchema,
-  type ForgotPasswordSchema,
-} from "@/schema";
 import { ControlledInputField } from "@/components/ui/controlled-input-field";
+import { LINKS } from "@/const";
+import { Link } from "@/i18n/navigation";
+import { cn } from "@/lib/utils";
+import { forgotPasswordSchema, type ForgotPasswordSchema } from "@/schema";
 
 export function ForgotPasswordForm({
   className,
@@ -41,21 +38,15 @@ export function ForgotPasswordForm({
     },
   });
 
-  async function onSubmit(data: ForgotPasswordSchema) {
-    const supabase = createClient();
-
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
-        redirectTo: `${window.location.origin}${LINKS.updatePassword}`,
-      });
-      if (error) throw error;
-
-      toast.success(t("success_description"));
-      setSuccess(true);
-    } catch (error: any) {
-      toast.error(error?.message ?? t("error_generic"));
+  const onSubmit = async (data: ForgotPasswordSchema) => {
+    const result = await forgotPasswordAction(data);
+    if (result.error) {
+      toast.error(t("error_generic"));
+      return;
     }
-  }
+    toast.success(t("success_description"));
+    setSuccess(true);
+  };
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>

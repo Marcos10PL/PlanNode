@@ -1,7 +1,7 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
+import { loginAction } from "@/actions/auth/login";
+import { resendConfirmationAction } from "@/actions/auth/resend-confirmation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,16 +10,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { LINKS } from "@/const";
-import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
-import { useForm } from "react-hook-form";
-import { loginSchema, LoginSchema } from "@/schema";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { FieldError } from "../ui/field";
-import { toast } from "sonner";
 import { ControlledInputField } from "@/components/ui/controlled-input-field";
 import { ControlledPasswordField } from "@/components/ui/controlled-password-field";
+import { ERRORS, LINKS } from "@/const";
+import { cn } from "@/lib/utils";
+import { loginSchema, LoginSchema } from "@/schema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { FieldError } from "../ui/field";
 import { Link } from "../ui/link";
 
 export function LoginForm({
@@ -38,53 +39,35 @@ export function LoginForm({
     },
   });
 
-  async function resendConfirmationEmail(email: string) {
-    const supabase = createClient();
-
-    const { error } = await supabase.auth.resend({
-      type: "signup",
-      email,
-      options: {
-        emailRedirectTo: `${window.location.origin}${LINKS.dashboard}`,
-      },
-    });
-
-    if (error) {
+  const resendConfirmationEmail = async (email: string) => {
+    const result = await resendConfirmationAction(email);
+    if (result.error) {
       toast.error(t("resend_email_failed"));
       return;
     }
-
     toast.success(t("resend_email_success"));
-  }
+  };
 
-  async function onSubmit(data: LoginSchema) {
-    const supabase = createClient();
-
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: data.email,
-        password: data.password,
-      });
-      if (error) throw error;
-      toast.success(t("logged_in_successfully"));
-      router.replace(LINKS.dashboard);
-    } catch (error: any) {
-      if (error.code === "invalid_credentials") {
+  const onSubmit = async (data: LoginSchema) => {
+    const result = await loginAction(data);
+    if (result.error) {
+      if (result.error === ERRORS.invalidCredentials) {
         toast.error(t("invalid_credentials"));
-      } else if (error.code === "email_not_confirmed") {
+      } else if (result.error === ERRORS.emailNotConfirmed) {
         toast.error(t("email_not_confirmed"), {
           action: {
             label: t("resend_email"),
-            onClick: async () => {
-              await resendConfirmationEmail(data.email);
-            },
+            onClick: () => resendConfirmationEmail(data.email),
           },
         });
       } else {
         toast.error(t("login_failed"));
       }
+      return;
     }
-  }
+    toast.success(t("logged_in_successfully"));
+    router.replace(LINKS.dashboard);
+  };
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>

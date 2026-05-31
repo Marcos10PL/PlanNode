@@ -25,6 +25,9 @@ export const ERRORS = {
   serverError: "server_error",
   samePassword: "same_password",
   workspaceLimitReached: "workspace_limit_reached",
+  invalidCredentials: "invalid_credentials",
+  emailNotConfirmed: "email_not_confirmed",
+  userAlreadyExists: "user_already_exists",
 } as const;
 
 export const VALIDATION_MAX = {

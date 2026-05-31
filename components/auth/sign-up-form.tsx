@@ -1,7 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
+import { signUpAction } from "@/actions/auth/sign-up";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,16 +9,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Link } from "../ui/link";
-import { LINKS } from "@/const";
-import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
-import { useForm } from "react-hook-form";
-import { registerSchema, RegisterSchema } from "@/schema";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
 import { ControlledInputField } from "@/components/ui/controlled-input-field";
 import { ControlledPasswordField } from "@/components/ui/controlled-password-field";
+import { ERRORS, LINKS } from "@/const";
+import { cn } from "@/lib/utils";
+import { registerSchema, RegisterSchema } from "@/schema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { Link } from "../ui/link";
 
 export function SignUpForm({
   className,
@@ -40,31 +40,20 @@ export function SignUpForm({
     },
   });
 
-  async function onSubmit(data: RegisterSchema) {
-    const supabase = createClient();
-
-    try {
-      const { error } = await supabase.auth.signUp({
-        email: data.email,
-        password: data.password,
-        options: {
-          emailRedirectTo: `${window.location.origin}${LINKS.dashboard}`,
-          data: { full_name: data.full_name },
-        },
-      });
-      if (error) throw error;
-      router.replace(
-        `${LINKS.signUpSuccess}?email=${encodeURIComponent(data.email)}`,
-      );
-    } catch (error: any) {
-      if (error.code === "user_already_exists") {
+  const onSubmit = async (data: RegisterSchema) => {
+    const result = await signUpAction(data);
+    if (result.error) {
+      if (result.error === ERRORS.userAlreadyExists) {
         toast.error(t("user_already_exists"));
       } else {
-        console.log(error);
         toast.error(t("sign_up_failed"));
       }
+      return;
     }
-  }
+    router.replace(
+      `${LINKS.signUpSuccess}?email=${encodeURIComponent(data.email)}`,
+    );
+  };
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
