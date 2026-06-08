@@ -3,6 +3,7 @@
 import { removeMemberAction } from "@/actions/workspace/remove-member";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,6 +35,7 @@ export function MemberRow({
 }: Props) {
   const t = useTranslations();
   const [changeRoleOpen, setChangeRoleOpen] = useState(false);
+  const [removeOpen, setRemoveOpen] = useState(false);
   const [isPending, setIsPending] = useState(false);
 
   const isSelf = member.id === currentUserId;
@@ -61,20 +63,16 @@ export function MemberRow({
     <>
       <div className="flex items-center gap-3 py-2">
         <UserAvatar name={member.profile.full_name} />
+
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium line-clamp-2">
             {member.profile.full_name}
           </p>
-          <p className="text-xs text-muted-foreground line-clamp-2">
+          <p className="text-sm text-muted-foreground line-clamp-2">
             {member.profile.email}
           </p>
         </div>
-        <Badge
-          variant={getRoleVariant(member.role)}
-          className="shrink-0 pointer-events-none"
-        >
-          {getRoleLabel(member.role, t)}
-        </Badge>
+
         {canManage && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -89,7 +87,7 @@ export function MemberRow({
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-destructive focus:text-destructive"
-                onClick={handleRemove}
+                onClick={() => setRemoveOpen(true)}
               >
                 <Trash2 className="mr-2 h-4 w-4" />
                 {t("team.remove_member")}
@@ -97,12 +95,30 @@ export function MemberRow({
             </DropdownMenuContent>
           </DropdownMenu>
         )}
+
+        <Badge
+          variant={getRoleVariant(member.role)}
+          className="shrink-0 pointer-events-none"
+        >
+          {getRoleLabel(member.role, t)}
+        </Badge>
       </div>
+
       <UpdateMemberRoleModal
         open={changeRoleOpen}
         onOpenChange={setChangeRoleOpen}
         workspaceId={workspaceId}
         member={member}
+      />
+
+      <ConfirmModal
+        open={removeOpen}
+        onOpenChange={setRemoveOpen}
+        onConfirm={handleRemove}
+        title={t("team.remove_member_confirm_title")}
+        description={t("team.remove_member_confirm_description")}
+        isPending={isPending}
+        variant="destructive"
       />
     </>
   );

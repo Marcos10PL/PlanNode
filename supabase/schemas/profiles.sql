@@ -24,9 +24,10 @@ RETURNS boolean AS $$
 $$ LANGUAGE sql SECURITY DEFINER STABLE SET search_path = '';
 
 -- Policies
-CREATE POLICY "Users can select own profile."
+CREATE POLICY "Authenticated users can view all profiles."
 ON public.profiles FOR SELECT
-USING ((SELECT auth.uid()) = id OR public.is_admin());
+TO authenticated
+USING (true);
 
 CREATE POLICY "Users can insert their own profile."
 ON public.profiles FOR INSERT

@@ -7,7 +7,11 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export const InvitationRow = ({ invitation }: { invitation: WorkspaceInvitation }) => {
+export const InvitationRow = ({
+  invitation,
+}: {
+  invitation: WorkspaceInvitation;
+}) => {
   const t = useTranslations();
   const [isPending, setIsPending] = useState(false);
 

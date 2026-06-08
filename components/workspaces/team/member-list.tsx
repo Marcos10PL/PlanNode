@@ -22,7 +22,7 @@ export async function MemberList({
   }
 
   return (
-    <div className="flex flex-col divide-y overflow-hidden">
+    <div className="flex flex-col divide-y-2 divide-accent/70 overflow-hidden">
       {members.map(member => (
         <MemberRow
           key={member.id}

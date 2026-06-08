@@ -278,9 +278,14 @@
     "leave_success": "You have left the workspace",
     "leave_error": "Could not leave the workspace"
   },
+  "confirm_modal": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "confirming": "Processing..."
+  },
   "team": {
     "title": "Team",
-    "workspace_context": "Regarding the selected workspace: {name}",
+    "workspace_context": "Regarding the selected workspace.",
     "no_active_workspace": "No active workspace selected. Switch to a workspace first.",
     "members_section": "Members",
     "invitations_section": "Pending invitations",
@@ -300,14 +305,21 @@
     "remove_member": "Remove",
     "remove_member_success": "Member removed",
     "remove_member_error": "Could not remove member",
+    "remove_member_confirm_title": "Remove member",
+    "remove_member_confirm_description": "Are you sure you want to remove this member from the workspace?",
     "change_role": "Change role",
     "change_role_submit": "Save",
+    "change_role_submitting": "Saving...",
     "change_role_success": "Role updated",
     "change_role_error": "Could not update role",
     "role_owner": "Owner",
     "role_admin": "Admin",
     "role_member": "Member",
-    "role_guest": "Guest"
+    "role_guest": "Guest",
+    "role_info_label": "Role information",
+    "role_admin_description": "Can invite members, change roles, and manage content. Cannot delete the workspace.",
+    "role_member_description": "Standard access to workspace content. Cannot manage members.",
+    "role_guest_description": "Limited access to selected resources only."
   },
   "notifications": {
     "title": "Notifications",

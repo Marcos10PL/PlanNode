@@ -13,13 +13,15 @@ export function getRoleLabel(role: WorkspaceRole, t: Translations) {
   return map[role];
 }
 
-const ROLE_VARIANT: Record<WorkspaceRole, "default" | "secondary" | "outline"> =
-  {
-    [WORKSPACE_ROLES.OWNER]: "default",
-    [WORKSPACE_ROLES.ADMIN]: "secondary",
-    [WORKSPACE_ROLES.MEMBER]: "outline",
-    [WORKSPACE_ROLES.GUEST]: "outline",
-  };
+const ROLE_VARIANT: Record<
+  WorkspaceRole,
+  "default" | "secondary" | "outline" | "destructive"
+> = {
+  [WORKSPACE_ROLES.OWNER]: "destructive",
+  [WORKSPACE_ROLES.ADMIN]: "default",
+  [WORKSPACE_ROLES.MEMBER]: "secondary",
+  [WORKSPACE_ROLES.GUEST]: "outline",
+};
 
 export function getRoleVariant(role: WorkspaceRole) {
   return ROLE_VARIANT[role];

@@ -3,14 +3,13 @@
 import { inviteMemberAction } from "@/actions/workspace/invite-member";
 import { Button } from "@/components/ui/button";
 import { ControlledInputField } from "@/components/ui/controlled-input-field";
-import { ControlledSelectField } from "@/components/ui/controlled-select-field";
-import { ERRORS, INVITABLE_ROLES, WORKSPACE_ROLES } from "@/const";
+import { ERRORS, WORKSPACE_ROLES } from "@/const";
 import { inviteMemberSchema, InviteMemberSchema } from "@/schema";
-import { getRoleLabel } from "@/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { RoleSelect } from "./role-select";
 
 export function InviteMemberForm({ workspaceId }: { workspaceId: string }) {
   const t = useTranslations();
@@ -20,11 +19,6 @@ export function InviteMemberForm({ workspaceId }: { workspaceId: string }) {
     resolver: zodResolver(inviteMemberSchema(tErrors)),
     defaultValues: { email: "", role: WORKSPACE_ROLES.MEMBER },
   });
-
-  const roleOptions = INVITABLE_ROLES.map(r => ({
-    value: r,
-    label: getRoleLabel(r, t),
-  }));
 
   const onSubmit = async (data: InviteMemberSchema) => {
     const result = await inviteMemberAction(workspaceId, data);
@@ -56,13 +50,9 @@ export function InviteMemberForm({ workspaceId }: { workspaceId: string }) {
         />
       </div>
       <div className="flex gap-2 mt-2 items-end">
-        <ControlledSelectField
-          control={form.control}
-          name="role"
-          label={t("team.invite_role_label")}
-          options={roleOptions}
-          disabled={isPending}
-        />
+        <div className="flex-1">
+          <RoleSelect control={form.control} pending={isPending} />
+        </div>
         <Button type="submit" disabled={isPending} className=" min-w-1/4">
           {isPending ? t("team.invite_submitting") : t("team.invite_submit")}
         </Button>

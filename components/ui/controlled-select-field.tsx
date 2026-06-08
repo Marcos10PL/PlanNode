@@ -25,7 +25,7 @@ type Props<
 > = {
   control: Control<TFieldValues>;
   name: TName;
-  label: React.ReactNode;
+  label?: React.ReactNode;
   placeholder?: string;
   options: Option[];
   disabled?: boolean;

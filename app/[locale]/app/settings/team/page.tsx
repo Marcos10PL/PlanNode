@@ -10,11 +10,7 @@ import { InviteMemberForm } from "@/components/workspaces/team/elements/invite-m
 import { MemberList } from "@/components/workspaces/team/member-list";
 import { PendingInvitationsList } from "@/components/workspaces/team/pending-invitations-list";
 import { COOKIES, WORKSPACE_ROLES } from "@/const";
-import {
-  getWorkspaceInvitations,
-  getWorkspaceMembers,
-  getWorkspaces,
-} from "@/lib/data";
+import { getWorkspaceInvitations, getWorkspaceMembers } from "@/lib/data";
 import { createClient } from "@/lib/supabase/server";
 import { getTranslations } from "next-intl/server";
 import { cookies } from "next/headers";
@@ -38,13 +34,11 @@ export default async function TeamPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const [workspaces, members, invitations] = await Promise.all([
-    getWorkspaces(),
+  const [members, invitations] = await Promise.all([
     getWorkspaceMembers(activeWorkspaceId),
     getWorkspaceInvitations(activeWorkspaceId),
   ]);
 
-  const workspace = workspaces.find(w => w.id === activeWorkspaceId);
   const currentMember = members.find(m => m.id === user?.id);
 
   const currentUserRole = currentMember?.role ?? WORKSPACE_ROLES.MEMBER;
@@ -65,7 +59,7 @@ export default async function TeamPage() {
     <>
       <SettingsHeader
         title={t("title")}
-        description={t("workspace_context", { name: workspace?.name ?? "" })}
+        description={t("workspace_context")}
         className="mt-4 mb-6"
       />
 
@@ -91,6 +85,7 @@ export default async function TeamPage() {
               />
             </AccordionContent>
           </AccordionItem>
+
           {isAdminOrOwner && (
             <AccordionItem value={ACCORDION_VALUES.INVITATIONS}>
               <AccordionTrigger>

@@ -34,10 +34,12 @@ CREATE TABLE public.workspace_invitations (
   invited_by_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,
   token text UNIQUE NOT NULL,
   expires_at timestamptz NOT NULL,
-  created_at timestamptz DEFAULT now(),
-
-  UNIQUE(workspace_id, email)
+  created_at timestamptz DEFAULT now()
 );
+
+CREATE UNIQUE INDEX workspace_invitations_workspace_id_email_pending_key
+  ON public.workspace_invitations (workspace_id, email)
+  WHERE status = 'pending';
 
 -- RLS
 ALTER TABLE public.workspaces ENABLE ROW LEVEL SECURITY;

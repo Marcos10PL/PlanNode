@@ -46,7 +46,10 @@ export async function acceptInvitationAction(token: string) {
       joined_at: new Date().toISOString(),
     });
 
-  if (memberError) return { error: ERRORS.serverError };
+  if (memberError) {
+    console.error("[accept-invitation] memberError:", memberError);
+    return { error: ERRORS.serverError };
+  }
 
   await supabase
     .from("workspace_invitations")

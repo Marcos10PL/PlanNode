@@ -2,21 +2,19 @@
 
 import { updateMemberRoleAction } from "@/actions/workspace/update-member-role";
 import { Button } from "@/components/ui/button";
-import { ControlledSelectField } from "@/components/ui/controlled-select-field";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { INVITABLE_ROLES } from "@/const";
-import { getRoleLabel } from "@/utils";
 import { updateMemberRoleSchema, UpdateMemberRoleSchema } from "@/schema";
 import { WorkspaceMember } from "@/types/entities";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { RoleSelect } from "./role-select";
 
 type Props = {
   open: boolean;
@@ -25,18 +23,18 @@ type Props = {
   member: WorkspaceMember;
 };
 
-export function UpdateMemberRoleModal({ open, onOpenChange, workspaceId, member }: Props) {
+export function UpdateMemberRoleModal({
+  open,
+  onOpenChange,
+  workspaceId,
+  member,
+}: Props) {
   const t = useTranslations();
 
   const form = useForm<UpdateMemberRoleSchema>({
     resolver: zodResolver(updateMemberRoleSchema()),
     values: { role: member.role },
   });
-
-  const roleOptions = INVITABLE_ROLES.map(r => ({
-    value: r,
-    label: getRoleLabel(r, t),
-  }));
 
   const onSubmit = async (data: UpdateMemberRoleSchema) => {
     const result = await updateMemberRoleAction(workspaceId, member.id, data);
@@ -48,23 +46,24 @@ export function UpdateMemberRoleModal({ open, onOpenChange, workspaceId, member 
     }
   };
 
+  const isChange = form.watch("role") !== member.role;
+
   const isPending = form.formState.isSubmitting;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t("team.change_role")}</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            {t("team.change_role")}
+          </DialogTitle>
         </DialogHeader>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
-          <ControlledSelectField
-            control={form.control}
-            name="role"
-            label={t("team.invite_role_label")}
-            options={roleOptions}
-            disabled={isPending}
-          />
-          <div className="flex justify-end gap-2">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex flex-col gap-4"
+        >
+          <RoleSelect control={form.control} pending={isPending} noLabel />
+          <div className="flex justify-end gap-2 mt-2">
             <Button
               type="button"
               variant="outline"
@@ -73,8 +72,10 @@ export function UpdateMemberRoleModal({ open, onOpenChange, workspaceId, member 
             >
               {t("workspace.edit.cancel")}
             </Button>
-            <Button type="submit" disabled={isPending}>
-              {t("team.change_role_submit")}
+            <Button type="submit" disabled={isPending || !isChange}>
+              {isPending
+                ? t("team.change_role_submitting")
+                : t("team.change_role_submit")}
             </Button>
           </div>
         </form>
