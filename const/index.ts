@@ -62,6 +62,11 @@ export const INVITABLE_ROLES = [
   WORKSPACE_ROLES.GUEST,
 ] as const;
 
+export const MANAGER_ROLES = [
+  WORKSPACE_ROLES.OWNER,
+  WORKSPACE_ROLES.ADMIN,
+] as const;
+
 export const INVITATION_STATUSES = {
   PENDING: "pending",
   ACCEPTED: "accepted",

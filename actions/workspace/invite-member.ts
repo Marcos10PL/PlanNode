@@ -4,8 +4,8 @@ import {
   EMAIL_TEMPLATES,
   ERRORS,
   LINKS,
+  MANAGER_ROLES,
   NOTIFICATION_TYPES,
-  WORKSPACE_ROLES,
 } from "@/const";
 import { renderEmailTemplate, sendEmail } from "@/utils/email";
 
@@ -34,12 +34,7 @@ export async function inviteMemberAction(
     .eq("id", user.id)
     .single();
 
-  if (
-    !callerMember ||
-    ![WORKSPACE_ROLES.OWNER, WORKSPACE_ROLES.ADMIN].includes(
-      callerMember.role as never,
-    )
-  ) {
+  if (!callerMember || !MANAGER_ROLES.includes(callerMember.role as never)) {
     return { error: ERRORS.insufficientRole };
   }
 

@@ -1,8 +1,14 @@
 import { revokeInvitationAction } from "@/actions/workspace/revoke-invitation";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { WorkspaceInvitation } from "@/types/entities";
-import { getRoleLabel } from "@/utils";
-import { Badge } from "lucide-react";
+import { getRoleLabel, getRoleVariant } from "@/utils";
+import { Undo2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -19,6 +25,7 @@ export const InvitationRow = ({
     setIsPending(true);
     const result = await revokeInvitationAction(invitation.id);
     setIsPending(false);
+
     if (result?.error) {
       toast.error(t("team.revoke_error"));
     } else {
@@ -27,20 +34,30 @@ export const InvitationRow = ({
   };
 
   return (
-    <div className="flex items-center gap-3 py-2">
-      <div className="flex-1 min-w-0">
+    <div className="flex items-center gap-3 py-1 bg-accent/50 pl-3 pr-2 rounded-xl">
+      <div className="flex-1 min-w-0 flex items-center gap-2">
         <p className="text-sm font-medium truncate">{invitation.email}</p>
+        <Badge
+          variant={getRoleVariant(invitation.role)}
+          className="shrink-0 pointer-events-none"
+        >
+          {getRoleLabel(invitation.role, t)}
+        </Badge>
       </div>
-      <Badge className="shrink-0">{getRoleLabel(invitation.role, t)}</Badge>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={handleRevoke}
-        disabled={isPending}
-        className="text-destructive hover:text-destructive shrink-0"
-      >
-        {t("team.revoke")}
-      </Button>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleRevoke}
+            disabled={isPending}
+            className="text-destructive hover:text-destructive shrink-0"
+          >
+            <Undo2 className="size-4!" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent> {t("team.revoke")}</TooltipContent>
+      </Tooltip>
     </div>
   );
 };

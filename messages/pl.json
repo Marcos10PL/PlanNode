@@ -99,7 +99,7 @@
   },
   "profile_settings": {
     "title": "Ustawienia profilu",
-    "description": "Zarządzaj danymi profilu",
+    "description": "Zarządzaj danymi profilu.",
     "full_name": "Imię i nazwisko",
     "email": "Email",
     "pending_email": "Oczekujący nowy email",
@@ -276,7 +276,9 @@
     "leave": "Opuść przestrzeń",
     "cannot_leave_as_owner": "Właściciel nie może opuścić przestrzeni roboczej. Usuń ją lub przekaż własność.",
     "leave_success": "Opuściłeś przestrzeń roboczą",
-    "leave_error": "Nie udało się opuścić przestrzeni roboczej"
+    "leave_error": "Nie udało się opuścić przestrzeni roboczej",
+    "my_workspaces": "Moje",
+    "shared_workspaces": "Udostępnione dla mnie"
   },
   "confirm_modal": {
     "cancel": "Anuluj",
@@ -285,6 +287,7 @@
   },
   "team": {
     "title": "Zespół",
+    "you": "Ty",
     "workspace_context": "Dotyczy wybranej przestrzeni.",
     "no_active_workspace": "Brak aktywnej przestrzeni roboczej. Najpierw wybierz przestrzeń.",
     "members_section": "Członkowie",

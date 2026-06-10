@@ -276,7 +276,9 @@
     "leave": "Leave workspace",
     "cannot_leave_as_owner": "Owner cannot leave the workspace. Delete it or transfer ownership first.",
     "leave_success": "You have left the workspace",
-    "leave_error": "Could not leave the workspace"
+    "leave_error": "Could not leave the workspace",
+    "my_workspaces": "Mine",
+    "shared_workspaces": "Shared with me"
   },
   "confirm_modal": {
     "cancel": "Cancel",
@@ -285,6 +287,7 @@
   },
   "team": {
     "title": "Team",
+    "you": "You",
     "workspace_context": "Regarding the selected workspace.",
     "no_active_workspace": "No active workspace selected. Switch to a workspace first.",
     "members_section": "Members",

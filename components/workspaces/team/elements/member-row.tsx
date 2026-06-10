@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import UserAvatar from "@/components/user-avatar";
-import { WORKSPACE_ROLES } from "@/const";
+import { MANAGER_ROLES, WORKSPACE_ROLES } from "@/const";
 import { WorkspaceMember, WorkspaceRole } from "@/types/entities";
 import { getRoleLabel, getRoleVariant } from "@/utils";
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
@@ -41,11 +41,7 @@ export function MemberRow({
   const isSelf = member.id === currentUserId;
   const isOwner = member.role === WORKSPACE_ROLES.OWNER;
   const canManage =
-    !isSelf &&
-    !isOwner &&
-    [WORKSPACE_ROLES.OWNER, WORKSPACE_ROLES.ADMIN].includes(
-      currentUserRole as never,
-    );
+    !isSelf && !isOwner && MANAGER_ROLES.includes(currentUserRole as never);
 
   const handleRemove = async () => {
     setIsPending(true);
@@ -66,7 +62,7 @@ export function MemberRow({
 
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium line-clamp-2">
-            {member.profile.full_name}
+            {member.profile.full_name} {isSelf && `(${t("team.you")})`}
           </p>
           <p className="text-sm text-muted-foreground line-clamp-2">
             {member.profile.email}

@@ -52,6 +52,7 @@ export function EditWorkspaceModal({ workspace, open, onOpenChange }: Props) {
   const onSubmit = async (data: UpdateWorkspaceSchema) => {
     setIsPending(true);
     const result = await updateWorkspaceAction(workspace.id, data);
+    setIsPending(false);
 
     if (result.error) {
       toast.error(t("error"));

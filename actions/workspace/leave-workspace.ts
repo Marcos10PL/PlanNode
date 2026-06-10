@@ -34,8 +34,20 @@ export async function leaveWorkspaceAction(workspaceId: string) {
   if (error) return { error: ERRORS.serverError };
 
   const cookieStore = await cookies();
+
   if (cookieStore.get(COOKIES.activeWorkspaceId)?.value === workspaceId) {
-    cookieStore.delete(COOKIES.activeWorkspaceId);
+    const { data: other } = await supabase
+      .from("workspace_members")
+      .select("workspace_id")
+      .eq("id", user.id)
+      .neq("workspace_id", workspaceId)
+      .single();
+
+    if (other) {
+      cookieStore.set(COOKIES.activeWorkspaceId, other.workspace_id);
+    } else {
+      cookieStore.delete(COOKIES.activeWorkspaceId);
+    }
   }
 
   revalidatePath(LINKS.profileWorkspaces);

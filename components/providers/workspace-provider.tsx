@@ -2,7 +2,13 @@
 
 import { setActiveWorkspaceAction } from "@/actions/workspace/set-active-workspace";
 import { Workspace } from "@/types/entities";
-import { createContext, useContext, useState, useTransition } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useTransition,
+} from "react";
 
 type WorkspaceContextValue = {
   workspaces: Workspace[];
@@ -22,10 +28,19 @@ export function WorkspaceProvider({
   activeWorkspaceId: string | null;
   children: React.ReactNode;
 }) {
-  const initial =
+  const resolve = () =>
     workspaces.find(w => w.id === activeWorkspaceId) ?? workspaces[0] ?? null;
 
-  const [activeWorkspace, setActive] = useState<Workspace | null>(initial);
+  const [activeWorkspace, setActive] = useState<Workspace | null>(resolve);
+
+  useEffect(() => {
+    const resolved = resolve();
+    setActive(resolved);
+
+    if (resolved && resolved.id !== activeWorkspaceId)
+      setActiveWorkspaceAction(resolved.id);
+  }, [activeWorkspaceId, workspaces]);
+
   const [isPending, startTransition] = useTransition();
 
   const setActiveWorkspace = (workspace: Workspace) => {

@@ -1,8 +1,15 @@
 "use client";
 
 import { useAppConfig } from "@/components/providers/app-config-provider";
+import { useUser } from "@/components/providers/user-provider";
 import { useWorkspaces } from "@/components/providers/workspace-provider";
 import { SettingsHeader } from "@/components/settings/settings-header";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { CreateWorkspaceModal } from "@/components/workspaces/create-workspace-modal";
 import { WorkspaceItem } from "@/components/workspaces/elements/workspace-item";
 import { NoWorkspaceBanner } from "@/components/workspaces/no-workspace-banner";
@@ -12,28 +19,80 @@ export default function ProfileWorkspacesPage() {
   const t = useTranslations("profile_workspaces");
   const { workspaces } = useWorkspaces();
   const { max_workspaces_per_user } = useAppConfig();
+  const { user } = useUser();
+
+  const myWorkspaces = workspaces.filter(w => w.owner_id === user?.id);
+  const sharedWorkspaces = workspaces.filter(w => w.owner_id !== user?.id);
+
+  const isShared = sharedWorkspaces.length > 0;
+
+  const myLabelCount = ` (${myWorkspaces.length}/${max_workspaces_per_user})`;
+  const sharedLabelCount = ` (${sharedWorkspaces.length})`;
+
+  const isReached = myWorkspaces.length >= max_workspaces_per_user;
+
+  const ACCORDION_VALUES = {
+    MY: {
+      value: "my",
+      label: `${t("my_workspaces")} ${myLabelCount}`,
+      items: myWorkspaces,
+    },
+    SHARED: {
+      value: "shared",
+      label: `${t("shared_workspaces")} ${sharedLabelCount}`,
+      items: sharedWorkspaces,
+    },
+  };
+
+  const defaultValues = [
+    ACCORDION_VALUES.MY.value,
+    ACCORDION_VALUES.SHARED.value,
+  ];
 
   return (
     <>
       <div className="flex flex-col! md:flex-row! md:items-center gap-x-8 gap-y-4 justify-between mt-4 mb-6">
         <SettingsHeader
           title={t("title")}
-          description={`${t("description")} (${workspaces.length}/${max_workspaces_per_user})`}
+          description={`${t("description")} ${isShared ? "" : myLabelCount}`}
         />
-        <CreateWorkspaceModal />
+        {!isReached && <CreateWorkspaceModal />}
       </div>
 
       {workspaces.length === 0 ? (
         <div className="mt-12">
           <NoWorkspaceBanner />
         </div>
+      ) : isShared ? (
+        <Accordion type="multiple" defaultValue={defaultValues}>
+          {Object.values(ACCORDION_VALUES).map(section => (
+            <AccordionItem key={section.value} value={section.value}>
+              <AccordionTrigger>{section.label}</AccordionTrigger>
+              <AccordionContent>
+                <Layout>
+                  {section.items.map(workspace => (
+                    <WorkspaceItem key={workspace.id} workspace={workspace} />
+                  ))}
+                </Layout>
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
       ) : (
-        <div className="flex flex-col gap-2 w-full max-w-full overflow-hidden">
-          {workspaces.map(workspace => (
+        <Layout>
+          {myWorkspaces.map(workspace => (
             <WorkspaceItem key={workspace.id} workspace={workspace} />
           ))}
-        </div>
+        </Layout>
       )}
     </>
   );
 }
+
+const Layout = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <div className="flex flex-col gap-2 w-full max-w-full overflow-hidden">
+      {children}
+    </div>
+  );
+};

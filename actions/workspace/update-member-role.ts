@@ -1,6 +1,6 @@
 "use server";
 
-import { ERRORS, LINKS, WORKSPACE_ROLES } from "@/const";
+import { ERRORS, LINKS, MANAGER_ROLES, WORKSPACE_ROLES } from "@/const";
 import { createClient } from "@/lib/supabase/server";
 import { updateMemberRoleSchema, UpdateMemberRoleSchema } from "@/schema";
 import { revalidatePath } from "next/cache";
@@ -27,12 +27,7 @@ export async function updateMemberRoleAction(
     .eq("id", user.id)
     .single();
 
-  if (
-    !callerMember ||
-    ![WORKSPACE_ROLES.OWNER, WORKSPACE_ROLES.ADMIN].includes(
-      callerMember.role as never,
-    )
-  ) {
+  if (!callerMember || !MANAGER_ROLES.includes(callerMember.role as never)) {
     return { error: ERRORS.insufficientRole };
   }
 

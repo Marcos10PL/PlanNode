@@ -49,11 +49,15 @@ export function InviteMemberForm({ workspaceId }: { workspaceId: string }) {
           disabled={isPending}
         />
       </div>
-      <div className="flex gap-2 mt-2 items-end">
-        <div className="flex-1">
+      <div className="flex flex-col sm:flex-row gap-2 mt-2 items-end">
+        <div className="flex-1 min-w-full sm:min-w-0">
           <RoleSelect control={form.control} pending={isPending} />
         </div>
-        <Button type="submit" disabled={isPending} className=" min-w-1/4">
+        <Button
+          type="submit"
+          disabled={isPending}
+          className="min-w-full sm:min-w-1/4"
+        >
           {isPending ? t("team.invite_submitting") : t("team.invite_submit")}
         </Button>
       </div>
