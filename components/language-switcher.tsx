@@ -8,11 +8,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { useLocale } from "next-intl";
-import { routing } from "@/i18n/routing";
+import { updateLocaleAction } from "@/actions/profile/update-locale";
 import { usePathname, useRouter } from "@/i18n/navigation";
-import { Button } from "./ui/button";
+import { routing } from "@/i18n/routing";
+import { Profile } from "@/types/entities";
 import { PL, US } from "country-flag-icons/react/3x2";
+import { useLocale } from "next-intl";
+import { Button } from "./ui/button";
 
 type Props = {
   iconOnly?: boolean;
@@ -24,6 +26,7 @@ export default function LanguageSwitcher({ iconOnly = false }: Props) {
   const router = useRouter();
 
   const handleLanguageChange = (newLocale: string) => {
+    updateLocaleAction(newLocale as Profile["locale"]);
     router.push(pathname, { locale: newLocale });
   };
 

@@ -13,28 +13,29 @@ export async function acceptInvitationAction(token: string) {
 
   if (!user) return { error: ERRORS.unauthorized };
 
-  const { data: invitation } = await supabase
+  const { data: invitation, error: fetchError } = await supabase
     .from("workspace_invitations")
     .select("*")
     .eq("token", token)
     .eq("status", "pending")
     .single();
 
+  if (fetchError) return { error: ERRORS.serverError };
   if (!invitation) return { error: ERRORS.invitationNotFound };
 
   if (new Date(invitation.expires_at) < new Date()) {
     return { error: ERRORS.invitationExpired };
   }
 
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from("profiles")
-    .select("email")
+    .select("id")
     .eq("id", user.id)
+    .eq("email", invitation.email)
     .single();
 
-  if (profile?.email !== invitation.email) {
-    return { error: ERRORS.invitationEmailMismatch };
-  }
+  if (profileError) return { error: ERRORS.serverError };
+  if (!profile) return { error: ERRORS.invitationEmailMismatch };
 
   const { error: memberError } = await supabase
     .from("workspace_members")
@@ -48,10 +49,12 @@ export async function acceptInvitationAction(token: string) {
 
   if (memberError) return { error: ERRORS.serverError };
 
-  await supabase
+  const { error: statusError } = await supabase
     .from("workspace_invitations")
     .update({ status: "accepted" })
     .eq("id", invitation.id);
+
+  if (statusError) return { error: ERRORS.serverError };
 
   await supabase
     .from("notifications")

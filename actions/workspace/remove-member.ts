@@ -15,23 +15,27 @@ export async function removeMemberAction(
 
   if (!user) return { error: ERRORS.unauthorized };
 
-  const { data: callerMember } = await supabase
+  const { data: callerMember, error: callerMemberError } = await supabase
     .from("workspace_members")
     .select("role")
     .eq("workspace_id", workspaceId)
     .eq("id", user.id)
     .single();
 
-  if (!callerMember || !MANAGER_ROLES.includes(callerMember.role as never)) {
+  if (callerMemberError) return { error: ERRORS.serverError };
+
+  if (!callerMember || !MANAGER_ROLES.includes(callerMember.role)) {
     return { error: ERRORS.insufficientRole };
   }
 
-  const { data: targetMember } = await supabase
+  const { data: targetMember, error: targetMemberError } = await supabase
     .from("workspace_members")
     .select("role")
     .eq("workspace_id", workspaceId)
     .eq("id", memberId)
     .single();
+
+  if (targetMemberError) return { error: ERRORS.serverError };
 
   if (targetMember?.role === WORKSPACE_ROLES.OWNER) {
     return { error: ERRORS.cannotRemoveOwner };

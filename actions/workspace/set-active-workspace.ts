@@ -1,15 +1,25 @@
 "use server";
 
-import { cookies } from "next/headers";
 import { COOKIES } from "@/const";
+import { createClient } from "@/lib/supabase/server";
+import { cookies } from "next/headers";
+
+const MAX_AGE = 60 * 60 * 24 * 365; // 1 year
 
 export async function setActiveWorkspaceAction(workspaceId: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return;
+
   const cookieStore = await cookies();
 
   cookieStore.set(COOKIES.activeWorkspaceId, workspaceId, {
-    httpOnly: false,
+    httpOnly: true,
     sameSite: "lax",
     path: "/",
-    maxAge: 60 * 60 * 24 * 365,
+    maxAge: MAX_AGE,
   });
 }

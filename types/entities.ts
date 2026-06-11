@@ -31,6 +31,7 @@ export type Profile = {
   full_name: string;
   email: string;
   role: UserRole;
+  locale: "pl" | "en";
   created_at: string;
   updated_at: string;
 };
@@ -58,12 +59,17 @@ export type WorkspaceInvitation = {
   workspace?: Pick<Workspace, "id" | "name">;
 };
 
+export type WorkspaceInvitationMetadata = {
+  inviterName: string;
+  workspaceName: string;
+  invitationId: string;
+};
+
 export type Notification = {
   id: string;
   user_id: string;
   type: NotificationType;
-  title: string;
-  message: string | null;
+  metadata: WorkspaceInvitationMetadata | null;
   link: string | null;
   read_at: string | null;
   created_at: string;

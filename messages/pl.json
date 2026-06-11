@@ -331,7 +331,8 @@
     "empty": "Brak powiadomień",
     "new_badge": "Nowe",
     "delete": "Usuń",
-    "view": "Przejdź"
+    "view": "Przejdź",
+    "workspace_invitation_title": "{inviterName} zaprasza Cię do \"{workspaceName}\""
   },
   "invite_page": {
     "title": "Zaproszenie do przestrzeni roboczej",

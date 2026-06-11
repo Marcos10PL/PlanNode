@@ -9,7 +9,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { ERRORS } from "@/const";
 import { Workspace } from "@/types/entities";
 import { LogOut, Pencil, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -32,9 +31,8 @@ export function WorkspaceActions({ workspace }: { workspace: Workspace }) {
     setIsLeaving(true);
     const result = await leaveWorkspaceAction(workspace.id);
     setIsLeaving(false);
-    if (result?.error === ERRORS.cannotLeaveAsOwner) {
-      toast.error(t("cannot_leave_as_owner"));
-    } else if (result?.error) {
+    
+    if (result?.error) {
       toast.error(t("leave_error"));
     } else {
       toast.success(t("leave_success"));

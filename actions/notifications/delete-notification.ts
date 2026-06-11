@@ -14,15 +14,18 @@ export async function deleteNotificationAction(
 
   if (!user) return { error: ERRORS.unauthorized };
 
-  if ("deleteAll" in opts) {
-    await supabase.from("notifications").delete().eq("user_id", user.id);
-  } else {
-    await supabase
-      .from("notifications")
-      .delete()
-      .eq("id", opts.id)
-      .eq("user_id", user.id);
-  }
+  const query =
+    "deleteAll" in opts
+      ? supabase.from("notifications").delete().eq("user_id", user.id)
+      : supabase
+          .from("notifications")
+          .delete()
+          .eq("id", opts.id)
+          .eq("user_id", user.id);
+
+  const { error } = await query;
+
+  if (error) return { error: ERRORS.serverError };
 
   revalidatePath(LINKS.notifications);
   return { success: true };

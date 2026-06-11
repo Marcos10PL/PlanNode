@@ -331,7 +331,8 @@
     "empty": "No notifications",
     "new_badge": "New",
     "delete": "Delete",
-    "view": "View"
+    "view": "View",
+    "workspace_invitation_title": "{inviterName} invited you to \"{workspaceName}\""
   },
   "invite_page": {
     "title": "Workspace invitation",

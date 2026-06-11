@@ -1,5 +1,8 @@
+import "server-only";
+
 import { EMAIL_TEMPLATES } from "@/const";
 import { createClient } from "@/lib/supabase/server";
+import { Profile } from "@/types/entities";
 import type { CreateEmailOptions } from "resend";
 import { Resend } from "resend";
 
@@ -33,8 +36,16 @@ export async function sendEmailBatch(emails: BatchEmailPayload[]) {
   if (error) console.error("[email] Failed to send batch:", error);
 }
 
-export async function renderEmailTemplate(
+export async function renderLocalizedEmailTemplate(
   name: (typeof EMAIL_TEMPLATES)[keyof typeof EMAIL_TEMPLATES],
+  locale: Profile["locale"],
+  variables: Record<string, string | null> = {},
+) {
+  return renderEmailTemplate(`${name}_${locale}`, variables);
+}
+
+async function renderEmailTemplate(
+  name: string,
   variables: Record<string, string | null> = {},
 ) {
   const supabase = await createClient();

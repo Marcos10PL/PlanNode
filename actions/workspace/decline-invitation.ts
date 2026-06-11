@@ -12,29 +12,32 @@ export async function declineInvitationAction(token: string) {
   } = await supabase.auth.getUser();
   if (!user) return { error: ERRORS.unauthorized };
 
-  const { data: invitation } = await supabase
+  const { data: invitation, error: fetchError } = await supabase
     .from("workspace_invitations")
-    .select("id, email, expires_at")
+    .select("id, email")
     .eq("token", token)
     .eq("status", "pending")
     .single();
 
+  if (fetchError) return { error: ERRORS.serverError };
   if (!invitation) return { error: ERRORS.invitationNotFound };
 
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from("profiles")
-    .select("email")
+    .select("id")
     .eq("id", user.id)
+    .eq("email", invitation.email)
     .single();
 
-  if (profile?.email !== invitation.email) {
-    return { error: ERRORS.invitationEmailMismatch };
-  }
+  if (profileError) return { error: ERRORS.serverError };
+  if (!profile) return { error: ERRORS.invitationEmailMismatch };
 
-  await supabase
+  const { error: statusError } = await supabase
     .from("workspace_invitations")
     .update({ status: "declined" })
     .eq("id", invitation.id);
+
+  if (statusError) return { error: ERRORS.serverError };
 
   await supabase
     .from("notifications")

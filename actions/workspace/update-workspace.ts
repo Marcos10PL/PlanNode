@@ -19,15 +19,19 @@ export async function updateWorkspaceAction(
 
   if (!user) return { error: ERRORS.unauthorized };
 
-  const { error } = await supabase
+  const { data: updated, error } = await supabase
     .from("workspaces")
     .update({
       name: parsed.data.name,
       description: parsed.data.description ?? null,
     })
-    .eq("id", workspaceId);
+    .eq("id", workspaceId)
+    .eq("owner_id", user.id)
+    .select("id")
+    .single();
 
   if (error) return { error: ERRORS.serverError };
+  if (!updated) return { error: ERRORS.unauthorized };
 
   revalidatePath(LINKS.profileWorkspaces);
 

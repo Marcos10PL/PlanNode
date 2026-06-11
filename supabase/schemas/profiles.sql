@@ -1,5 +1,6 @@
 -- Types
 CREATE TYPE public.user_role AS ENUM ('admin', 'user');
+CREATE TYPE public.locale AS ENUM ('pl', 'en');
 
 -- Table
 CREATE TABLE public.profiles (
@@ -7,6 +8,7 @@ CREATE TABLE public.profiles (
   full_name text NOT NULL,
   role public.user_role DEFAULT 'user',
   email text UNIQUE NOT NULL,
+  locale public.locale NOT NULL DEFAULT 'pl',
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );
@@ -45,8 +47,13 @@ USING (public.is_admin());
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
 BEGIN
-  INSERT INTO public.profiles (id, email, full_name)
-  VALUES (new.id, new.email, new.raw_user_meta_data->>'full_name');
+  INSERT INTO public.profiles (id, email, full_name, locale)
+  VALUES (
+    new.id,
+    new.email,
+    new.raw_user_meta_data->>'full_name',
+    COALESCE((new.raw_user_meta_data->>'locale')::public.locale, 'pl')
+  );
   RETURN new;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';

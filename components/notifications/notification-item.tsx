@@ -38,16 +38,15 @@ export function NotificationItem({ notification }: { notification: Notification 
     <div className={`flex items-start gap-3 py-3 ${isUnread ? "font-medium" : ""}`}>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-0.5">
-          <p className="text-sm truncate">{notification.title}</p>
+          <p className="text-sm truncate">
+            {t(`${notification.type}_title`, notification.metadata ?? {})}
+          </p>
           {isUnread && (
             <Badge variant="default" className="shrink-0 text-xs py-0">
               {t("new_badge")}
             </Badge>
           )}
         </div>
-        {notification.message && (
-          <p className="text-xs text-muted-foreground">{notification.message}</p>
-        )}
         <p className="text-xs text-muted-foreground mt-0.5">
           {new Date(notification.created_at).toLocaleDateString()}
         </p>

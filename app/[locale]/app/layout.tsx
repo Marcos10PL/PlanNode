@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { routing } from "@/i18n/routing";
 import { hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
-import { notFound } from "next/dist/client/components/navigation";
+import { notFound } from "next/navigation";
 import { DashboardShell } from "@/components/providers/dashboard-shell";
 import { AppLoader } from "@/components/app-loader";
 
@@ -27,7 +27,7 @@ export default async function DashboardLayout({
 
   return (
     <Suspense fallback={<AppLoader />}>
-      <DashboardShell>{children}</DashboardShell>
+      <DashboardShell locale={locale}>{children}</DashboardShell>
     </Suspense>
   );
 }

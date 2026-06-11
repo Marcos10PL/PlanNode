@@ -6,8 +6,7 @@ CREATE TABLE public.notifications (
   id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id    uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   type       public.notification_type NOT NULL,
-  title      text NOT NULL,
-  message    text,
+  metadata   jsonb,
   link       text,
   read_at    timestamptz,
   created_at timestamptz DEFAULT now() NOT NULL
@@ -35,18 +34,29 @@ USING (user_id = (SELECT auth.uid()));
 CREATE OR REPLACE FUNCTION public.create_notification(
   p_user_id  uuid,
   p_type     public.notification_type,
-  p_title    text,
-  p_message  text DEFAULT NULL,
-  p_link     text DEFAULT NULL
+  p_metadata jsonb    DEFAULT NULL,
+  p_link     text     DEFAULT NULL
 )
 RETURNS void
 LANGUAGE sql
 SECURITY DEFINER
 SET search_path = ''
 AS $$
-  INSERT INTO public.notifications (user_id, type, title, message, link)
-  VALUES (p_user_id, p_type, p_title, p_message, p_link);
+  INSERT INTO public.notifications (user_id, type, metadata, link)
+  VALUES (p_user_id, p_type, p_metadata, p_link);
 $$;
 
-GRANT EXECUTE ON FUNCTION public.create_notification(uuid, public.notification_type, text, text, text) TO authenticated;
-REVOKE EXECUTE ON FUNCTION public.create_notification(uuid, public.notification_type, text, text, text) FROM anon;
+GRANT EXECUTE ON FUNCTION public.create_notification(uuid, public.notification_type, jsonb, text) TO authenticated;
+REVOKE EXECUTE ON FUNCTION public.create_notification(uuid, public.notification_type, jsonb, text) FROM anon;
+
+CREATE OR REPLACE FUNCTION public.delete_notification(p_invitation_id uuid)
+RETURNS void
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+  DELETE FROM public.notifications WHERE metadata->>'invitationId' = p_invitation_id::text;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.delete_notification(uuid) TO authenticated;
+REVOKE EXECUTE ON FUNCTION public.delete_notification(uuid) FROM anon;

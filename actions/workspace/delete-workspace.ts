@@ -13,21 +13,16 @@ export async function deleteWorkspaceAction(workspaceId: string) {
 
   if (!user) return { error: ERRORS.unauthorized };
 
-  const { data: workspace, error: fetchError } = await supabase
-    .from("workspaces")
-    .select("owner_id")
-    .eq("id", workspaceId)
-    .single();
-
-  if (fetchError || !workspace) return { error: ERRORS.serverError };
-  if (workspace.owner_id !== user.id) return { error: ERRORS.unauthorized };
-
-  const { error } = await supabase
+  const { data: deleted, error } = await supabase
     .from("workspaces")
     .delete()
-    .eq("id", workspaceId);
+    .eq("id", workspaceId)
+    .eq("owner_id", user.id)
+    .select("id")
+    .single();
 
   if (error) return { error: ERRORS.serverError };
+  if (!deleted) return { error: ERRORS.unauthorized };
 
   const cookieStore = await cookies();
 

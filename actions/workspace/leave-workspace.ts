@@ -12,13 +12,14 @@ export async function leaveWorkspaceAction(workspaceId: string) {
   } = await supabase.auth.getUser();
   if (!user) return { error: ERRORS.unauthorized };
 
-  const { data: member } = await supabase
+  const { data: member, error: memberError } = await supabase
     .from("workspace_members")
     .select("role")
     .eq("workspace_id", workspaceId)
     .eq("id", user.id)
     .single();
 
+  if (memberError) return { error: ERRORS.serverError };
   if (!member) return { error: ERRORS.unauthorized };
 
   if (member.role === WORKSPACE_ROLES.OWNER) {

@@ -246,4 +246,11 @@ with check (((id = ( SELECT auth.uid() AS uid)) AND (EXISTS ( SELECT 1
 using (((id = ( SELECT auth.uid() AS uid)) AND (role <> 'owner'::public.workspace_role)));
 
 
+  create policy "Authenticated users can view all profiles."
+  on "public"."profiles"
+  as permissive
+  for select
+  to authenticated
+using (true);
 
+drop policy "Users can select own profile." on "public"."profiles";

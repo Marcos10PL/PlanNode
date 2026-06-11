@@ -12,31 +12,36 @@ export async function revokeInvitationAction(invitationId: string) {
 
   if (!user) return { error: ERRORS.unauthorized };
 
-  const { data: invitation } = await supabase
+  const { data: invitation, error: invitationError } = await supabase
     .from("workspace_invitations")
-    .select("workspace_id, token")
+    .select("workspace_id")
     .eq("id", invitationId)
     .single();
 
+  if (invitationError) return { error: ERRORS.serverError };
   if (!invitation) return { error: ERRORS.invitationNotFound };
 
-  const { data: callerMember } = await supabase
+  const { data: callerMember, error: callerMemberError } = await supabase
     .from("workspace_members")
     .select("role")
     .eq("workspace_id", invitation.workspace_id)
     .eq("id", user.id)
     .single();
 
-  if (!callerMember || !MANAGER_ROLES.includes(callerMember.role as never)) {
+  if (callerMemberError) return { error: ERRORS.serverError };
+
+  if (!callerMember || !MANAGER_ROLES.includes(callerMember.role)) {
     return { error: ERRORS.insufficientRole };
   }
 
-  await supabase.from("workspace_invitations").delete().eq("id", invitationId);
-
-  await supabase
-    .from("notifications")
+  const { error: deleteError } = await supabase
+    .from("workspace_invitations")
     .delete()
-    .eq("link", `/invite/${invitation.token}`);
+    .eq("id", invitationId);
+
+  if (deleteError) return { error: ERRORS.serverError };
+
+  await supabase.rpc("delete_notification", { p_invitation_id: invitationId });
 
   revalidatePath(LINKS.team);
   return { success: true };
