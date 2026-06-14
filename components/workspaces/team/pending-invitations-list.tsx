@@ -1,6 +1,6 @@
 "use client";
 
-import { WorkspaceInvitation } from "@/types/entities";
+import { WorkspaceInvitation } from "@/types/dto";
 import { useTranslations } from "next-intl";
 import { InvitationRow } from "./elements/invitation-row";
 

@@ -2,27 +2,28 @@ import { WORKSPACE_ROLES } from "@/const";
 import { Translations } from "@/types";
 import { WorkspaceRole } from "@/types/entities";
 
-export function getRoleLabel(role: WorkspaceRole, t: Translations) {
-  const map: Record<WorkspaceRole, string> = {
-    [WORKSPACE_ROLES.OWNER]: t("team.role_owner"),
-    [WORKSPACE_ROLES.ADMIN]: t("team.role_admin"),
-    [WORKSPACE_ROLES.MEMBER]: t("team.role_member"),
-    [WORKSPACE_ROLES.GUEST]: t("team.role_guest"),
-  };
-
-  return map[role];
-}
-
-const ROLE_VARIANT: Record<
-  WorkspaceRole,
-  "default" | "secondary" | "outline" | "destructive"
-> = {
-  [WORKSPACE_ROLES.OWNER]: "destructive",
-  [WORKSPACE_ROLES.ADMIN]: "default",
-  [WORKSPACE_ROLES.MEMBER]: "secondary",
-  [WORKSPACE_ROLES.GUEST]: "outline",
+export const getRoleLabel = (role: WorkspaceRole, t: Translations) => {
+  switch (role) {
+    case WORKSPACE_ROLES.OWNER:
+      return t("team.role_owner");
+    case WORKSPACE_ROLES.ADMIN:
+      return t("team.role_admin");
+    case WORKSPACE_ROLES.MEMBER:
+      return t("team.role_member");
+    case WORKSPACE_ROLES.GUEST:
+      return t("team.role_guest");
+  }
 };
 
-export function getRoleVariant(role: WorkspaceRole) {
-  return ROLE_VARIANT[role];
-}
+export const getRoleVariant = (role: WorkspaceRole) => {
+  switch (role) {
+    case WORKSPACE_ROLES.OWNER:
+      return "destructive";
+    case WORKSPACE_ROLES.ADMIN:
+      return "default";
+    case WORKSPACE_ROLES.MEMBER:
+      return "secondary";
+    case WORKSPACE_ROLES.GUEST:
+      return "outline";
+  }
+};

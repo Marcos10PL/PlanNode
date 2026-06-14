@@ -1,4 +1,4 @@
-"use server";
+﻿"use server";
 
 import { COOKIES } from "@/const";
 import { createClient } from "@/lib/supabase/server";
@@ -16,7 +16,7 @@ export async function setActiveWorkspaceAction(workspaceId: string) {
 
   const cookieStore = await cookies();
 
-  cookieStore.set(COOKIES.activeWorkspaceId, workspaceId, {
+  cookieStore.set(COOKIES.ACTIVE_WORKSPACE_ID, workspaceId, {
     httpOnly: true,
     sameSite: "lax",
     path: "/",

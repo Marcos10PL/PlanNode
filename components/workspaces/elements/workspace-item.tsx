@@ -1,4 +1,4 @@
-import { Workspace } from "@/types/entities";
+import { Workspace } from "@/types/dto";
 import { WorkspaceActions } from "./workspace-actions";
 
 export function WorkspaceItem({ workspace }: { workspace: Workspace }) {

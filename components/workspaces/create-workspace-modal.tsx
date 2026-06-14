@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { ERRORS, VALIDATION_MAX } from "@/const";
 import { createWorkspaceSchema, CreateWorkspaceSchema } from "@/schema";
-import { Workspace } from "@/types/entities";
+import { Workspace } from "@/types/dto";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
@@ -51,7 +51,7 @@ export function CreateWorkspaceModal() {
 
     if (result.error) {
       toast.error(
-        result.error === ERRORS.workspaceLimitReached
+        result.error === ERRORS.WORKSPACE_LIMIT_REACHED
           ? t("create.limit_reached")
           : t("create.error"),
       );

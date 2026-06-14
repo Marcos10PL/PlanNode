@@ -1,11 +1,11 @@
-import { AppSidebar } from "@/components/app-sidebar";
+﻿import { AppSidebar } from "@/components/app-sidebar";
 import { MyAccount } from "@/components/nav/my-account";
 import { NotificationsIndicator } from "@/components/notifications/notifications-indicator";
 import { AppConfigProvider } from "@/components/providers/app-config-provider";
 import { UserProvider } from "@/components/providers/user-provider";
 import { WorkspaceProvider } from "@/components/providers/workspace-provider";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { COOKIES } from "@/const";
+import { COOKIES, LINKS } from "@/const";
 import { routing } from "@/i18n/routing";
 import { getAppConfig, getProfile, getWorkspaces } from "@/lib/data";
 import { cookies } from "next/headers";
@@ -20,7 +20,7 @@ export async function DashboardShell({
 }) {
   const cookieStore = await cookies();
   const activeWorkspaceId =
-    cookieStore.get(COOKIES.activeWorkspaceId)?.value ?? null;
+    cookieStore.get(COOKIES.ACTIVE_WORKSPACE_ID)?.value ?? null;
 
   const [{ profile, user }, workspaces, appConfig] = await Promise.all([
     getProfile(),
@@ -28,12 +28,14 @@ export async function DashboardShell({
     getAppConfig(),
   ]);
 
+  console.log(workspaces);
+
   if (
     profile &&
     profile.locale !== locale &&
     routing.locales.includes(profile.locale)
   ) {
-    redirect(`/${profile.locale}/app/dashboard`);
+    redirect(`/${profile.locale}${LINKS.DASHBOARD}`);
   }
 
   return (

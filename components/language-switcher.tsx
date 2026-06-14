@@ -11,7 +11,7 @@ import {
 import { updateLocaleAction } from "@/actions/profile/update-locale";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
-import { Profile } from "@/types/entities";
+import { Profile } from "@/types/dto";
 import { PL, US } from "country-flag-icons/react/3x2";
 import { useLocale } from "next-intl";
 import { Button } from "./ui/button";

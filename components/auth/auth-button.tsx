@@ -1,4 +1,4 @@
-import { Link } from "@/i18n/navigation";
+﻿import { Link } from "@/i18n/navigation";
 import { Button } from "../ui/button";
 import { getTranslations } from "next-intl/server";
 import { LINKS } from "@/const";
@@ -42,10 +42,10 @@ async function Buttons() {
   return (
     <>
       <Button asChild variant={"outline"}>
-        <Link href={LINKS.login}>{t("sign_in")}</Link>
+        <Link href={LINKS.LOGIN}>{t("sign_in")}</Link>
       </Button>
       <Button asChild>
-        <Link href={LINKS.signUp}>{t("sign_up")}</Link>
+        <Link href={LINKS.SIGN_UP}>{t("sign_up")}</Link>
       </Button>
     </>
   );

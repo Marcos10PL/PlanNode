@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { loginAction } from "@/actions/auth/login";
 import { resendConfirmationAction } from "@/actions/auth/resend-confirmation";
@@ -51,9 +51,9 @@ export function LoginForm({
   const onSubmit = async (data: LoginSchema) => {
     const result = await loginAction(data);
     if (result.error) {
-      if (result.error === ERRORS.invalidCredentials) {
+      if (result.error === ERRORS.INVALID_CREDENTIALS) {
         toast.error(t("invalid_credentials"));
-      } else if (result.error === ERRORS.emailNotConfirmed) {
+      } else if (result.error === ERRORS.EMAIL_NOT_CONFIRMED) {
         toast.error(t("email_not_confirmed"), {
           action: {
             label: t("resend_email"),
@@ -66,7 +66,7 @@ export function LoginForm({
       return;
     }
     toast.success(t("logged_in_successfully"));
-    router.replace(LINKS.dashboard);
+    router.replace(LINKS.DASHBOARD);
   };
 
   return (
@@ -96,7 +96,7 @@ export function LoginForm({
               label={t("password")}
               autoComplete="current-password"
               labelRight={
-                <Link href={LINKS.forgotPassword} className="ml-auto text-sm">
+                <Link href={LINKS.FORGOT_PASSWORD} className="ml-auto text-sm">
                   {t("forgot_password")}
                 </Link>
               }
@@ -116,7 +116,7 @@ export function LoginForm({
 
             <div className="mt-4 text-center text-sm">
               {t("no_account")}{" "}
-              <Link href={LINKS.signUp}>{tAuth("sign_up")}</Link>
+              <Link href={LINKS.SIGN_UP}>{tAuth("sign_up")}</Link>
             </div>
           </form>
         </CardContent>

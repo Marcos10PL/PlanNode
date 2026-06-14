@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -34,7 +34,7 @@ export function MyAccount() {
     startTransition(async () => {
       await logout();
       router.refresh();
-      router.replace(LINKS.login);
+      router.replace(LINKS.LOGIN);
     });
   };
 
@@ -47,7 +47,7 @@ export function MyAccount() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="rounded-full group">
           <UserAvatar
-            name={user?.profile.full_name}
+            name={user?.profile.fullName}
             className="border-2 border-gray-400 group-hover:border-gray-300 transition-colors"
           />
         </Button>
@@ -55,8 +55,8 @@ export function MyAccount() {
       <DropdownMenuContent align="end" className="min-w-40">
         <DropdownMenuItem asChild>
           <Link
-            href={LINKS.profileSettings}
-            className={cn(isActive(LINKS.profileSettings))}
+            href={LINKS.PROFILE_SETTINGS}
+            className={cn(isActive(LINKS.PROFILE_SETTINGS))}
           >
             <SettingsIcon />
             {t("settings")}

@@ -1,6 +1,6 @@
 set check_function_bodies = off;
 
-CREATE OR REPLACE FUNCTION public.delete_notification(p_invitation_id uuid)
+CREATE OR REPLACE FUNCTION public.delete_invitation_notification(p_invitation_id uuid)
  RETURNS void
  LANGUAGE sql
  SECURITY DEFINER

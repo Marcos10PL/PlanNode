@@ -1,4 +1,4 @@
-"use server";
+﻿"use server";
 
 import {
   EMAIL_TEMPLATES,
@@ -23,14 +23,14 @@ export async function inviteMemberAction(
   data: InviteMemberSchema,
 ) {
   const parsed = inviteMemberSchema().safeParse(data);
-  if (!parsed.success) return { error: ERRORS.invalidData };
+  if (!parsed.success) return { error: ERRORS.INVALID_DATA };
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) return { error: ERRORS.unauthorized };
+  if (!user) return { error: ERRORS.UNAUTHENTICATED };
 
   const { data: callerMember, error: callerMemberError } = await supabase
     .from("workspace_members")
@@ -39,10 +39,10 @@ export async function inviteMemberAction(
     .eq("id", user.id)
     .single();
 
-  if (callerMemberError) return { error: ERRORS.serverError };
+  if (callerMemberError) return { error: ERRORS.SERVER_ERROR };
 
   if (!callerMember || !MANAGER_ROLES.includes(callerMember.role)) {
-    return { error: ERRORS.insufficientRole };
+    return { error: ERRORS.INSUFFICIENT_ROLE };
   }
 
   const { email, role } = parsed.data;
@@ -61,7 +61,7 @@ export async function inviteMemberAction(
       .eq("id", invitedProfile.id)
       .single();
 
-    if (existingMember) return { error: ERRORS.alreadyMember };
+    if (existingMember) return { error: ERRORS.ALREADY_MEMBER };
   }
 
   const { data: existingInvitation } = await supabase
@@ -72,7 +72,7 @@ export async function inviteMemberAction(
     .eq("status", "pending")
     .single();
 
-  if (existingInvitation) return { error: ERRORS.alreadyMember };
+  if (existingInvitation) return { error: ERRORS.ALREADY_MEMBER };
 
   const token = crypto.randomUUID();
   const expiresAt = generateExpirationDate(7);
@@ -90,14 +90,14 @@ export async function inviteMemberAction(
     .select("id")
     .single();
 
-  if (insertError || !invitation) return { error: ERRORS.serverError };
+  if (insertError || !invitation) return { error: ERRORS.SERVER_ERROR };
 
   const [{ data: workspace }, { data: callerProfile }] = await Promise.all([
     supabase.from("workspaces").select("name").eq("id", workspaceId).single(),
     supabase.from("profiles").select("full_name").eq("id", user.id).single(),
   ]);
 
-  if (!workspace || !callerProfile) return { error: ERRORS.serverError };
+  if (!workspace || !callerProfile) return { error: ERRORS.SERVER_ERROR };
 
   if (invitedProfile) {
     await supabase.rpc("create_notification", {
@@ -128,6 +128,6 @@ export async function inviteMemberAction(
     console.error("[invite-member] Email error:", e);
   }
 
-  revalidatePath(LINKS.team);
+  revalidatePath(LINKS.TEAM);
   return { success: true };
 }

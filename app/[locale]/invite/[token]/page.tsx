@@ -3,10 +3,10 @@ import { declineInvitationAction } from "@/actions/workspace/decline-invitation"
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LINKS } from "@/const";
-import { getRoleLabel } from "@/utils";
 import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
+import { getRoleLabel } from "@/utils";
 import { getTranslations } from "next-intl/server";
+import { redirect } from "next/navigation";
 
 type Props = {
   params: Promise<{ locale: string; token: string }>;
@@ -23,7 +23,7 @@ export default async function InvitePage({ params }: Props) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect(`/${locale}${LINKS.login}`);
+    redirect(`/${locale}${LINKS.LOGIN}`);
   }
 
   const { data: invitation } = await supabase
@@ -41,7 +41,9 @@ export default async function InvitePage({ params }: Props) {
             <CardTitle>{t("title")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground">{t("error_not_found")}</p>
+            <p className="text-sm text-muted-foreground">
+              {t("error_not_found")}
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -56,7 +58,9 @@ export default async function InvitePage({ params }: Props) {
             <CardTitle>{t("title")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground">{t("error_expired")}</p>
+            <p className="text-sm text-muted-foreground">
+              {t("error_expired")}
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -77,14 +81,17 @@ export default async function InvitePage({ params }: Props) {
             <CardTitle>{t("title")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground">{t("error_email_mismatch")}</p>
+            <p className="text-sm text-muted-foreground">
+              {t("error_email_mismatch")}
+            </p>
           </CardContent>
         </Card>
       </div>
     );
   }
 
-  const workspaceName = (invitation.workspace as { name: string } | null)?.name ?? "";
+  const workspaceName =
+    (invitation.workspace as { name: string } | null)?.name ?? "";
 
   return (
     <div className="flex min-h-svh items-center justify-center p-6">
@@ -94,12 +101,16 @@ export default async function InvitePage({ params }: Props) {
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <div>
-            <p className="text-sm text-muted-foreground">{t("invited_by", { name: invitation.email })}</p>
+            <p className="text-sm text-muted-foreground">
+              {t("invited_by", { name: invitation.email })}
+            </p>
             <p className="text-lg font-semibold mt-1">{workspaceName}</p>
           </div>
           <div>
             <p className="text-xs text-muted-foreground">{t("role_label")}</p>
-            <p className="text-sm font-medium">{getRoleLabel(invitation.role, tTeam)}</p>
+            <p className="text-sm font-medium">
+              {getRoleLabel(invitation.role!, tTeam)}
+            </p>
           </div>
           <div className="flex gap-2">
             <form

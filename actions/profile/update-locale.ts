@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { Profile } from "@/types/entities";
+import { Profile } from "@/types/dto";
 
 export async function updateLocaleAction(locale: Profile["locale"]) {
   const supabase = await createClient();

@@ -1,4 +1,4 @@
-"use server";
+﻿"use server";
 
 import { COOKIES, ERRORS, LINKS, WORKSPACE_ROLES } from "@/const";
 import { createClient } from "@/lib/supabase/server";
@@ -10,7 +10,7 @@ export async function leaveWorkspaceAction(workspaceId: string) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { error: ERRORS.unauthorized };
+  if (!user) return { error: ERRORS.UNAUTHENTICATED };
 
   const { data: member, error: memberError } = await supabase
     .from("workspace_members")
@@ -19,11 +19,11 @@ export async function leaveWorkspaceAction(workspaceId: string) {
     .eq("id", user.id)
     .single();
 
-  if (memberError) return { error: ERRORS.serverError };
-  if (!member) return { error: ERRORS.unauthorized };
+  if (memberError) return { error: ERRORS.SERVER_ERROR };
+  if (!member) return { error: ERRORS.UNAUTHORIZED };
 
   if (member.role === WORKSPACE_ROLES.OWNER) {
-    return { error: ERRORS.cannotLeaveAsOwner };
+    return { error: ERRORS.CANNOT_LEAVE_AS_OWNER };
   }
 
   const { error } = await supabase
@@ -32,11 +32,11 @@ export async function leaveWorkspaceAction(workspaceId: string) {
     .eq("workspace_id", workspaceId)
     .eq("id", user.id);
 
-  if (error) return { error: ERRORS.serverError };
+  if (error) return { error: ERRORS.SERVER_ERROR };
 
   const cookieStore = await cookies();
 
-  if (cookieStore.get(COOKIES.activeWorkspaceId)?.value === workspaceId) {
+  if (cookieStore.get(COOKIES.ACTIVE_WORKSPACE_ID)?.value === workspaceId) {
     const { data: other } = await supabase
       .from("workspace_members")
       .select("workspace_id")
@@ -45,12 +45,12 @@ export async function leaveWorkspaceAction(workspaceId: string) {
       .single();
 
     if (other) {
-      cookieStore.set(COOKIES.activeWorkspaceId, other.workspace_id);
+      cookieStore.set(COOKIES.ACTIVE_WORKSPACE_ID, other.workspace_id);
     } else {
-      cookieStore.delete(COOKIES.activeWorkspaceId);
+      cookieStore.delete(COOKIES.ACTIVE_WORKSPACE_ID);
     }
   }
 
-  revalidatePath(LINKS.profileWorkspaces);
+  revalidatePath(LINKS.PROFILE_WORKSPACES);
   return { success: true };
 }

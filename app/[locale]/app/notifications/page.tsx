@@ -8,7 +8,7 @@ import { getTranslations } from "next-intl/server";
 export default async function NotificationsPage() {
   const t = await getTranslations("notifications");
   const notifications = await getNotifications();
-  const hasUnread = notifications.some(n => !n.read_at);
+  const hasUnread = notifications.some(n => !n.readAt);
 
   return (
     <div className="max-w-2xl mx-auto px-4 md:px-6 py-6 flex flex-col gap-4">

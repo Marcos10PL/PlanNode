@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useWorkspaces } from "@/components/providers/workspace-provider";
 import {
@@ -73,7 +73,7 @@ export function WorkspaceSwitcher() {
                 className="bg-secondary hover:bg-secondary/80!"
               >
                 <Link
-                  href={LINKS.profileWorkspaces}
+                  href={LINKS.PROFILE_WORKSPACES}
                   className="flex items-center gap-2"
                 >
                   <Settings size={16} />

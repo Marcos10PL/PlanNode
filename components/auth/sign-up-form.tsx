@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { signUpAction } from "@/actions/auth/sign-up";
 import { Button } from "@/components/ui/button";
@@ -43,7 +43,7 @@ export function SignUpForm({
   const onSubmit = async (data: RegisterSchema) => {
     const result = await signUpAction(data);
     if (result.error) {
-      if (result.error === ERRORS.userAlreadyExists) {
+      if (result.error === ERRORS.USER_ALREADY_EXISTS) {
         toast.error(t("user_already_exists"));
       } else {
         toast.error(t("sign_up_failed"));
@@ -51,7 +51,7 @@ export function SignUpForm({
       return;
     }
     router.replace(
-      `${LINKS.signUpSuccess}?email=${encodeURIComponent(data.email)}`,
+      `${LINKS.SIGN_UP_SUCCESS}?email=${encodeURIComponent(data.email)}`,
     );
   };
 
@@ -108,7 +108,7 @@ export function SignUpForm({
 
             <div className="mt-4 text-center text-sm">
               {t("have_account")}{" "}
-              <Link href={LINKS.login}>{tAuth("sign_in")}</Link>
+              <Link href={LINKS.LOGIN}>{tAuth("sign_in")}</Link>
             </div>
           </form>
         </CardContent>

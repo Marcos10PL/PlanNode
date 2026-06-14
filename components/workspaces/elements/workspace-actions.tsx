@@ -9,7 +9,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Workspace } from "@/types/entities";
+import { Workspace } from "@/types/dto";
 import { LogOut, Pencil, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
@@ -25,13 +25,13 @@ export function WorkspaceActions({ workspace }: { workspace: Workspace }) {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
 
-  const isOwner = workspace.owner_id === user?.id;
+  const isOwner = workspace.ownerId === user?.id;
 
   const handleLeave = async () => {
     setIsLeaving(true);
     const result = await leaveWorkspaceAction(workspace.id);
     setIsLeaving(false);
-    
+
     if (result?.error) {
       toast.error(t("leave_error"));
     } else {

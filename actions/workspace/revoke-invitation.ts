@@ -1,6 +1,6 @@
-"use server";
+﻿"use server";
 
-import { ERRORS, LINKS, MANAGER_ROLES } from "@/const";
+import { ERRORS, INVITATION_STATUSES, LINKS, MANAGER_ROLES } from "@/const";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
@@ -10,16 +10,17 @@ export async function revokeInvitationAction(invitationId: string) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) return { error: ERRORS.unauthorized };
+  if (!user) return { error: ERRORS.UNAUTHENTICATED };
 
   const { data: invitation, error: invitationError } = await supabase
     .from("workspace_invitations")
     .select("workspace_id")
     .eq("id", invitationId)
+    .eq("status", INVITATION_STATUSES.PENDING)
     .single();
 
-  if (invitationError) return { error: ERRORS.serverError };
-  if (!invitation) return { error: ERRORS.invitationNotFound };
+  if (invitationError) return { error: ERRORS.SERVER_ERROR };
+  if (!invitation) return { error: ERRORS.INVITATION_NOT_FOUND };
 
   const { data: callerMember, error: callerMemberError } = await supabase
     .from("workspace_members")
@@ -28,10 +29,10 @@ export async function revokeInvitationAction(invitationId: string) {
     .eq("id", user.id)
     .single();
 
-  if (callerMemberError) return { error: ERRORS.serverError };
+  if (callerMemberError) return { error: ERRORS.SERVER_ERROR };
 
   if (!callerMember || !MANAGER_ROLES.includes(callerMember.role)) {
-    return { error: ERRORS.insufficientRole };
+    return { error: ERRORS.INSUFFICIENT_ROLE };
   }
 
   const { error: deleteError } = await supabase
@@ -39,10 +40,12 @@ export async function revokeInvitationAction(invitationId: string) {
     .delete()
     .eq("id", invitationId);
 
-  if (deleteError) return { error: ERRORS.serverError };
+  if (deleteError) return { error: ERRORS.SERVER_ERROR };
 
-  await supabase.rpc("delete_notification", { p_invitation_id: invitationId });
+  await supabase.rpc("delete_invitation_notification", {
+    p_invitation_id: invitationId,
+  });
 
-  revalidatePath(LINKS.team);
+  revalidatePath(LINKS.TEAM);
   return { success: true };
 }

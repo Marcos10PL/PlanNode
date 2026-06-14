@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { VALIDATION_MAX } from "@/const";
 import { updateWorkspaceSchema, UpdateWorkspaceSchema } from "@/schema";
-import { Workspace } from "@/types/entities";
+import { Workspace } from "@/types/dto";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";

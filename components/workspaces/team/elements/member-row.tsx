@@ -12,7 +12,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import UserAvatar from "@/components/user-avatar";
 import { MANAGER_ROLES, WORKSPACE_ROLES } from "@/const";
-import { WorkspaceMember, WorkspaceRole } from "@/types/entities";
+
+import { WorkspaceMember } from "@/types/dto";
+import { WorkspaceRole } from "@/types/entities";
 import { getRoleLabel, getRoleVariant } from "@/utils";
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -58,14 +60,14 @@ export function MemberRow({
   return (
     <>
       <div className="flex items-center gap-3 py-2">
-        <UserAvatar name={member.profile.full_name} />
+        <UserAvatar name={member.fullName} />
 
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium line-clamp-2">
-            {member.profile.full_name} {isSelf && `(${t("team.you")})`}
+            {member.fullName} {isSelf && `(${t("team.you")})`}
           </p>
           <p className="text-sm text-muted-foreground line-clamp-2">
-            {member.profile.email}
+            {member.email}
           </p>
         </div>
 

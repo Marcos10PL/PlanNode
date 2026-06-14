@@ -2,7 +2,7 @@ import "server-only";
 
 import { EMAIL_TEMPLATES } from "@/const";
 import { createClient } from "@/lib/supabase/server";
-import { Profile } from "@/types/entities";
+import { Profile } from "@/types/dto";
 import type { CreateEmailOptions } from "resend";
 import { Resend } from "resend";
 

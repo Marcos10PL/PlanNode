@@ -42,7 +42,7 @@ export function UpdatePasswordForm({
       toast.error(t("error_generic"));
       return;
     }
-    router.replace(LINKS.dashboard);
+    router.replace(LINKS.DASHBOARD);
   };
 
   return (

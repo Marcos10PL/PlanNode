@@ -1,4 +1,4 @@
-"use server";
+﻿"use server";
 
 import { ERRORS, LINKS } from "@/const";
 import { createClient } from "@/lib/supabase/server";
@@ -7,7 +7,7 @@ import { headers } from "next/headers";
 
 export async function forgotPasswordAction(data: ForgotPasswordSchema) {
   const parsed = forgotPasswordSchema().safeParse(data);
-  if (!parsed.success) return { error: ERRORS.invalidData };
+  if (!parsed.success) return { error: ERRORS.INVALID_DATA };
 
   const origin = (await headers()).get("origin") ?? "";
   const supabase = await createClient();
@@ -15,11 +15,11 @@ export async function forgotPasswordAction(data: ForgotPasswordSchema) {
   const { error } = await supabase.auth.resetPasswordForEmail(
     parsed.data.email,
     {
-      redirectTo: `${origin}${LINKS.updatePassword}`,
+      redirectTo: `${origin}${LINKS.UPDATE_PASSWORD}`,
     },
   );
 
-  if (error) return { error: ERRORS.serverError };
+  if (error) return { error: ERRORS.SERVER_ERROR };
 
   return { success: true };
 }

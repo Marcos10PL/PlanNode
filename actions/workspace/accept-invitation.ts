@@ -2,6 +2,7 @@
 
 import { ERRORS, LINKS } from "@/const";
 import { createClient } from "@/lib/supabase/server";
+import { generateInvitationRoute } from "@/utils/helpers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -11,7 +12,7 @@ export async function acceptInvitationAction(token: string) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) return { error: ERRORS.unauthorized };
+  if (!user) return { error: ERRORS.UNAUTHENTICATED };
 
   const { data: invitation, error: fetchError } = await supabase
     .from("workspace_invitations")
@@ -20,11 +21,11 @@ export async function acceptInvitationAction(token: string) {
     .eq("status", "pending")
     .single();
 
-  if (fetchError) return { error: ERRORS.serverError };
-  if (!invitation) return { error: ERRORS.invitationNotFound };
+  if (fetchError) return { error: ERRORS.SERVER_ERROR };
+  if (!invitation) return { error: ERRORS.INVITATION_NOT_FOUND };
 
   if (new Date(invitation.expires_at) < new Date()) {
-    return { error: ERRORS.invitationExpired };
+    return { error: ERRORS.INVITATION_EXPIRED };
   }
 
   const { data: profile, error: profileError } = await supabase
@@ -34,36 +35,36 @@ export async function acceptInvitationAction(token: string) {
     .eq("email", invitation.email)
     .single();
 
-  if (profileError) return { error: ERRORS.serverError };
-  if (!profile) return { error: ERRORS.invitationEmailMismatch };
+  if (profileError) return { error: ERRORS.SERVER_ERROR };
+  if (!profile) return { error: ERRORS.INVITATION_EMAIL_MISMATCH };
 
   const { error: memberError } = await supabase
     .from("workspace_members")
     .insert({
       id: user.id,
       workspace_id: invitation.workspace_id,
-      role: invitation.role,
+      role: invitation.role!,
       invited_by_id: invitation.invited_by_id,
       joined_at: new Date().toISOString(),
     });
 
-  if (memberError) return { error: ERRORS.serverError };
+  if (memberError) return { error: ERRORS.SERVER_ERROR };
 
   const { error: statusError } = await supabase
     .from("workspace_invitations")
     .update({ status: "accepted" })
     .eq("id", invitation.id);
 
-  if (statusError) return { error: ERRORS.serverError };
+  if (statusError) return { error: ERRORS.SERVER_ERROR };
 
   await supabase
     .from("notifications")
     .update({ read_at: new Date().toISOString() })
     .eq("user_id", user.id)
-    .eq("link", `/invite/${token}`);
+    .eq("link", generateInvitationRoute(token));
 
-  revalidatePath(LINKS.team);
-  revalidatePath(LINKS.profileWorkspaces);
+  revalidatePath(LINKS.TEAM);
+  revalidatePath(LINKS.PROFILE_WORKSPACES);
 
-  redirect(LINKS.dashboard);
+  redirect(LINKS.DASHBOARD);
 }

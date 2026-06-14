@@ -11,7 +11,7 @@ export async function markNotificationReadAction(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { error: ERRORS.unauthorized };
+  if (!user) return { error: ERRORS.UNAUTHENTICATED };
 
   const readAt = new Date().toISOString();
 
@@ -29,6 +29,6 @@ export async function markNotificationReadAction(
       .eq("user_id", user.id);
   }
 
-  revalidatePath(LINKS.notifications);
+  revalidatePath(LINKS.NOTIFICATIONS);
   return { success: true };
 }

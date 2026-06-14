@@ -1,4 +1,5 @@
-import { WorkspaceMember, WorkspaceRole } from "@/types/entities";
+import { WorkspaceMember } from "@/types/dto";
+import { WorkspaceRole } from "@/types/entities";
 import { getTranslations } from "next-intl/server";
 import { MemberRow } from "./elements/member-row";
 

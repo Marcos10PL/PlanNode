@@ -1,4 +1,4 @@
-import { SettingsHeader } from "@/components/settings/settings-header";
+﻿import { SettingsHeader } from "@/components/settings/settings-header";
 import {
   Accordion,
   AccordionContent,
@@ -14,12 +14,13 @@ import { getWorkspaceInvitations, getWorkspaceMembers } from "@/lib/data";
 import { createClient } from "@/lib/supabase/server";
 import { getTranslations } from "next-intl/server";
 import { cookies } from "next/headers";
+import { Suspense } from "react";
 
 export default async function TeamPage() {
   const t = await getTranslations("team");
 
   const cookieStore = await cookies();
-  const activeWorkspaceId = cookieStore.get(COOKIES.activeWorkspaceId)?.value;
+  const activeWorkspaceId = cookieStore.get(COOKIES.ACTIVE_WORKSPACE_ID)?.value;
 
   if (!activeWorkspaceId) {
     return (
@@ -63,41 +64,49 @@ export default async function TeamPage() {
         className="mt-4 mb-6"
       />
 
-      <div className="flex flex-col gap-4">
-        {isAdminOrOwner && <InviteMemberForm workspaceId={activeWorkspaceId} />}
-
-        <Accordion type="multiple" defaultValue={values}>
-          <AccordionItem
-            value={ACCORDION_VALUES.MEMBERS}
-            disabled={!isAdminOrOwner} // for better UX - only one section, no accordion needed
-          >
-            <AccordionTrigger
-              className={"disabled:opacity-100! disabled:[&>svg]:hidden"}
-            >
-              {t("members_section")} ({members.length})
-            </AccordionTrigger>
-            <AccordionContent>
-              <MemberList
-                members={members}
-                currentUserId={user?.id ?? ""}
-                currentUserRole={currentUserRole}
-                workspaceId={activeWorkspaceId}
-              />
-            </AccordionContent>
-          </AccordionItem>
-
+      <Suspense fallback={<div>Ładowanie...</div>}>
+        <div className="flex flex-col gap-4">
           {isAdminOrOwner && (
-            <AccordionItem value={ACCORDION_VALUES.INVITATIONS}>
-              <AccordionTrigger>
-                {t("invitations_section")} ({invitations.length})
+            <InviteMemberForm workspaceId={activeWorkspaceId} />
+          )}
+
+          <Accordion type="multiple" defaultValue={values}>
+            <AccordionItem
+              value={ACCORDION_VALUES.MEMBERS}
+              disabled={!isAdminOrOwner} // for better UX - only one section, no accordion needed
+            >
+              <AccordionTrigger
+                className={"disabled:opacity-100! disabled:[&>svg]:hidden"}
+              >
+                {t("members_section")} ({members.length})
               </AccordionTrigger>
               <AccordionContent>
-                <PendingInvitationsList invitations={invitations} />
+                <MemberList
+                  members={members}
+                  currentUserId={user?.id ?? ""}
+                  currentUserRole={currentUserRole}
+                  workspaceId={activeWorkspaceId}
+                />
               </AccordionContent>
             </AccordionItem>
-          )}
-        </Accordion>
-      </div>
+
+            {isAdminOrOwner && (
+              <AccordionItem value={ACCORDION_VALUES.INVITATIONS}>
+                <AccordionTrigger>
+                  {t("invitations_section")} ({invitations.length})
+                </AccordionTrigger>
+                <AccordionContent>
+                  <PendingInvitationsList invitations={invitations} />
+                </AccordionContent>
+              </AccordionItem>
+            )}
+          </Accordion>
+        </div>
+      </Suspense>
     </>
   );
 }
+
+const AccordionSection = () => {
+  return <div>Section</div>;
+};

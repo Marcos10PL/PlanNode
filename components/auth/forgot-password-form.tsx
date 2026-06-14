@@ -62,7 +62,7 @@ export function ForgotPasswordForm({
             </p>
             <div className="mt-4 text-center text-sm">
               {t("have_account")}{" "}
-              <Link href={LINKS.login} className="underline underline-offset-4">
+              <Link href={LINKS.LOGIN} className="underline underline-offset-4">
                 {tAuth("sign_in")}
               </Link>
             </div>
@@ -99,7 +99,7 @@ export function ForgotPasswordForm({
               <div className="mt-4 text-center text-sm">
                 {t("have_account")}{" "}
                 <Link
-                  href={LINKS.login}
+                  href={LINKS.LOGIN}
                   className="underline underline-offset-4"
                 >
                   {tAuth("sign_in")}

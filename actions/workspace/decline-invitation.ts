@@ -1,7 +1,8 @@
-"use server";
+﻿"use server";
 
 import { ERRORS, LINKS } from "@/const";
 import { createClient } from "@/lib/supabase/server";
+import { generateInvitationRoute } from "@/utils/helpers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -10,7 +11,8 @@ export async function declineInvitationAction(token: string) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { error: ERRORS.unauthorized };
+
+  if (!user) return { error: ERRORS.UNAUTHENTICATED };
 
   const { data: invitation, error: fetchError } = await supabase
     .from("workspace_invitations")
@@ -19,8 +21,8 @@ export async function declineInvitationAction(token: string) {
     .eq("status", "pending")
     .single();
 
-  if (fetchError) return { error: ERRORS.serverError };
-  if (!invitation) return { error: ERRORS.invitationNotFound };
+  if (fetchError) return { error: ERRORS.SERVER_ERROR };
+  if (!invitation) return { error: ERRORS.INVITATION_NOT_FOUND };
 
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
@@ -29,23 +31,23 @@ export async function declineInvitationAction(token: string) {
     .eq("email", invitation.email)
     .single();
 
-  if (profileError) return { error: ERRORS.serverError };
-  if (!profile) return { error: ERRORS.invitationEmailMismatch };
+  if (profileError) return { error: ERRORS.SERVER_ERROR };
+  if (!profile) return { error: ERRORS.INVITATION_EMAIL_MISMATCH };
 
   const { error: statusError } = await supabase
     .from("workspace_invitations")
     .update({ status: "declined" })
     .eq("id", invitation.id);
 
-  if (statusError) return { error: ERRORS.serverError };
+  if (statusError) return { error: ERRORS.SERVER_ERROR };
 
   await supabase
     .from("notifications")
     .update({ read_at: new Date().toISOString() })
     .eq("user_id", user.id)
-    .eq("link", `/invite/${token}`);
+    .eq("link", generateInvitationRoute(token));
 
-  revalidatePath(LINKS.notifications);
+  revalidatePath(LINKS.NOTIFICATIONS);
 
-  redirect(LINKS.notifications);
+  redirect(LINKS.NOTIFICATIONS);
 }

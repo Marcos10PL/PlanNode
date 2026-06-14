@@ -6,7 +6,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { WorkspaceInvitation } from "@/types/entities";
+import { WorkspaceInvitation } from "@/types/dto";
 import { getRoleLabel, getRoleVariant } from "@/utils";
 import { Undo2 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -38,10 +38,10 @@ export const InvitationRow = ({
       <div className="flex-1 min-w-0 flex items-center gap-2">
         <p className="text-sm font-medium truncate">{invitation.email}</p>
         <Badge
-          variant={getRoleVariant(invitation.role)}
+          variant={getRoleVariant(invitation.role!)}
           className="shrink-0 pointer-events-none"
         >
-          {getRoleLabel(invitation.role, t)}
+          {getRoleLabel(invitation.role!, t)}
         </Badge>
       </div>
       <Tooltip>

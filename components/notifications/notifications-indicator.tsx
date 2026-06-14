@@ -8,7 +8,7 @@ export async function NotificationsIndicator() {
 
   return (
     <Link
-      href={LINKS.notifications}
+      href={LINKS.NOTIFICATIONS}
       className="relative inline-flex items-center justify-center h-8 w-8 rounded-md hover:bg-accent transition-colors"
       aria-label="Notifications"
     >

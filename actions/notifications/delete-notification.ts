@@ -1,4 +1,4 @@
-"use server";
+﻿"use server";
 
 import { ERRORS, LINKS } from "@/const";
 import { createClient } from "@/lib/supabase/server";
@@ -12,7 +12,7 @@ export async function deleteNotificationAction(
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) return { error: ERRORS.unauthorized };
+  if (!user) return { error: ERRORS.UNAUTHENTICATED };
 
   const query =
     "deleteAll" in opts
@@ -25,8 +25,8 @@ export async function deleteNotificationAction(
 
   const { error } = await query;
 
-  if (error) return { error: ERRORS.serverError };
+  if (error) return { error: ERRORS.SERVER_ERROR };
 
-  revalidatePath(LINKS.notifications);
+  revalidatePath(LINKS.NOTIFICATIONS);
   return { success: true };
 }

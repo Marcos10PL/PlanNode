@@ -9,7 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { updateMemberRoleSchema, UpdateMemberRoleSchema } from "@/schema";
-import { WorkspaceMember } from "@/types/entities";
+import { WorkspaceMember } from "@/types/dto";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";

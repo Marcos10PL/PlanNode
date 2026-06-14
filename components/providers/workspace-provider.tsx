@@ -1,7 +1,8 @@
 "use client";
 
 import { setActiveWorkspaceAction } from "@/actions/workspace/set-active-workspace";
-import { Workspace } from "@/types/entities";
+import { Workspace } from "@/types/dto";
+
 import {
   createContext,
   useContext,

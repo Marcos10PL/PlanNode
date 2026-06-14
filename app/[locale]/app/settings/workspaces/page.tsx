@@ -18,18 +18,18 @@ import { useTranslations } from "next-intl";
 export default function ProfileWorkspacesPage() {
   const t = useTranslations("profile_workspaces");
   const { workspaces } = useWorkspaces();
-  const { max_workspaces_per_user } = useAppConfig();
+  const { maxWorkspacesPerUser } = useAppConfig();
   const { user } = useUser();
 
-  const myWorkspaces = workspaces.filter(w => w.owner_id === user?.id);
-  const sharedWorkspaces = workspaces.filter(w => w.owner_id !== user?.id);
+  const myWorkspaces = workspaces.filter(w => w.ownerId === user?.id);
+  const sharedWorkspaces = workspaces.filter(w => w.ownerId !== user?.id);
 
   const isShared = sharedWorkspaces.length > 0;
 
-  const myLabelCount = ` (${myWorkspaces.length}/${max_workspaces_per_user})`;
+  const myLabelCount = ` (${myWorkspaces.length}/${maxWorkspacesPerUser})`;
   const sharedLabelCount = ` (${sharedWorkspaces.length})`;
 
-  const isReached = myWorkspaces.length >= max_workspaces_per_user;
+  const isReached = myWorkspaces.length >= maxWorkspacesPerUser;
 
   const ACCORDION_VALUES = {
     MY: {

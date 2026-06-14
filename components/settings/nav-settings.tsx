@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { LINKS } from "@/const";
 import { usePathname } from "@/i18n/navigation";
@@ -10,15 +10,15 @@ import Link from "next/link";
 const navItems = (t: Translations) => [
   {
     label: t("settings.profile"),
-    href: LINKS.profileSettings,
+    href: LINKS.PROFILE_SETTINGS,
   },
   {
     label: t("settings.workspace"),
-    href: LINKS.profileWorkspaces,
+    href: LINKS.PROFILE_WORKSPACES,
   },
   {
     label: t("settings.team"),
-    href: LINKS.team,
+    href: LINKS.TEAM,
   },
 ];
 

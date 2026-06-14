@@ -1,4 +1,4 @@
-"use server";
+﻿"use server";
 
 import { COOKIES, ERRORS, LINKS } from "@/const";
 import { createClient } from "@/lib/supabase/server";
@@ -11,7 +11,7 @@ export async function deleteWorkspaceAction(workspaceId: string) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) return { error: ERRORS.unauthorized };
+  if (!user) return { error: ERRORS.UNAUTHENTICATED };
 
   const { data: deleted, error } = await supabase
     .from("workspaces")
@@ -21,12 +21,12 @@ export async function deleteWorkspaceAction(workspaceId: string) {
     .select("id")
     .single();
 
-  if (error) return { error: ERRORS.serverError };
-  if (!deleted) return { error: ERRORS.unauthorized };
+  if (error) return { error: ERRORS.SERVER_ERROR };
+  if (!deleted) return { error: ERRORS.UNAUTHORIZED };
 
   const cookieStore = await cookies();
 
-  if (cookieStore.get(COOKIES.activeWorkspaceId)?.value === workspaceId) {
+  if (cookieStore.get(COOKIES.ACTIVE_WORKSPACE_ID)?.value === workspaceId) {
     const { data: other } = await supabase
       .from("workspace_members")
       .select("workspace_id")
@@ -35,13 +35,13 @@ export async function deleteWorkspaceAction(workspaceId: string) {
       .single();
 
     if (other) {
-      cookieStore.set(COOKIES.activeWorkspaceId, other.workspace_id);
+      cookieStore.set(COOKIES.ACTIVE_WORKSPACE_ID, other.workspace_id);
     } else {
-      cookieStore.delete(COOKIES.activeWorkspaceId);
+      cookieStore.delete(COOKIES.ACTIVE_WORKSPACE_ID);
     }
   }
 
-  revalidatePath(LINKS.profileWorkspaces);
+  revalidatePath(LINKS.PROFILE_WORKSPACES);
 
   return { success: true };
 }

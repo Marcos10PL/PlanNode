@@ -1,8 +1,8 @@
 "use client";
 
-import { createContext, useContext } from "react";
-import { Profile } from "@/types/entities";
+import { Profile } from "@/types/dto";
 import { User } from "@supabase/supabase-js";
+import { createContext, useContext } from "react";
 
 type UserContextValue = {
   profile: Profile;

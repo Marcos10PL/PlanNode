@@ -37,8 +37,8 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <Link
-                href={LINKS.dashboard}
-                className={cn(isActive(LINKS.dashboard))}
+                href={LINKS.DASHBOARD}
+                className={cn(isActive(LINKS.DASHBOARD))}
                 onClick={() => setOpenMobile(false)}
               >
                 <LayoutDashboard className="mr-2" />

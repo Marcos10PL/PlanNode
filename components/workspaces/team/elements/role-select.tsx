@@ -27,7 +27,7 @@ export function RoleSelect({ pending, control, noLabel }: Props) {
 
   const roleOptions = INVITABLE_ROLES.map(r => ({
     value: r,
-    label: getRoleLabel(r, t),
+    label: getRoleLabel(r, t)!,
   }));
 
   return (
@@ -46,7 +46,7 @@ export function RoleSelect({ pending, control, noLabel }: Props) {
             <div key={value}>
               <p className="text-xs font-medium pb-1">{label}</p>
               <p className="text-xs text-muted-foreground">
-                {t(ROLE_DESCRIPTION_KEYS[value])}
+                {t(ROLE_DESCRIPTION_KEYS[value as never])}
               </p>
             </div>
           ))}

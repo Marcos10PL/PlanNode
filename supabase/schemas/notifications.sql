@@ -49,7 +49,7 @@ $$;
 GRANT EXECUTE ON FUNCTION public.create_notification(uuid, public.notification_type, jsonb, text) TO authenticated;
 REVOKE EXECUTE ON FUNCTION public.create_notification(uuid, public.notification_type, jsonb, text) FROM anon;
 
-CREATE OR REPLACE FUNCTION public.delete_notification(p_invitation_id uuid)
+CREATE OR REPLACE FUNCTION public.delete_invitation_notification(p_invitation_id uuid)
 RETURNS void
 LANGUAGE sql
 SECURITY DEFINER
@@ -58,5 +58,5 @@ AS $$
   DELETE FROM public.notifications WHERE metadata->>'invitationId' = p_invitation_id::text;
 $$;
 
-GRANT EXECUTE ON FUNCTION public.delete_notification(uuid) TO authenticated;
-REVOKE EXECUTE ON FUNCTION public.delete_notification(uuid) FROM anon;
+GRANT EXECUTE ON FUNCTION public.delete_invitation_notification(uuid) TO authenticated;
+REVOKE EXECUTE ON FUNCTION public.delete_invitation_notification(uuid) FROM anon;

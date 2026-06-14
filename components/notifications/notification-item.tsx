@@ -4,19 +4,23 @@ import { deleteNotificationAction } from "@/actions/notifications/delete-notific
 import { markNotificationReadAction } from "@/actions/notifications/mark-read";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Notification } from "@/types/entities";
+import { Notification } from "@/types/dto";
 import { ExternalLink, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export function NotificationItem({ notification }: { notification: Notification }) {
+export function NotificationItem({
+  notification,
+}: {
+  notification: Notification;
+}) {
   const t = useTranslations("notifications");
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
 
-  const isUnread = !notification.read_at;
+  const isUnread = !notification.readAt;
 
   const handleView = async () => {
     if (isUnread) {
@@ -35,11 +39,16 @@ export function NotificationItem({ notification }: { notification: Notification 
   };
 
   return (
-    <div className={`flex items-start gap-3 py-3 ${isUnread ? "font-medium" : ""}`}>
+    <div
+      className={`flex items-start gap-3 py-3 ${isUnread ? "font-medium" : ""}`}
+    >
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-0.5">
           <p className="text-sm truncate">
-            {t(`${notification.type}_title`, notification.metadata ?? {})}
+            {t(
+              `${notification.type}_title`,
+              (notification.metadata as Record<string, string>) ?? {},
+            )}
           </p>
           {isUnread && (
             <Badge variant="default" className="shrink-0 text-xs py-0">
@@ -48,12 +57,17 @@ export function NotificationItem({ notification }: { notification: Notification 
           )}
         </div>
         <p className="text-xs text-muted-foreground mt-0.5">
-          {new Date(notification.created_at).toLocaleDateString()}
+          {new Date(notification.createdAt).toLocaleDateString()}
         </p>
       </div>
       <div className="flex items-center gap-1 shrink-0">
         {notification.link && (
-          <Button variant="ghost" size="icon" onClick={handleView} title={t("view")}>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleView}
+            title={t("view")}
+          >
             <ExternalLink className="h-4 w-4" />
           </Button>
         )}
