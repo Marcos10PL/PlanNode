@@ -16,7 +16,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { SettingsHeader } from "../settings/settings-header";
+import { SubHeader } from "../sub-header";
 
 export function ProfileForm() {
   const { profile, user } = useUser();
@@ -82,11 +82,7 @@ export function ProfileForm() {
 
   return (
     <>
-      <SettingsHeader
-        className="mt-4 mb-6"
-        title={t("title")}
-        description={t("description")}
-      />
+      <SubHeader title={t("title")} description={t("description")} />
 
       <form
         onSubmit={form.handleSubmit(onSubmit)}

@@ -203,13 +203,21 @@ CREATE INDEX idx_workspace_members_id ON public.workspace_members(id);
 CREATE INDEX idx_workspace_invitations_workspace_id ON public.workspace_invitations(workspace_id);
 CREATE INDEX idx_workspace_invitations_token ON public.workspace_invitations(token);
 CREATE INDEX idx_workspace_invitations_email ON public.workspace_invitations(email);
+CREATE INDEX idx_workspace_invitations_status ON public.workspace_invitations(status);
 
 -- Permissions
-REVOKE SELECT ON public.workspaces FROM anon;
-REVOKE SELECT ON public.workspace_members FROM anon;
-REVOKE SELECT ON public.workspace_invitations FROM anon;
+REVOKE ALL ON public.workspaces FROM anon;
+REVOKE ALL ON public.workspace_members FROM anon;
+REVOKE ALL ON public.workspace_invitations FROM anon;
 REVOKE EXECUTE ON FUNCTION public.is_workspace_member(uuid, uuid) FROM anon;
 REVOKE EXECUTE ON FUNCTION public.get_workspace_member_role(uuid, uuid) FROM anon;
 REVOKE EXECUTE ON FUNCTION public.get_workspace_owner(uuid) FROM anon;
 REVOKE EXECUTE ON FUNCTION public.add_workspace_owner() FROM anon;
 REVOKE EXECUTE ON FUNCTION public.set_workspaces_updated_at() FROM anon;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.workspaces TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.workspace_members TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.workspace_invitations TO authenticated;
+GRANT ALL ON public.workspaces TO service_role;
+GRANT ALL ON public.workspace_members TO service_role;
+GRANT ALL ON public.workspace_invitations TO service_role;

@@ -93,8 +93,11 @@ CREATE OR REPLACE TRIGGER set_profiles_updated_at
   FOR EACH ROW EXECUTE PROCEDURE public.set_updated_at();
 
 -- Permissions
-REVOKE SELECT ON public.profiles FROM anon;
+REVOKE ALL ON public.profiles FROM anon;
 REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM anon;
 REVOKE EXECUTE ON FUNCTION public.handle_user_email_update() FROM anon;
 REVOKE EXECUTE ON FUNCTION public.set_updated_at() FROM anon;
 REVOKE EXECUTE ON FUNCTION public.is_admin() FROM anon;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO authenticated;
+GRANT ALL ON public.profiles TO service_role;

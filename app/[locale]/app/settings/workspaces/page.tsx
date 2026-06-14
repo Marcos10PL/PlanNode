@@ -3,7 +3,7 @@
 import { useAppConfig } from "@/components/providers/app-config-provider";
 import { useUser } from "@/components/providers/user-provider";
 import { useWorkspaces } from "@/components/providers/workspace-provider";
-import { SettingsHeader } from "@/components/settings/settings-header";
+import { SubHeader } from "@/components/sub-header";
 import {
   Accordion,
   AccordionContent,
@@ -52,7 +52,7 @@ export default function ProfileWorkspacesPage() {
   return (
     <>
       <div className="flex flex-col! md:flex-row! md:items-center gap-x-8 gap-y-4 justify-between mt-4 mb-6">
-        <SettingsHeader
+        <SubHeader
           title={t("title")}
           description={`${t("description")} ${isShared ? "" : myLabelCount}`}
         />

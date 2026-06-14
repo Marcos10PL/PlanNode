@@ -28,6 +28,7 @@ export function DeleteWorkspaceModal({ workspace, open, onOpenChange }: Props) {
   const [isPending, setIsPending] = useState(false);
 
   const t = useTranslations("workspace.delete");
+  const tCommon = useTranslations("common");
   const { activeWorkspace, setActiveWorkspace, workspaces } = useWorkspaces();
 
   const handleClose = () => onOpenChange(false);
@@ -51,6 +52,8 @@ export function DeleteWorkspaceModal({ workspace, open, onOpenChange }: Props) {
       }
 
       handleClose();
+    } catch {
+      toast.error(tCommon("unexpected_error"));
     } finally {
       setIsPending(false);
     }

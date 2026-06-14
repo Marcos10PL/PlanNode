@@ -1,5 +1,8 @@
 {
   "logo": "PlanNode",
+  "common": {
+    "unexpected_error": "Something went wrong. Please try again."
+  },
   "footer": {
     "all_rights_reserved": "PlanNode. All rights reserved."
   },
@@ -332,6 +335,10 @@
     "title": "Notifications",
     "mark_all_read": "Mark all as read",
     "delete_all": "Delete all",
+    "delete_confirm_title": "Delete notification",
+    "delete_confirm_description": "Are you sure you want to delete this notification?",
+    "delete_all_confirm_title": "Delete all notifications",
+    "delete_all_confirm_description": "Are you sure you want to delete all notifications? This action cannot be undone.",
     "empty": "No notifications",
     "new_badge": "New",
     "delete": "Delete",

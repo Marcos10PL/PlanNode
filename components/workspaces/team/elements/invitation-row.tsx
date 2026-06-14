@@ -30,6 +30,8 @@ export const InvitationRow = ({
       } else {
         toast.success(t("team.revoke_success"));
       }
+    } catch {
+      toast.error(t("common.unexpected_error"));
     } finally {
       setIsPending(false);
     }

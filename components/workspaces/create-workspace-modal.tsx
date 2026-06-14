@@ -31,6 +31,7 @@ export function CreateWorkspaceModal() {
   const t = useTranslations("workspace");
   const tProfile = useTranslations("profile_workspaces");
   const tErrors = useTranslations("fields.errors");
+  const tCommon = useTranslations("common");
   const { workspaces, setActiveWorkspace } = useWorkspaces();
 
   const form = useForm<CreateWorkspaceSchema>({
@@ -47,25 +48,29 @@ export function CreateWorkspaceModal() {
   };
 
   const onSubmit = async (data: CreateWorkspaceSchema) => {
-    const result = await createWorkspaceAction(data);
+    try {
+      const result = await createWorkspaceAction(data);
 
-    if (result.error) {
-      toast.error(
-        result.error === ERRORS.WORKSPACE_LIMIT_REACHED
-          ? t("create.limit_reached")
-          : t("create.error"),
-      );
-      return;
-    }
+      if (result.error) {
+        toast.error(
+          result.error === ERRORS.WORKSPACE_LIMIT_REACHED
+            ? t("create.limit_reached")
+            : t("create.error"),
+        );
+        return;
+      }
 
-    toast.success(t("create.success"));
+      toast.success(t("create.success"));
 
-    if (workspaces.length === 0) {
-      setActiveWorkspace(result.workspace);
-      handleClose();
-    } else {
-      setCreated(result.workspace);
-      setStep("confirm-active");
+      if (workspaces.length === 0) {
+        setActiveWorkspace(result.workspace);
+        handleClose();
+      } else {
+        setCreated(result.workspace);
+        setStep("confirm-active");
+      }
+    } catch {
+      toast.error(tCommon("unexpected_error"));
     }
   };
 

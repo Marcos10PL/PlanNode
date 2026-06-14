@@ -27,6 +27,7 @@ export function SignUpForm({
 }: React.ComponentPropsWithoutRef<"div">) {
   const t = useTranslations("auth.sign_up_form");
   const tAuth = useTranslations("auth");
+  const tCommon = useTranslations("common");
 
   const router = useRouter();
 
@@ -41,18 +42,22 @@ export function SignUpForm({
   });
 
   const onSubmit = async (data: RegisterSchema) => {
-    const result = await signUpAction(data);
-    if (result.error) {
-      if (result.error === ERRORS.USER_ALREADY_EXISTS) {
-        toast.error(t("user_already_exists"));
-      } else {
-        toast.error(t("sign_up_failed"));
+    try {
+      const result = await signUpAction(data);
+      if (result.error) {
+        if (result.error === ERRORS.USER_ALREADY_EXISTS) {
+          toast.error(t("user_already_exists"));
+        } else {
+          toast.error(t("sign_up_failed"));
+        }
+        return;
       }
-      return;
+      router.replace(
+        `${LINKS.SIGN_UP_SUCCESS}?email=${encodeURIComponent(data.email)}`,
+      );
+    } catch {
+      toast.error(tCommon("unexpected_error"));
     }
-    router.replace(
-      `${LINKS.SIGN_UP_SUCCESS}?email=${encodeURIComponent(data.email)}`,
-    );
   };
 
   return (

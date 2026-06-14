@@ -29,6 +29,7 @@ export function LoginForm({
 }: React.ComponentPropsWithoutRef<"div">) {
   const t = useTranslations("auth.login");
   const tAuth = useTranslations("auth");
+  const tCommon = useTranslations("common");
   const router = useRouter();
 
   const form = useForm<LoginSchema>({
@@ -49,24 +50,28 @@ export function LoginForm({
   };
 
   const onSubmit = async (data: LoginSchema) => {
-    const result = await loginAction(data);
-    if (result.error) {
-      if (result.error === ERRORS.INVALID_CREDENTIALS) {
-        toast.error(t("invalid_credentials"));
-      } else if (result.error === ERRORS.EMAIL_NOT_CONFIRMED) {
-        toast.error(t("email_not_confirmed"), {
-          action: {
-            label: t("resend_email"),
-            onClick: () => resendConfirmationEmail(data.email),
-          },
-        });
-      } else {
-        toast.error(t("login_failed"));
+    try {
+      const result = await loginAction(data);
+      if (result.error) {
+        if (result.error === ERRORS.INVALID_CREDENTIALS) {
+          toast.error(t("invalid_credentials"));
+        } else if (result.error === ERRORS.EMAIL_NOT_CONFIRMED) {
+          toast.error(t("email_not_confirmed"), {
+            action: {
+              label: t("resend_email"),
+              onClick: () => resendConfirmationEmail(data.email),
+            },
+          });
+        } else {
+          toast.error(t("login_failed"));
+        }
+        return;
       }
-      return;
+      toast.success(t("logged_in_successfully"));
+      router.replace(LINKS.DASHBOARD);
+    } catch {
+      toast.error(tCommon("unexpected_error"));
     }
-    toast.success(t("logged_in_successfully"));
-    router.replace(LINKS.DASHBOARD);
   };
 
   return (

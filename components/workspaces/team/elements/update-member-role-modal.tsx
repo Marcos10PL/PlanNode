@@ -37,12 +37,16 @@ export function UpdateMemberRoleModal({
   });
 
   const onSubmit = async (data: UpdateMemberRoleSchema) => {
-    const result = await updateMemberRoleAction(workspaceId, member.id, data);
-    if (result?.error) {
-      toast.error(t("team.change_role_error"));
-    } else {
-      toast.success(t("team.change_role_success"));
-      onOpenChange(false);
+    try {
+      const result = await updateMemberRoleAction(workspaceId, member.id, data);
+      if (result?.error) {
+        toast.error(t("team.change_role_error"));
+      } else {
+        toast.success(t("team.change_role_success"));
+        onOpenChange(false);
+      }
+    } catch {
+      toast.error(t("common.unexpected_error"));
     }
   };
 

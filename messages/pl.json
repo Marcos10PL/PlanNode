@@ -1,5 +1,8 @@
 {
   "logo": "PlanNode",
+  "common": {
+    "unexpected_error": "Coś poszło nie tak. Spróbuj ponownie."
+  },
   "footer": {
     "all_rights_reserved": "PlanNode. Wszelkie prawa zastrzeżone."
   },
@@ -332,6 +335,10 @@
     "title": "Powiadomienia",
     "mark_all_read": "Oznacz wszystkie jako przeczytane",
     "delete_all": "Usuń wszystkie",
+    "delete_confirm_title": "Usuń powiadomienie",
+    "delete_confirm_description": "Czy na pewno chcesz usunąć to powiadomienie?",
+    "delete_all_confirm_title": "Usuń wszystkie powiadomienia",
+    "delete_all_confirm_description": "Czy na pewno chcesz usunąć wszystkie powiadomienia? Tej operacji nie można cofnąć.",
     "empty": "Brak powiadomień",
     "new_badge": "Nowe",
     "delete": "Usuń",

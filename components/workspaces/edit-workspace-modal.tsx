@@ -29,6 +29,7 @@ type Props = {
 export function EditWorkspaceModal({ workspace, open, onOpenChange }: Props) {
   const t = useTranslations("workspace.edit");
   const tErrors = useTranslations("fields.errors");
+  const tCommon = useTranslations("common");
 
   const form = useForm<UpdateWorkspaceSchema>({
     resolver: zodResolver(updateWorkspaceSchema(tErrors)),
@@ -48,15 +49,19 @@ export function EditWorkspaceModal({ workspace, open, onOpenChange }: Props) {
   }, [open, workspace]);
 
   const onSubmit = async (data: UpdateWorkspaceSchema) => {
-    const result = await updateWorkspaceAction(workspace.id, data);
+    try {
+      const result = await updateWorkspaceAction(workspace.id, data);
 
-    if (result.error) {
-      toast.error(t("error"));
-      return;
+      if (result.error) {
+        toast.error(t("error"));
+        return;
+      }
+
+      toast.success(t("success"));
+      onOpenChange(false);
+    } catch {
+      toast.error(tCommon("unexpected_error"));
     }
-
-    toast.success(t("success"));
-    onOpenChange(false);
   };
 
   const isChanged =

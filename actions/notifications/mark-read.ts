@@ -26,7 +26,8 @@ export async function markNotificationReadAction(
       .from("notifications")
       .update({ read_at: readAt })
       .eq("id", opts.id)
-      .eq("user_id", user.id);
+      .eq("user_id", user.id)
+      .is("read_at", null);
   }
 
   revalidatePath(LINKS.NOTIFICATIONS);

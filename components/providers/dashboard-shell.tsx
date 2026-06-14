@@ -28,8 +28,6 @@ export async function DashboardShell({
     getAppConfig(),
   ]);
 
-  console.log(workspaces);
-
   if (
     profile &&
     profile.locale !== locale &&

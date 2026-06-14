@@ -20,6 +20,7 @@ import { EditWorkspaceModal } from "../edit-workspace-modal";
 
 export function WorkspaceActions({ workspace }: { workspace: Workspace }) {
   const t = useTranslations("profile_workspaces");
+  const tCommon = useTranslations("common");
   const { user } = useUser();
 
   const [editOpen, setEditOpen] = useState(false);
@@ -39,6 +40,8 @@ export function WorkspaceActions({ workspace }: { workspace: Workspace }) {
       } else {
         toast.success(t("leave_success"));
       }
+    } catch {
+      toast.error(tCommon("unexpected_error"));
     } finally {
       setIsLeaving(false);
     }
@@ -115,7 +118,6 @@ export function WorkspaceActions({ workspace }: { workspace: Workspace }) {
         title={t("workspace.leave_confirm_title")}
         description={t("workspace.leave_confirm_description")}
         isPending={isLeaving}
-        variant="destructive"
       />
     </>
   );

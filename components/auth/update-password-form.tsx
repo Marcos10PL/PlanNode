@@ -24,6 +24,7 @@ export function UpdatePasswordForm({
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
   const t = useTranslations("auth.update_password");
+  const tCommon = useTranslations("common");
   const router = useRouter();
 
   const form = useForm<UpdatePasswordSchema>({
@@ -37,12 +38,16 @@ export function UpdatePasswordForm({
   });
 
   const handleUpdatePassword = async (data: UpdatePasswordSchema) => {
-    const result = await updatePasswordAction(data);
-    if (result.error) {
-      toast.error(t("error_generic"));
-      return;
+    try {
+      const result = await updatePasswordAction(data);
+      if (result.error) {
+        toast.error(t("error_generic"));
+        return;
+      }
+      router.replace(LINKS.DASHBOARD);
+    } catch {
+      toast.error(tCommon("unexpected_error"));
     }
-    router.replace(LINKS.DASHBOARD);
   };
 
   return (

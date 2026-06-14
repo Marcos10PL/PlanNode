@@ -54,6 +54,8 @@ export function MemberRow({
       } else {
         toast.success(t("team.remove_member_success"));
       }
+    } catch {
+      toast.error(t("common.unexpected_error"));
     } finally {
       setIsPending(false);
     }

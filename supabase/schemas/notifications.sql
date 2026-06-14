@@ -49,6 +49,11 @@ $$;
 GRANT EXECUTE ON FUNCTION public.create_notification(uuid, public.notification_type, jsonb, text) TO authenticated;
 REVOKE EXECUTE ON FUNCTION public.create_notification(uuid, public.notification_type, jsonb, text) FROM anon;
 
+REVOKE ALL ON public.notifications FROM anon;
+REVOKE INSERT ON public.notifications FROM authenticated;
+GRANT SELECT, UPDATE, DELETE ON public.notifications TO authenticated;
+GRANT ALL ON public.notifications TO service_role;
+
 CREATE OR REPLACE FUNCTION public.delete_invitation_notification(p_invitation_id uuid)
 RETURNS void
 LANGUAGE sql
@@ -60,3 +65,6 @@ $$;
 
 GRANT EXECUTE ON FUNCTION public.delete_invitation_notification(uuid) TO authenticated;
 REVOKE EXECUTE ON FUNCTION public.delete_invitation_notification(uuid) FROM anon;
+
+ALTER publication supabase_realtime
+ADD TABLE public.notifications;

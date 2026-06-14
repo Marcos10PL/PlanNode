@@ -18,3 +18,8 @@ ON public.email_templates FOR SELECT TO authenticated USING (true);
 CREATE POLICY "admin can manage email_templates"
 ON public.email_templates FOR ALL TO authenticated
 USING (public.is_admin()) WITH CHECK (public.is_admin());
+
+-- Permissions
+REVOKE ALL ON public.email_templates FROM anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.email_templates TO authenticated;
+GRANT ALL ON public.email_templates TO service_role;

@@ -27,6 +27,7 @@ export function ForgotPasswordForm({
 }: React.ComponentPropsWithoutRef<"div">) {
   const t = useTranslations("auth.forgot_password");
   const tAuth = useTranslations("auth");
+  const tCommon = useTranslations("common");
   const [success, setSuccess] = useState(false);
 
   const form = useForm<ForgotPasswordSchema>({
@@ -39,13 +40,17 @@ export function ForgotPasswordForm({
   });
 
   const onSubmit = async (data: ForgotPasswordSchema) => {
-    const result = await forgotPasswordAction(data);
-    if (result.error) {
-      toast.error(t("error_generic"));
-      return;
+    try {
+      const result = await forgotPasswordAction(data);
+      if (result.error) {
+        toast.error(t("error_generic"));
+        return;
+      }
+      toast.success(t("success_description"));
+      setSuccess(true);
+    } catch {
+      toast.error(tCommon("unexpected_error"));
     }
-    toast.success(t("success_description"));
-    setSuccess(true);
   };
 
   return (
