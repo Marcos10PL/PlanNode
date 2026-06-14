@@ -278,7 +278,11 @@
     "leave_success": "You have left the workspace",
     "leave_error": "Could not leave the workspace",
     "my_workspaces": "Mine",
-    "shared_workspaces": "Shared with me"
+    "shared_workspaces": "Shared with me",
+    "workspace": {
+      "leave_confirm_title": "Leave workspace",
+      "leave_confirm_description": "Are you sure you want to leave this workspace? You will lose access to all its content."
+    }
   },
   "confirm_modal": {
     "cancel": "Cancel",

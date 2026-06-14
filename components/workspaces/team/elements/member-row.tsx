@@ -47,13 +47,15 @@ export function MemberRow({
 
   const handleRemove = async () => {
     setIsPending(true);
-    const result = await removeMemberAction(workspaceId, member.id);
-    setIsPending(false);
-
-    if (result?.error) {
-      toast.error(t("team.remove_member_error"));
-    } else {
-      toast.success(t("team.remove_member_success"));
+    try {
+      const result = await removeMemberAction(workspaceId, member.id);
+      if (result?.error) {
+        toast.error(t("team.remove_member_error"));
+      } else {
+        toast.success(t("team.remove_member_success"));
+      }
+    } finally {
+      setIsPending(false);
     }
   };
 

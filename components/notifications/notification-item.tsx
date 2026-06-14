@@ -33,9 +33,12 @@ export function NotificationItem({
 
   const handleDelete = async () => {
     setIsPending(true);
-    await deleteNotificationAction({ id: notification.id });
-    setIsPending(false);
-    toast.success(t("delete"));
+    try {
+      await deleteNotificationAction({ id: notification.id });
+      toast.success(t("delete"));
+    } finally {
+      setIsPending(false);
+    }
   };
 
   return (

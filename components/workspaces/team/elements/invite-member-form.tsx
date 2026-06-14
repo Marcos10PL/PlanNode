@@ -22,6 +22,7 @@ export function InviteMemberForm({ workspaceId }: { workspaceId: string }) {
 
   const onSubmit = async (data: InviteMemberSchema) => {
     const result = await inviteMemberAction(workspaceId, data);
+
     if (result?.error === ERRORS.ALREADY_MEMBER) {
       toast.error(t("team.invite_already_member"));
     } else if (result?.error) {

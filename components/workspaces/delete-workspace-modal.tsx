@@ -35,22 +35,25 @@ export function DeleteWorkspaceModal({ workspace, open, onOpenChange }: Props) {
 
   const handleDelete = async () => {
     setIsPending(true);
+    try {
+      const result = await deleteWorkspaceAction(workspace.id);
 
-    const result = await deleteWorkspaceAction(workspace.id);
+      if (result.error) {
+        toast.error(t("error"));
+        return;
+      }
 
-    if (result.error) {
-      toast.error(t("error"));
-      return;
+      toast.success(t("success"));
+
+      if (activeWorkspace?.id === workspace.id) {
+        const next = workspaces.find(w => w.id !== workspace.id) ?? null;
+        if (next) setActiveWorkspace(next);
+      }
+
+      handleClose();
+    } finally {
+      setIsPending(false);
     }
-
-    toast.success(t("success"));
-
-    if (activeWorkspace?.id === workspace.id) {
-      const next = workspaces.find(w => w.id !== workspace.id) ?? null;
-      if (next) setActiveWorkspace(next);
-    }
-
-    handleClose();
   };
 
   return (

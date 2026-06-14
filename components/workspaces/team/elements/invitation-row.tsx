@@ -23,13 +23,15 @@ export const InvitationRow = ({
 
   const handleRevoke = async () => {
     setIsPending(true);
-    const result = await revokeInvitationAction(invitation.id);
-    setIsPending(false);
-
-    if (result?.error) {
-      toast.error(t("team.revoke_error"));
-    } else {
-      toast.success(t("team.revoke_success"));
+    try {
+      const result = await revokeInvitationAction(invitation.id);
+      if (result?.error) {
+        toast.error(t("team.revoke_error"));
+      } else {
+        toast.success(t("team.revoke_success"));
+      }
+    } finally {
+      setIsPending(false);
     }
   };
 

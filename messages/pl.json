@@ -278,7 +278,11 @@
     "leave_success": "Opuściłeś przestrzeń roboczą",
     "leave_error": "Nie udało się opuścić przestrzeni roboczej",
     "my_workspaces": "Moje",
-    "shared_workspaces": "Udostępnione dla mnie"
+    "shared_workspaces": "Udostępnione dla mnie",
+    "workspace": {
+      "leave_confirm_title": "Opuść przestrzeń roboczą",
+      "leave_confirm_description": "Czy na pewno chcesz opuścić tę przestrzeń roboczą? Utracisz dostęp do całej jej zawartości."
+    }
   },
   "confirm_modal": {
     "cancel": "Anuluj",

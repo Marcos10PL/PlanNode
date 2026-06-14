@@ -16,7 +16,7 @@ import { updateWorkspaceSchema, UpdateWorkspaceSchema } from "@/schema";
 import { Workspace } from "@/types/dto";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -29,8 +29,6 @@ type Props = {
 export function EditWorkspaceModal({ workspace, open, onOpenChange }: Props) {
   const t = useTranslations("workspace.edit");
   const tErrors = useTranslations("fields.errors");
-
-  const [isPending, setIsPending] = useState(false);
 
   const form = useForm<UpdateWorkspaceSchema>({
     resolver: zodResolver(updateWorkspaceSchema(tErrors)),
@@ -50,9 +48,7 @@ export function EditWorkspaceModal({ workspace, open, onOpenChange }: Props) {
   }, [open, workspace]);
 
   const onSubmit = async (data: UpdateWorkspaceSchema) => {
-    setIsPending(true);
     const result = await updateWorkspaceAction(workspace.id, data);
-    setIsPending(false);
 
     if (result.error) {
       toast.error(t("error"));
@@ -97,8 +93,11 @@ export function EditWorkspaceModal({ workspace, open, onOpenChange }: Props) {
             >
               {t("cancel")}
             </Button>
-            <Button type="submit" disabled={isPending || !isChanged}>
-              {isPending ? t("submitting") : t("submit")}
+            <Button
+              type="submit"
+              disabled={form.formState.isSubmitting || !isChanged}
+            >
+              {form.formState.isSubmitting ? t("submitting") : t("submit")}
             </Button>
           </div>
         </form>
