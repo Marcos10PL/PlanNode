@@ -66,5 +66,5 @@ export async function acceptInvitationAction(token: string) {
   revalidatePath(LINKS.TEAM);
   revalidatePath(LINKS.PROFILE_WORKSPACES);
 
-  redirect(LINKS.DASHBOARD);
+  redirect(LINKS.PROFILE_WORKSPACES);
 }

@@ -1,4 +1,6 @@
+import { LINKS } from "@/const";
 import { Notification } from "@/types/dto";
+import { redirect } from "next/navigation";
 import { cache } from "react";
 import { createClient } from "../supabase/server";
 
@@ -8,7 +10,7 @@ export const getNotifications = cache(async () => {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) throw new Error("Unauthenticated");
+  if (!user) redirect(LINKS.LOGIN);
 
   const { data } = await supabase
     .from("notifications")
@@ -37,7 +39,7 @@ export const getUnreadNotificationsCount = cache(async () => {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) throw new Error("Unauthenticated");
+  if (!user) redirect(LINKS.LOGIN);
 
   const { count } = await supabase
     .from("notifications")

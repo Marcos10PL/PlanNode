@@ -44,6 +44,13 @@ export type WorkspaceInvitation = ToCamelCase<
   Pick<WorkspaceInvitationTable, "id" | "email" | "role">
 >;
 
+export type InvitationDetails = ToCamelCase<
+  Pick<WorkspaceInvitationTable, "id" | "email" | "role" | "expires_at">
+> & {
+  workspaceName: string | null;
+  inviterName: string | null;
+};
+
 export type WorkspaceMember = {
   id: WorkspaceMemberTable["id"];
   role: WorkspaceMemberTable["role"];

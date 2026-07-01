@@ -51,7 +51,7 @@ export default function ProfileWorkspacesPage() {
 
   return (
     <>
-      <div className="flex flex-col! md:flex-row! md:items-center gap-x-8 gap-y-4 justify-between mt-4 mb-6">
+      <div className="flex flex-col! md:flex-row! md:items-center gap-x-8 justify-between">
         <SubHeader
           title={t("title")}
           description={`${t("description")} ${isShared ? "" : myLabelCount}`}
@@ -91,7 +91,7 @@ export default function ProfileWorkspacesPage() {
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="flex flex-col gap-2 w-full max-w-full overflow-hidden">
+    <div className="flex flex-col gap-2 w-full max-w-full overflow-hidden mt-4 md:mt-0">
       {children}
     </div>
   );

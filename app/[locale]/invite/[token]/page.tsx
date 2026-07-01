@@ -1,97 +1,48 @@
-import { acceptInvitationAction } from "@/actions/workspace/accept-invitation";
-import { declineInvitationAction } from "@/actions/workspace/decline-invitation";
-import { Button } from "@/components/ui/button";
+import { Actions } from "@/components/invite/actions";
+import { Layout } from "@/components/invite/layout";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { LINKS } from "@/const";
-import { createClient } from "@/lib/supabase/server";
-import { getRoleLabel } from "@/utils";
+import { getInvitationByToken, getProfile } from "@/lib/data";
+import { getRoleLabel, getRoleVariant } from "@/utils";
 import { getTranslations } from "next-intl/server";
-import { redirect } from "next/navigation";
 
 type Props = {
   params: Promise<{ locale: string; token: string }>;
 };
 
 export default async function InvitePage({ params }: Props) {
-  const { locale, token } = await params;
+  const { token } = await params;
   const t = await getTranslations("invite_page");
   const tTeam = await getTranslations();
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect(`/${locale}${LINKS.LOGIN}`);
-  }
-
-  const { data: invitation } = await supabase
-    .from("workspace_invitations")
-    .select("*, workspace:workspaces(name)")
-    .eq("token", token)
-    .eq("status", "pending")
-    .single();
+  const { profile } = await getProfile();
+  const invitation = await getInvitationByToken(token);
 
   if (!invitation) {
     return (
-      <div className="flex min-h-svh items-center justify-center p-6">
-        <Card className="w-full max-w-sm">
-          <CardHeader>
-            <CardTitle>{t("title")}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              {t("error_not_found")}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      <Layout>
+        <p className="text-sm text-muted-foreground">{t("error_not_found")}</p>
+      </Layout>
     );
   }
 
-  if (new Date(invitation.expires_at) < new Date()) {
+  if (new Date(invitation.expiresAt) < new Date()) {
     return (
-      <div className="flex min-h-svh items-center justify-center p-6">
-        <Card className="w-full max-w-sm">
-          <CardHeader>
-            <CardTitle>{t("title")}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              {t("error_expired")}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      <Layout>
+        <p className="text-sm text-muted-foreground">{t("error_expired")}</p>
+      </Layout>
     );
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("email")
-    .eq("id", user.id)
-    .single();
-
-  if (profile?.email !== invitation.email) {
+  if (profile.email !== invitation.email) {
     return (
-      <div className="flex min-h-svh items-center justify-center p-6">
-        <Card className="w-full max-w-sm">
-          <CardHeader>
-            <CardTitle>{t("title")}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              {t("error_email_mismatch")}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      <Layout>
+        <p className="text-sm text-muted-foreground">
+          {t("error_email_mismatch")}
+        </p>
+      </Layout>
     );
   }
-
-  const workspaceName =
-    (invitation.workspace as { name: string } | null)?.name ?? "";
 
   return (
     <div className="flex min-h-svh items-center justify-center p-6">
@@ -99,43 +50,27 @@ export default async function InvitePage({ params }: Props) {
         <CardHeader>
           <CardTitle>{t("title")}</CardTitle>
         </CardHeader>
-        <CardContent className="flex flex-col gap-4">
+        <CardContent className="flex flex-col gap-1.5">
           <div>
-            <p className="text-sm text-muted-foreground">
-              {t("invited_by", { name: invitation.email })}
-            </p>
-            <p className="text-lg font-semibold mt-1">{workspaceName}</p>
+            {invitation.inviterName && (
+              <p className="text-sm text-muted-foreground">
+                {t("invited_by", { name: invitation.inviterName })}
+                <span className="text-sm dark:text-white text-black font-semibold mt-1 ml-1">
+                  {invitation.workspaceName}
+                </span>
+              </p>
+            )}
           </div>
-          <div>
-            <p className="text-xs text-muted-foreground">{t("role_label")}</p>
-            <p className="text-sm font-medium">
+          <div className="flex gap-2 items-center mb-4">
+            <p className="text-sm text-muted-foreground">{t("role_label")}</p>
+            <Badge
+              variant={getRoleVariant(invitation.role!)}
+              className="shrink-0 pointer-events-none"
+            >
               {getRoleLabel(invitation.role!, tTeam)}
-            </p>
+            </Badge>
           </div>
-          <div className="flex gap-2">
-            <form
-              action={async () => {
-                "use server";
-                await acceptInvitationAction(token);
-              }}
-              className="flex-1"
-            >
-              <Button type="submit" className="w-full">
-                {t("accept")}
-              </Button>
-            </form>
-            <form
-              action={async () => {
-                "use server";
-                await declineInvitationAction(token);
-              }}
-              className="flex-1"
-            >
-              <Button type="submit" variant="outline" className="w-full">
-                {t("decline")}
-              </Button>
-            </form>
-          </div>
+          <Actions token={token} />
         </CardContent>
       </Card>
     </div>

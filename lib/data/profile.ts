@@ -1,4 +1,6 @@
+import { LINKS } from "@/const";
 import { Profile } from "@/types/dto";
+import { redirect } from "next/navigation";
 import { cache } from "react";
 import { createClient } from "../supabase/server";
 
@@ -9,7 +11,7 @@ export const getProfile = cache(async () => {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) throw new Error("Unauthenticated");
+  if (!user) redirect(LINKS.LOGIN);
 
   const { data: profile, error } = await supabase
     .from("profiles")
@@ -17,7 +19,7 @@ export const getProfile = cache(async () => {
     .eq("id", user.id)
     .single();
 
-  if (!profile || error) throw new Error("Profile not found");
+  if (!profile || error) redirect(LINKS.LOGIN);
 
   return {
     profile: {
