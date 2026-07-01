@@ -18,7 +18,7 @@ export const getWorkspaceMembers = cache(async (workspaceId: string) => {
     .eq("workspace_id", workspaceId)
     .order("joined_at", { ascending: true });
 
-  if (!members?.some(m => m.id === user.id)) throw new Error("Unauthorized");
+  if (!members?.some(m => m.id === user.id)) redirect(LINKS.LOGIN);
 
   const { data: profiles } = await supabase
     .from("profiles")
