@@ -1,6 +1,6 @@
 "use client";
 
-import { AppConfig } from "@/types/entities";
+import { AppConfig } from "@/types/dto";
 import { createContext, useContext } from "react";
 
 const AppConfigContext = createContext<AppConfig | null>(null);

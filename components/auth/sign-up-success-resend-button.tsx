@@ -6,18 +6,17 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 
-type SignUpSuccessResendButtonProps = {
+type Props = {
   email: string;
 };
 
-export function SignUpSuccessResendButton({
-  email,
-}: SignUpSuccessResendButtonProps) {
+export function SignUpSuccessResendButton({ email }: Props) {
   const t = useTranslations("auth.sign_up_success");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const tCommon = useTranslations("common");
+  const [isPending, setIsPending] = useState(false);
 
   const handleResend = async () => {
-    setIsSubmitting(true);
+    setIsPending(true);
     try {
       const result = await resendConfirmationAction(email);
       if (result.error) {
@@ -25,8 +24,10 @@ export function SignUpSuccessResendButton({
         return;
       }
       toast.success(t("resend_email_success"));
+    } catch {
+      toast.error(tCommon("unexpected_error"));
     } finally {
-      setIsSubmitting(false);
+      setIsPending(false);
     }
   };
 
@@ -35,10 +36,10 @@ export function SignUpSuccessResendButton({
       type="button"
       variant="outline"
       onClick={handleResend}
-      disabled={isSubmitting}
+      disabled={isPending}
       className="mt-4 w-full"
     >
-      {isSubmitting ? t("resending_email") : t("resend_email")}
+      {isPending ? t("resending_email") : t("resend_email")}
     </Button>
   );
 }

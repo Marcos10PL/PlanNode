@@ -1,4 +1,4 @@
-import { createServerClient } from "@supabase/ssr";
+﻿import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { LOCALES } from "@/i18n/routing";
 import { LINKS } from "@/const";
@@ -31,8 +31,9 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
-  const { data } = await supabase.auth.getClaims();
-  const user = data?.claims;
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   const { pathname } = request.nextUrl;
   const locale =
@@ -43,8 +44,8 @@ export async function updateSession(request: NextRequest) {
   const pathWithoutLocale =
     pathname.replace(new RegExp(`^/${locale}`), "") || "/";
 
-  const protectedRoutes = [LINKS.app];
-  const guestOnlyRoutes = [LINKS.home, LINKS.login, LINKS.signUp, LINKS.forgotPassword];
+  const protectedRoutes = [LINKS.APP];
+  const guestOnlyRoutes = [LINKS.HOME, LINKS.LOGIN, LINKS.SIGN_UP, LINKS.FORGOT_PASSWORD];
 
   const isProtected = protectedRoutes.some(
     route =>
@@ -56,13 +57,13 @@ export async function updateSession(request: NextRequest) {
 
   if (isProtected && !user) {
     const url = request.nextUrl.clone();
-    url.pathname = `/${locale}${LINKS.login}`;
+    url.pathname = `/${locale}${LINKS.LOGIN}`;
     return NextResponse.redirect(url);
   }
 
   if (isGuestOnly && user) {
     const url = request.nextUrl.clone();
-    url.pathname = `/${locale}${LINKS.dashboard}`;
+    url.pathname = `/${locale}${LINKS.DASHBOARD}`;
     return NextResponse.redirect(url);
   }
 

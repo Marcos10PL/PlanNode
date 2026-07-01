@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -9,16 +9,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { LogOutIcon, SettingsIcon } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
-import { LINKS } from "@/const";
-import { useTranslations } from "next-intl";
-import { Avatar, AvatarFallback } from "../ui/avatar";
 import { logout } from "@/actions/auth/logout";
-import { useTransition } from "react";
+import { LINKS } from "@/const";
+import { cn, isActivePath } from "@/utils";
+import { LogOutIcon, SettingsIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { cn, isActivePath } from "@/lib/utils";
+import { usePathname, useRouter } from "next/navigation";
+import { useTransition } from "react";
 import { useUser } from "../providers/user-provider";
+import UserAvatar from "../user-avatar";
 
 export function MyAccount() {
   const router = useRouter();
@@ -34,29 +34,29 @@ export function MyAccount() {
     startTransition(async () => {
       await logout();
       router.refresh();
-      router.replace(LINKS.login);
+      router.replace(LINKS.LOGIN);
     });
   };
 
   const isActive = (href: string) =>
-    isActivePath(pathname, href) && "bg-accent text-accent-foreground cursor-default!";
+    isActivePath(pathname, href) &&
+    "bg-accent text-accent-foreground cursor-default!";
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="rounded-full">
-          <Avatar className="border-2 border-gray-400">
-            <AvatarFallback>
-              {user.profile.full_name?.charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
+        <Button variant="ghost" size="icon" className="rounded-full group">
+          <UserAvatar
+            name={user?.profile.fullName}
+            className="border-2 border-gray-400 group-hover:border-gray-300 transition-colors"
+          />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-40">
         <DropdownMenuItem asChild>
           <Link
-            href={LINKS.profileSettings}
-            className={cn(isActive(LINKS.profileSettings))}
+            href={LINKS.PROFILE_SETTINGS}
+            className={cn(isActive(LINKS.PROFILE_SETTINGS))}
           >
             <SettingsIcon />
             {t("settings")}

@@ -1,4 +1,4 @@
-"use server";
+﻿"use server";
 
 import { ERRORS, LINKS } from "@/const";
 import { createClient } from "@/lib/supabase/server";
@@ -12,11 +12,11 @@ export async function resendConfirmationAction(email: string) {
     type: "signup",
     email,
     options: {
-      emailRedirectTo: `${origin}${LINKS.dashboard}`,
+      emailRedirectTo: `${origin}${LINKS.DASHBOARD}`,
     },
   });
 
-  if (error) return { error: ERRORS.serverError };
+  if (error) return { error: ERRORS.SERVER_ERROR };
 
   return { success: true };
 }

@@ -6,7 +6,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "migration:diff": "supabase db diff -f",
+    "migration:push": "supabase db push",
+    "generate-types": "supabase gen types typescript --local > types/supabase.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -27,6 +30,7 @@
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-hook-form": "^7.75.0",
+    "resend": "^6.12.4",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.5.0",
     "zod": "^4.4.3"

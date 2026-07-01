@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/sidebar";
 import { LINKS } from "@/const";
 import { usePathname } from "@/i18n/navigation";
-import { cn, isActivePath } from "@/lib/utils";
+import { cn, isActivePath } from "@/utils";
 import { LayoutDashboard } from "lucide-react";
 import Link from "next/link";
 import LanguageSwitcher from "./language-switcher";
@@ -37,8 +37,8 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <Link
-                href={LINKS.dashboard}
-                className={cn(isActive(LINKS.dashboard))}
+                href={LINKS.DASHBOARD}
+                className={cn(isActive(LINKS.DASHBOARD))}
                 onClick={() => setOpenMobile(false)}
               >
                 <LayoutDashboard className="mr-2" />

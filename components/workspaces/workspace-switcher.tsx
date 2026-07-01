@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useWorkspaces } from "@/components/providers/workspace-provider";
 import {
@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/sidebar";
 import { CreateWorkspaceModal } from "@/components/workspaces/create-workspace-modal";
 import { LINKS } from "@/const";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 import { ChartNoAxesGantt, ChevronDown, Settings } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
@@ -73,7 +73,7 @@ export function WorkspaceSwitcher() {
                 className="bg-secondary hover:bg-secondary/80!"
               >
                 <Link
-                  href={LINKS.profileWorkspaces}
+                  href={LINKS.PROFILE_WORKSPACES}
                   className="flex items-center gap-2"
                 >
                   <Settings size={16} />

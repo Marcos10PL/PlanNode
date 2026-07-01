@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { updateEmailAction } from "@/actions/profile/update-email";
 import { updatePasswordAction } from "@/actions/profile/update-password";
@@ -9,14 +9,14 @@ import { ControlledInputField } from "@/components/ui/controlled-input-field";
 import { ControlledPasswordField } from "@/components/ui/controlled-password-field";
 import { Separator } from "@/components/ui/separator";
 import { ERRORS, VALIDATION_MAX } from "@/const";
-import { formatDate } from "@/lib/utils";
 import { profileSettingsSchema, ProfileSettingsSchema } from "@/schema";
+import { formatDate } from "@/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { SettingsHeader } from "../settings/settings-header";
+import { SubHeader } from "../sub-header";
 
 export function ProfileForm() {
   const { profile, user } = useUser();
@@ -29,7 +29,7 @@ export function ProfileForm() {
       profileSettingsSchema(useTranslations("fields.errors")),
     ),
     defaultValues: {
-      full_name: profile.full_name ?? "",
+      full_name: profile.fullName ?? "",
       email: profile.email,
       password: "",
       confirmPassword: "",
@@ -39,7 +39,7 @@ export function ProfileForm() {
   async function onSubmit(data: ProfileSettingsSchema) {
     const tasks: Promise<string | null>[] = [];
 
-    if (data.full_name !== profile.full_name) {
+    if (data.full_name !== profile.fullName) {
       tasks.push(
         updateProfileAction({ full_name: data.full_name }).then(result =>
           result.error ? t("save_failed") : null,
@@ -64,7 +64,7 @@ export function ProfileForm() {
           confirmPassword: data.confirmPassword,
         }).then(result => {
           if (!result.error) return null;
-          if (result.error === ERRORS.samePassword)
+          if (result.error === ERRORS.SAME_PASSWORD)
             return t("password_same_as_old");
           return t("password_update_failed");
         }),
@@ -82,11 +82,7 @@ export function ProfileForm() {
 
   return (
     <>
-      <SettingsHeader
-        className="mt-4 mb-6"
-        title={t("title")}
-        description={t("description")}
-      />
+      <SubHeader title={t("title")} description={t("description")} />
 
       <form
         onSubmit={form.handleSubmit(onSubmit)}
@@ -149,10 +145,10 @@ export function ProfileForm() {
         <div className="flex flex-col-reverse md:flex-row gap-6 md:items-end justify-between">
           <div className="space-y-1 text-xs text-muted-foreground">
             <p>
-              {t("created_at")}: {formatDate(profile.created_at, locale)}
+              {t("created_at")}: {formatDate(profile.createdAt, locale)}
             </p>
             <p>
-              {t("updated_at")}: {formatDate(profile.updated_at, locale)}
+              {t("updated_at")}: {formatDate(profile.updatedAt, locale)}
             </p>
           </div>
           <Button

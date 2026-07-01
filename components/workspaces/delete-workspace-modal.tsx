@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Workspace } from "@/types/entities";
+import { Workspace } from "@/types/dto"
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -28,6 +28,7 @@ export function DeleteWorkspaceModal({ workspace, open, onOpenChange }: Props) {
   const [isPending, setIsPending] = useState(false);
 
   const t = useTranslations("workspace.delete");
+  const tCommon = useTranslations("common");
   const { activeWorkspace, setActiveWorkspace, workspaces } = useWorkspaces();
 
   const handleClose = () => onOpenChange(false);
@@ -35,22 +36,27 @@ export function DeleteWorkspaceModal({ workspace, open, onOpenChange }: Props) {
 
   const handleDelete = async () => {
     setIsPending(true);
+    try {
+      const result = await deleteWorkspaceAction(workspace.id);
 
-    const result = await deleteWorkspaceAction(workspace.id);
+      if (result.error) {
+        toast.error(t("error"));
+        return;
+      }
 
-    if (result.error) {
-      toast.error(t("error"));
-      return;
+      toast.success(t("success"));
+
+      if (activeWorkspace?.id === workspace.id) {
+        const next = workspaces.find(w => w.id !== workspace.id) ?? null;
+        if (next) setActiveWorkspace(next);
+      }
+
+      handleClose();
+    } catch {
+      toast.error(tCommon("unexpected_error"));
+    } finally {
+      setIsPending(false);
     }
-
-    toast.success(t("success"));
-
-    if (activeWorkspace?.id === workspace.id) {
-      const next = workspaces.find(w => w.id !== workspace.id) ?? null;
-      if (next) setActiveWorkspace(next);
-    }
-
-    handleClose();
   };
 
   return (

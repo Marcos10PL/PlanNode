@@ -18,8 +18,8 @@ import {
 import { ControlledInputField } from "@/components/ui/controlled-input-field";
 import { LINKS } from "@/const";
 import { Link } from "@/i18n/navigation";
-import { cn } from "@/lib/utils";
 import { forgotPasswordSchema, type ForgotPasswordSchema } from "@/schema";
+import { cn } from "@/utils";
 
 export function ForgotPasswordForm({
   className,
@@ -27,6 +27,7 @@ export function ForgotPasswordForm({
 }: React.ComponentPropsWithoutRef<"div">) {
   const t = useTranslations("auth.forgot_password");
   const tAuth = useTranslations("auth");
+  const tCommon = useTranslations("common");
   const [success, setSuccess] = useState(false);
 
   const form = useForm<ForgotPasswordSchema>({
@@ -39,13 +40,17 @@ export function ForgotPasswordForm({
   });
 
   const onSubmit = async (data: ForgotPasswordSchema) => {
-    const result = await forgotPasswordAction(data);
-    if (result.error) {
-      toast.error(t("error_generic"));
-      return;
+    try {
+      const result = await forgotPasswordAction(data);
+      if (result.error) {
+        toast.error(t("error_generic"));
+        return;
+      }
+      toast.success(t("success_description"));
+      setSuccess(true);
+    } catch {
+      toast.error(tCommon("unexpected_error"));
     }
-    toast.success(t("success_description"));
-    setSuccess(true);
   };
 
   return (
@@ -62,7 +67,7 @@ export function ForgotPasswordForm({
             </p>
             <div className="mt-4 text-center text-sm">
               {t("have_account")}{" "}
-              <Link href={LINKS.login} className="underline underline-offset-4">
+              <Link href={LINKS.LOGIN} className="underline underline-offset-4">
                 {tAuth("sign_in")}
               </Link>
             </div>
@@ -99,7 +104,7 @@ export function ForgotPasswordForm({
               <div className="mt-4 text-center text-sm">
                 {t("have_account")}{" "}
                 <Link
-                  href={LINKS.login}
+                  href={LINKS.LOGIN}
                   className="underline underline-offset-4"
                 >
                   {tAuth("sign_in")}

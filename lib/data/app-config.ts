@@ -1,8 +1,8 @@
-import { AppConfig } from "@/types/entities";
+import { AppConfig } from "@/types/dto";
 import { cache } from "react";
 import { createClient } from "../supabase/server";
 
-export const getAppConfig = cache(async (): Promise<AppConfig> => {
+export const getAppConfig = cache(async () => {
   const supabase = await createClient();
 
   const { data } = await supabase.from("app_config").select("key, value");
@@ -14,6 +14,6 @@ export const getAppConfig = cache(async (): Promise<AppConfig> => {
   }
 
   return {
-    max_workspaces_per_user: (config.max_workspaces_per_user as number) ?? 15,
-  };
+    maxWorkspacesPerUser: Number(config.max_workspaces_per_user ?? 15),
+  } satisfies AppConfig;
 });

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { loginAction } from "@/actions/auth/login";
 import { resendConfirmationAction } from "@/actions/auth/resend-confirmation";
@@ -13,8 +13,8 @@ import {
 import { ControlledInputField } from "@/components/ui/controlled-input-field";
 import { ControlledPasswordField } from "@/components/ui/controlled-password-field";
 import { ERRORS, LINKS } from "@/const";
-import { cn } from "@/lib/utils";
 import { loginSchema, LoginSchema } from "@/schema";
+import { cn } from "@/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -29,6 +29,7 @@ export function LoginForm({
 }: React.ComponentPropsWithoutRef<"div">) {
   const t = useTranslations("auth.login");
   const tAuth = useTranslations("auth");
+  const tCommon = useTranslations("common");
   const router = useRouter();
 
   const form = useForm<LoginSchema>({
@@ -49,24 +50,28 @@ export function LoginForm({
   };
 
   const onSubmit = async (data: LoginSchema) => {
-    const result = await loginAction(data);
-    if (result.error) {
-      if (result.error === ERRORS.invalidCredentials) {
-        toast.error(t("invalid_credentials"));
-      } else if (result.error === ERRORS.emailNotConfirmed) {
-        toast.error(t("email_not_confirmed"), {
-          action: {
-            label: t("resend_email"),
-            onClick: () => resendConfirmationEmail(data.email),
-          },
-        });
-      } else {
-        toast.error(t("login_failed"));
+    try {
+      const result = await loginAction(data);
+      if (result.error) {
+        if (result.error === ERRORS.INVALID_CREDENTIALS) {
+          toast.error(t("invalid_credentials"));
+        } else if (result.error === ERRORS.EMAIL_NOT_CONFIRMED) {
+          toast.error(t("email_not_confirmed"), {
+            action: {
+              label: t("resend_email"),
+              onClick: () => resendConfirmationEmail(data.email),
+            },
+          });
+        } else {
+          toast.error(t("login_failed"));
+        }
+        return;
       }
-      return;
+      toast.success(t("logged_in_successfully"));
+      router.replace(LINKS.DASHBOARD);
+    } catch {
+      toast.error(tCommon("unexpected_error"));
     }
-    toast.success(t("logged_in_successfully"));
-    router.replace(LINKS.dashboard);
   };
 
   return (
@@ -96,7 +101,7 @@ export function LoginForm({
               label={t("password")}
               autoComplete="current-password"
               labelRight={
-                <Link href={LINKS.forgotPassword} className="ml-auto text-sm">
+                <Link href={LINKS.FORGOT_PASSWORD} className="ml-auto text-sm">
                   {t("forgot_password")}
                 </Link>
               }
@@ -116,7 +121,7 @@ export function LoginForm({
 
             <div className="mt-4 text-center text-sm">
               {t("no_account")}{" "}
-              <Link href={LINKS.signUp}>{tAuth("sign_up")}</Link>
+              <Link href={LINKS.SIGN_UP}>{tAuth("sign_up")}</Link>
             </div>
           </form>
         </CardContent>

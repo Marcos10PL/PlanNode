@@ -1,20 +1,33 @@
+import { LINKS } from "@/const";
+import { Workspace } from "@/types/dto";
+import { redirect } from "next/navigation";
 import { cache } from "react";
-import { Workspace } from "@/types/entities";
 import { createClient } from "../supabase/server";
 
-export const getWorkspaces = cache(async (): Promise<Workspace[]> => {
+export const getWorkspaces = cache(async () => {
   const supabase = await createClient();
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) return [];
+  if (!user) redirect(LINKS.LOGIN);
 
   const { data } = await supabase
     .from("workspaces")
-    .select("*")
+    .select("*, workspace_members!inner(id)")
+    .eq("workspace_members.id", user.id)
     .order("created_at", { ascending: true });
 
-  return data ?? [];
+  const cleanData = data?.map(({ workspace_members: _, ...w }) => w) ?? [];
+
+  return cleanData.map(
+    w =>
+      ({
+        id: w.id,
+        name: w.name,
+        description: w.description,
+        ownerId: w.owner_id,
+      }) satisfies Workspace,
+  );
 });

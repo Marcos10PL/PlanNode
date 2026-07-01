@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { signUpAction } from "@/actions/auth/sign-up";
 import { Button } from "@/components/ui/button";
@@ -12,8 +12,8 @@ import {
 import { ControlledInputField } from "@/components/ui/controlled-input-field";
 import { ControlledPasswordField } from "@/components/ui/controlled-password-field";
 import { ERRORS, LINKS } from "@/const";
-import { cn } from "@/lib/utils";
 import { registerSchema, RegisterSchema } from "@/schema";
+import { cn } from "@/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -27,6 +27,7 @@ export function SignUpForm({
 }: React.ComponentPropsWithoutRef<"div">) {
   const t = useTranslations("auth.sign_up_form");
   const tAuth = useTranslations("auth");
+  const tCommon = useTranslations("common");
 
   const router = useRouter();
 
@@ -41,18 +42,22 @@ export function SignUpForm({
   });
 
   const onSubmit = async (data: RegisterSchema) => {
-    const result = await signUpAction(data);
-    if (result.error) {
-      if (result.error === ERRORS.userAlreadyExists) {
-        toast.error(t("user_already_exists"));
-      } else {
-        toast.error(t("sign_up_failed"));
+    try {
+      const result = await signUpAction(data);
+      if (result.error) {
+        if (result.error === ERRORS.USER_ALREADY_EXISTS) {
+          toast.error(t("user_already_exists"));
+        } else {
+          toast.error(t("sign_up_failed"));
+        }
+        return;
       }
-      return;
+      router.replace(
+        `${LINKS.SIGN_UP_SUCCESS}?email=${encodeURIComponent(data.email)}`,
+      );
+    } catch {
+      toast.error(tCommon("unexpected_error"));
     }
-    router.replace(
-      `${LINKS.signUpSuccess}?email=${encodeURIComponent(data.email)}`,
-    );
   };
 
   return (
@@ -108,7 +113,7 @@ export function SignUpForm({
 
             <div className="mt-4 text-center text-sm">
               {t("have_account")}{" "}
-              <Link href={LINKS.login}>{tAuth("sign_in")}</Link>
+              <Link href={LINKS.LOGIN}>{tAuth("sign_in")}</Link>
             </div>
           </form>
         </CardContent>

@@ -81,7 +81,7 @@ CREATE UNIQUE INDEX workspace_invitations_pkey ON public.workspace_invitations U
 
 CREATE UNIQUE INDEX workspace_invitations_token_key ON public.workspace_invitations USING btree (token);
 
-CREATE UNIQUE INDEX workspace_invitations_workspace_id_email_key ON public.workspace_invitations USING btree (workspace_id, email);
+CREATE UNIQUE INDEX workspace_invitations_workspace_id_email_pending_key ON public.workspace_invitations (workspace_id, email) WHERE status = 'pending';
 
 CREATE UNIQUE INDEX workspace_members_pkey ON public.workspace_members USING btree (workspace_id, id);
 
@@ -107,7 +107,6 @@ alter table "public"."workspace_invitations" validate constraint "workspace_invi
 
 alter table "public"."workspace_invitations" add constraint "workspace_invitations_token_key" UNIQUE using index "workspace_invitations_token_key";
 
-alter table "public"."workspace_invitations" add constraint "workspace_invitations_workspace_id_email_key" UNIQUE using index "workspace_invitations_workspace_id_email_key";
 
 alter table "public"."workspace_invitations" add constraint "workspace_invitations_workspace_id_fkey" FOREIGN KEY (workspace_id) REFERENCES public.workspaces(id) ON DELETE CASCADE not valid;
 

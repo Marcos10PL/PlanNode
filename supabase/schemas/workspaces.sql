@@ -13,7 +13,7 @@ CREATE TABLE public.workspaces (
 );
 
 CREATE TABLE public.workspace_members (
-  id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   workspace_id uuid NOT NULL REFERENCES public.workspaces(id) ON DELETE CASCADE,
   role public.workspace_role DEFAULT 'member' NOT NULL,
   invited_by_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,
@@ -34,10 +34,12 @@ CREATE TABLE public.workspace_invitations (
   invited_by_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,
   token text UNIQUE NOT NULL,
   expires_at timestamptz NOT NULL,
-  created_at timestamptz DEFAULT now(),
-
-  UNIQUE(workspace_id, email)
+  created_at timestamptz DEFAULT now()
 );
+
+CREATE UNIQUE INDEX workspace_invitations_workspace_id_email_pending_key
+  ON public.workspace_invitations (workspace_id, email)
+  WHERE status = 'pending';
 
 -- RLS
 ALTER TABLE public.workspaces ENABLE ROW LEVEL SECURITY;
@@ -75,6 +77,19 @@ USING (
   OR owner_id = (SELECT auth.uid())
 );
 
+CREATE POLICY "Invited users can see workspace they are invited to"
+ON public.workspaces FOR SELECT
+USING (
+  EXISTS (
+    SELECT 1 FROM public.workspace_invitations wi
+    JOIN public.profiles p ON p.email = wi.email
+    WHERE wi.workspace_id = workspaces.id
+      AND p.id = (SELECT auth.uid())
+      AND wi.status = 'pending'
+      AND wi.expires_at > now()
+  )
+);
+
 CREATE POLICY "Users can create workspaces"
 ON public.workspaces FOR INSERT
 WITH CHECK (owner_id = (SELECT auth.uid()));
@@ -100,6 +115,21 @@ WITH CHECK (
   public.get_workspace_member_role(workspace_id, (SELECT auth.uid())) IN ('owner', 'admin')
 );
 
+-- Allows invited users to accept their invitation by inserting their own membership
+CREATE POLICY "Invited users can join workspace"
+ON public.workspace_members FOR INSERT
+WITH CHECK (
+  id = (SELECT auth.uid())
+  AND EXISTS (
+    SELECT 1 FROM public.workspace_invitations wi
+    JOIN public.profiles p ON p.email = wi.email
+    WHERE wi.workspace_id = workspace_members.workspace_id
+      AND p.id = (SELECT auth.uid())
+      AND wi.status = 'pending'
+      AND wi.expires_at > now()
+  )
+);
+
 CREATE POLICY "Admins/owners can update members"
 ON public.workspace_members FOR UPDATE
 USING (
@@ -110,6 +140,13 @@ CREATE POLICY "Admins/owners can remove members"
 ON public.workspace_members FOR DELETE
 USING (
   public.get_workspace_member_role(workspace_id, (SELECT auth.uid())) IN ('owner', 'admin')
+);
+
+CREATE POLICY "Members can leave workspace"
+ON public.workspace_members FOR DELETE
+USING (
+  id = (SELECT auth.uid())
+  AND role != 'owner'::public.workspace_role
 );
 
 -- Policies: workspace_invitations
@@ -123,6 +160,21 @@ USING (
 CREATE POLICY "Admins/owners can create invitations"
 ON public.workspace_invitations FOR INSERT
 WITH CHECK (
+  public.get_workspace_member_role(workspace_id, (SELECT auth.uid())) IN ('owner', 'admin')
+);
+
+CREATE POLICY "Invited users can update their invitation status"
+ON public.workspace_invitations FOR UPDATE
+USING (
+  email = (SELECT email FROM public.profiles WHERE id = (SELECT auth.uid()))
+)
+WITH CHECK (
+  email = (SELECT email FROM public.profiles WHERE id = (SELECT auth.uid()))
+);
+
+CREATE POLICY "Admins/owners can revoke invitations"
+ON public.workspace_invitations FOR DELETE
+USING (
   public.get_workspace_member_role(workspace_id, (SELECT auth.uid())) IN ('owner', 'admin')
 );
 
@@ -164,13 +216,21 @@ CREATE INDEX idx_workspace_members_id ON public.workspace_members(id);
 CREATE INDEX idx_workspace_invitations_workspace_id ON public.workspace_invitations(workspace_id);
 CREATE INDEX idx_workspace_invitations_token ON public.workspace_invitations(token);
 CREATE INDEX idx_workspace_invitations_email ON public.workspace_invitations(email);
+CREATE INDEX idx_workspace_invitations_status ON public.workspace_invitations(status);
 
 -- Permissions
-REVOKE SELECT ON public.workspaces FROM anon;
-REVOKE SELECT ON public.workspace_members FROM anon;
-REVOKE SELECT ON public.workspace_invitations FROM anon;
+REVOKE ALL ON public.workspaces FROM anon;
+REVOKE ALL ON public.workspace_members FROM anon;
+REVOKE ALL ON public.workspace_invitations FROM anon;
 REVOKE EXECUTE ON FUNCTION public.is_workspace_member(uuid, uuid) FROM anon;
 REVOKE EXECUTE ON FUNCTION public.get_workspace_member_role(uuid, uuid) FROM anon;
 REVOKE EXECUTE ON FUNCTION public.get_workspace_owner(uuid) FROM anon;
 REVOKE EXECUTE ON FUNCTION public.add_workspace_owner() FROM anon;
 REVOKE EXECUTE ON FUNCTION public.set_workspaces_updated_at() FROM anon;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.workspaces TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.workspace_members TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.workspace_invitations TO authenticated;
+GRANT ALL ON public.workspaces TO service_role;
+GRANT ALL ON public.workspace_members TO service_role;
+GRANT ALL ON public.workspace_invitations TO service_role;

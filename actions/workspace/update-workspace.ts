@@ -1,4 +1,4 @@
-"use server";
+﻿"use server";
 
 import { ERRORS, LINKS } from "@/const";
 import { createClient } from "@/lib/supabase/server";
@@ -10,26 +10,30 @@ export async function updateWorkspaceAction(
   data: UpdateWorkspaceSchema,
 ) {
   const parsed = updateWorkspaceSchema().safeParse(data);
-  if (!parsed.success) return { error: ERRORS.invalidData };
+  if (!parsed.success) return { error: ERRORS.INVALID_DATA };
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) return { error: ERRORS.unauthorized };
+  if (!user) return { error: ERRORS.UNAUTHENTICATED };
 
-  const { error } = await supabase
+  const { data: updated, error } = await supabase
     .from("workspaces")
     .update({
       name: parsed.data.name,
       description: parsed.data.description ?? null,
     })
-    .eq("id", workspaceId);
+    .eq("id", workspaceId)
+    .eq("owner_id", user.id)
+    .select("id")
+    .single();
 
-  if (error) return { error: ERRORS.serverError };
+  if (error) return { error: ERRORS.SERVER_ERROR };
+  if (!updated) return { error: ERRORS.UNAUTHORIZED };
 
-  revalidatePath(LINKS.profileWorkspaces);
+  revalidatePath(LINKS.PROFILE_WORKSPACES);
 
   return { success: true };
 }
