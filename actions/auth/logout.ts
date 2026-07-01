@@ -7,15 +7,7 @@ export async function logout() {
 
   const { error } = await supabase.auth.signOut();
 
-  if (error) {
-    return {
-      error: true,
-      message: "Logout failed",
-    };
-  }
-
-  return {
-    success: true,
-    message: "Logged out successfully",
-  };
+  if (error) return { error: true };
+  
+  return { success: true };
 }

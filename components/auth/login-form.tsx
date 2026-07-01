@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
-import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
+import { loginAction } from "@/actions/auth/login";
+import { resendConfirmationAction } from "@/actions/auth/resend-confirmation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,16 +10,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { LINKS } from "@/const";
-import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
-import { useForm } from "react-hook-form";
-import { loginSchema, LoginSchema } from "@/schema";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { FieldError } from "../ui/field";
-import { toast } from "sonner";
 import { ControlledInputField } from "@/components/ui/controlled-input-field";
 import { ControlledPasswordField } from "@/components/ui/controlled-password-field";
+import { ERRORS, LINKS } from "@/const";
+import { loginSchema, LoginSchema } from "@/schema";
+import { cn } from "@/utils";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { FieldError } from "../ui/field";
 import { Link } from "../ui/link";
 
 export function LoginForm({
@@ -28,6 +29,7 @@ export function LoginForm({
 }: React.ComponentPropsWithoutRef<"div">) {
   const t = useTranslations("auth.login");
   const tAuth = useTranslations("auth");
+  const tCommon = useTranslations("common");
   const router = useRouter();
 
   const form = useForm<LoginSchema>({
@@ -38,53 +40,39 @@ export function LoginForm({
     },
   });
 
-  async function resendConfirmationEmail(email: string) {
-    const supabase = createClient();
-
-    const { error } = await supabase.auth.resend({
-      type: "signup",
-      email,
-      options: {
-        emailRedirectTo: `${window.location.origin}${LINKS.dashboard}`,
-      },
-    });
-
-    if (error) {
+  const resendConfirmationEmail = async (email: string) => {
+    const result = await resendConfirmationAction(email);
+    if (result.error) {
       toast.error(t("resend_email_failed"));
       return;
     }
-
     toast.success(t("resend_email_success"));
-  }
+  };
 
-  async function onSubmit(data: LoginSchema) {
-    const supabase = createClient();
-
+  const onSubmit = async (data: LoginSchema) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: data.email,
-        password: data.password,
-      });
-      if (error) throw error;
-      toast.success(t("logged_in_successfully"));
-      router.replace(LINKS.dashboard);
-    } catch (error: any) {
-      if (error.code === "invalid_credentials") {
-        toast.error(t("invalid_credentials"));
-      } else if (error.code === "email_not_confirmed") {
-        toast.error(t("email_not_confirmed"), {
-          action: {
-            label: t("resend_email"),
-            onClick: async () => {
-              await resendConfirmationEmail(data.email);
+      const result = await loginAction(data);
+      if (result.error) {
+        if (result.error === ERRORS.INVALID_CREDENTIALS) {
+          toast.error(t("invalid_credentials"));
+        } else if (result.error === ERRORS.EMAIL_NOT_CONFIRMED) {
+          toast.error(t("email_not_confirmed"), {
+            action: {
+              label: t("resend_email"),
+              onClick: () => resendConfirmationEmail(data.email),
             },
-          },
-        });
-      } else {
-        toast.error(t("login_failed"));
+          });
+        } else {
+          toast.error(t("login_failed"));
+        }
+        return;
       }
+      toast.success(t("logged_in_successfully"));
+      router.replace(LINKS.DASHBOARD);
+    } catch {
+      toast.error(tCommon("unexpected_error"));
     }
-  }
+  };
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -113,7 +101,7 @@ export function LoginForm({
               label={t("password")}
               autoComplete="current-password"
               labelRight={
-                <Link href={LINKS.forgotPassword} className="ml-auto text-sm">
+                <Link href={LINKS.FORGOT_PASSWORD} className="ml-auto text-sm">
                   {t("forgot_password")}
                 </Link>
               }
@@ -133,7 +121,7 @@ export function LoginForm({
 
             <div className="mt-4 text-center text-sm">
               {t("no_account")}{" "}
-              <Link href={LINKS.signUp}>{tAuth("sign_up")}</Link>
+              <Link href={LINKS.SIGN_UP}>{tAuth("sign_up")}</Link>
             </div>
           </form>
         </CardContent>

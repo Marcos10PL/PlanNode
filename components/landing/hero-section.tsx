@@ -1,4 +1,4 @@
-import { Badge } from "@/components/ui/badge";
+﻿import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Container from "@/components/ui/container";
 import { Link } from "@/i18n/navigation";
@@ -36,7 +36,7 @@ export function HeroSection() {
 
       <div className="flex flex-col sm:flex-row gap-3 mt-2">
         <Button size="lg" asChild>
-          <Link href={LINKS.signUp}>
+          <Link href={LINKS.SIGN_UP}>
             {t("cta_primary")}
             <ArrowRight className="ml-2 h-4 w-4" />
           </Link>

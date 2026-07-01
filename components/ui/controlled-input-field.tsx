@@ -24,6 +24,7 @@ type ControlledInputFieldControlledProps<
   autoComplete?: string;
   disabled?: boolean;
   readOnly?: boolean;
+  maxLength?: number;
 };
 
 type ControlledInputFieldReadonlyProps = {
@@ -53,7 +54,7 @@ function ControlledInputFieldReadonly({
       <Input id={id} type={type} value={value} disabled readOnly />
     </div>
   );
-};
+}
 
 function ControlledInputField<
   TFieldValues extends FieldValues,
@@ -72,6 +73,7 @@ function ControlledInputField<
     autoComplete,
     disabled,
     readOnly,
+    maxLength,
   } = props;
 
   return (
@@ -89,6 +91,7 @@ function ControlledInputField<
             autoComplete={autoComplete}
             disabled={disabled}
             readOnly={readOnly}
+            maxLength={maxLength}
             aria-invalid={fieldState.invalid}
           />
           {fieldState.invalid && <FieldError errors={[fieldState.error]} />}

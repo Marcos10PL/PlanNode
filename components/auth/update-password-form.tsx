@@ -1,7 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
+import { updatePasswordAction } from "@/actions/auth/update-password";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,16 +9,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { LINKS } from "@/const";
-import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  updatePasswordSchema,
-  type UpdatePasswordSchema,
-} from "@/schema";
 import { ControlledPasswordField } from "@/components/ui/controlled-password-field";
+import { LINKS } from "@/const";
+import { updatePasswordSchema, type UpdatePasswordSchema } from "@/schema";
+import { cn } from "@/utils";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 export function UpdatePasswordForm({
@@ -27,6 +24,7 @@ export function UpdatePasswordForm({
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
   const t = useTranslations("auth.update_password");
+  const tCommon = useTranslations("common");
   const router = useRouter();
 
   const form = useForm<UpdatePasswordSchema>({
@@ -40,16 +38,15 @@ export function UpdatePasswordForm({
   });
 
   const handleUpdatePassword = async (data: UpdatePasswordSchema) => {
-    const supabase = createClient();
-
     try {
-      const { error } = await supabase.auth.updateUser({
-        password: data.password,
-      });
-      if (error) throw error;
-      router.replace(LINKS.dashboard);
+      const result = await updatePasswordAction(data);
+      if (result.error) {
+        toast.error(t("error_generic"));
+        return;
+      }
+      router.replace(LINKS.DASHBOARD);
     } catch {
-      toast.error(t("error_generic"));
+      toast.error(tCommon("unexpected_error"));
     }
   };
 

@@ -1,13 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { useTranslations } from "next-intl";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
+import { forgotPasswordAction } from "@/actions/auth/forgot-password";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -16,13 +15,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Link } from "@/i18n/navigation";
-import { LINKS } from "@/const";
-import {
-  forgotPasswordSchema,
-  type ForgotPasswordSchema,
-} from "@/schema";
 import { ControlledInputField } from "@/components/ui/controlled-input-field";
+import { LINKS } from "@/const";
+import { Link } from "@/i18n/navigation";
+import { forgotPasswordSchema, type ForgotPasswordSchema } from "@/schema";
+import { cn } from "@/utils";
 
 export function ForgotPasswordForm({
   className,
@@ -30,6 +27,7 @@ export function ForgotPasswordForm({
 }: React.ComponentPropsWithoutRef<"div">) {
   const t = useTranslations("auth.forgot_password");
   const tAuth = useTranslations("auth");
+  const tCommon = useTranslations("common");
   const [success, setSuccess] = useState(false);
 
   const form = useForm<ForgotPasswordSchema>({
@@ -41,21 +39,19 @@ export function ForgotPasswordForm({
     },
   });
 
-  async function onSubmit(data: ForgotPasswordSchema) {
-    const supabase = createClient();
-
+  const onSubmit = async (data: ForgotPasswordSchema) => {
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
-        redirectTo: `${window.location.origin}${LINKS.updatePassword}`,
-      });
-      if (error) throw error;
-
+      const result = await forgotPasswordAction(data);
+      if (result.error) {
+        toast.error(t("error_generic"));
+        return;
+      }
       toast.success(t("success_description"));
       setSuccess(true);
-    } catch (error: any) {
-      toast.error(error?.message ?? t("error_generic"));
+    } catch {
+      toast.error(tCommon("unexpected_error"));
     }
-  }
+  };
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -71,7 +67,7 @@ export function ForgotPasswordForm({
             </p>
             <div className="mt-4 text-center text-sm">
               {t("have_account")}{" "}
-              <Link href={LINKS.login} className="underline underline-offset-4">
+              <Link href={LINKS.LOGIN} className="underline underline-offset-4">
                 {tAuth("sign_in")}
               </Link>
             </div>
@@ -108,7 +104,7 @@ export function ForgotPasswordForm({
               <div className="mt-4 text-center text-sm">
                 {t("have_account")}{" "}
                 <Link
-                  href={LINKS.login}
+                  href={LINKS.LOGIN}
                   className="underline underline-offset-4"
                 >
                   {tAuth("sign_in")}

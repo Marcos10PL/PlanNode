@@ -7,13 +7,21 @@ html {
 @plugin "tailwindcss-animate";
 
 @keyframes spinner-spin {
-  100% { transform: rotate(360deg); }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes spinner-fade {
-  20% { opacity: 0.1; }
-  40% { opacity: 1; }
-  60% { opacity: 0.1; }
+  20% {
+    opacity: 0.1;
+  }
+  40% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 0.1;
+  }
 }
 
 .spinner-arc {
@@ -26,7 +34,9 @@ html {
   opacity: 0.05;
   border: inherit;
   border-color: transparent;
-  animation: spinner-spin 1.2s cubic-bezier(0.6, 0.2, 0, 0.8) infinite, spinner-fade 1.2s linear infinite;
+  animation:
+    spinner-spin 1.2s cubic-bezier(0.6, 0.2, 0, 0.8) infinite,
+    spinner-fade 1.2s linear infinite;
 }
 
 .spinner-arc-delayed {
@@ -67,6 +77,8 @@ html {
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
+
+  --color-info: hsl(var(--info));
 }
 
 @layer base {
@@ -91,6 +103,7 @@ html {
     --input: 0 0% 89.8%;
     --ring: 0 0% 3.9%;
     --radius: 0.5rem;
+    --info: 217.2 91.2% 59.8%;
   }
 
   .dark {
@@ -108,11 +121,12 @@ html {
     --muted-foreground: 0 0% 63.9%;
     --accent: 0 0% 14.9%;
     --accent-foreground: 0 0% 98%;
-    --destructive: 0 70% 46%;
+    --destructive: 0 70% 56%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 14.9%;
     --input: 0 0% 14.9%;
     --ring: 0 0% 83.1%;
+    --info: 217.2 91.2% 59.8%;
   }
 }
 
@@ -157,7 +171,9 @@ html {
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  --animate-spinner: spinner-spin 1.2s cubic-bezier(0.6,0.2,0,0.8) infinite, spinner-fade 1.2s linear infinite;
+  --animate-spinner:
+    spinner-spin 1.2s cubic-bezier(0.6, 0.2, 0, 0.8) infinite,
+    spinner-fade 1.2s linear infinite;
 }
 
 html.dark [data-sonner-toast] {

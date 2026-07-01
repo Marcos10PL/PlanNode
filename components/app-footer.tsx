@@ -1,8 +1,8 @@
-import Container from "@/components/ui/container";
 import Logo from "@/components/app-logo";
+import Container from "@/components/ui/container";
 import { Separator } from "@/components/ui/separator";
+import { cn } from "@/utils";
 import { useTranslations } from "next-intl";
-import { cn } from "@/lib/utils";
 
 export default function AppFooter({
   withoutLogo = false,

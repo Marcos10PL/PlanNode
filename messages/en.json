@@ -1,5 +1,8 @@
 {
   "logo": "PlanNode",
+  "common": {
+    "unexpected_error": "Something went wrong. Please try again."
+  },
   "footer": {
     "all_rights_reserved": "PlanNode. All rights reserved."
   },
@@ -80,7 +83,8 @@
       "invalid_email": "Please enter a valid email address",
       "password_too_short": "Password must be at least 6 characters",
       "passwords_do_not_match": "Passwords do not match",
-      "full_name_required": "Full name is required"
+      "full_name_required": "Full name is required",
+      "field_required": "This field is required"
     }
   },
   "metadata": {
@@ -208,5 +212,149 @@
   "my_account": {
     "settings": "Settings",
     "sign_out": "Sign out"
+  },
+  "workspace": {
+    "workspaces": {
+      "title": "Workspaces",
+      "settings": "Settings"
+    },
+    "create": {
+      "title": "Create workspace",
+      "name_label": "Name",
+      "name_placeholder": "My team",
+      "description_label": "Description",
+      "description_placeholder": "What is this workspace for?",
+      "description": "Fill in the details for your new workspace.",
+      "submit": "Create",
+      "submitting": "Creating...",
+      "success": "Workspace created",
+      "error": "Could not create workspace",
+      "limit_reached": "You have reached the maximum number of workspaces",
+      "set_active_title": "Set as active workspace?",
+      "set_active_description": "Do you want to switch to \"{name}\" right now?",
+      "set_active_yes": "Yes, switch",
+      "set_active_no": "No"
+    },
+    "edit": {
+      "title": "Edit workspace",
+      "description": "Update your workspace details.",
+      "name_label": "Name",
+      "name_placeholder": "My team",
+      "description_label": "Description",
+      "description_placeholder": "What is this workspace for?",
+      "submit": "Save changes",
+      "submitting": "Saving...",
+      "success": "Workspace updated",
+      "error": "Could not update workspace",
+      "cancel": "Cancel"
+    },
+    "delete": {
+      "title": "Delete workspace",
+      "description": "This action cannot be undone. Type the workspace name to confirm.",
+      "confirm_label": "Workspace name",
+      "submit": "Delete workspace",
+      "submitting": "Deleting...",
+      "success": "Workspace deleted",
+      "error": "Could not delete workspace",
+      "cancel": "Cancel"
+    }
+  },
+  "settings": {
+    "profile": "Profile",
+    "workspace": "Workspaces",
+    "team": "Team"
+  },
+  "no_workspace_banner": {
+    "title": "Create your first workspace",
+    "description": "A workspace is a shared space for your team to manage projects and tasks.",
+    "cta": "Create workspace"
+  },
+  "profile_workspaces": {
+    "title": "Workspaces",
+    "description": "Manage your workspaces",
+    "create_workspace": "New workspace",
+    "no_workspaces": "You don't have any workspaces yet.",
+    "edit": "Edit",
+    "delete": "Delete",
+    "leave": "Leave workspace",
+    "cannot_leave_as_owner": "Owner cannot leave the workspace. Delete it or transfer ownership first.",
+    "leave_success": "You have left the workspace",
+    "leave_error": "Could not leave the workspace",
+    "my_workspaces": "Mine",
+    "shared_workspaces": "Shared with me",
+    "workspace": {
+      "leave_confirm_title": "Leave workspace",
+      "leave_confirm_description": "Are you sure you want to leave this workspace? You will lose access to all its content."
+    }
+  },
+  "confirm_modal": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "confirming": "Processing..."
+  },
+  "team": {
+    "title": "Team",
+    "you": "You",
+    "workspace_context": "Regarding the selected workspace.",
+    "no_active_workspace": "No active workspace selected. Switch to a workspace first.",
+    "members_section": "Members",
+    "invitations_section": "Pending invitations",
+    "no_members": "No members yet.",
+    "no_invitations": "No pending invitations.",
+    "invite_email_label": "Email address",
+    "invite_email_placeholder": "colleague@example.com",
+    "invite_role_label": "Role",
+    "invite_submit": "Invite",
+    "invite_submitting": "Inviting...",
+    "invite_success": "Invitation sent",
+    "invite_error": "Could not send invitation",
+    "invite_already_member": "This person is already a member or has a pending invitation",
+    "revoke": "Revoke",
+    "revoke_success": "Invitation revoked",
+    "revoke_error": "Could not revoke invitation",
+    "remove_member": "Remove",
+    "remove_member_success": "Member removed",
+    "remove_member_error": "Could not remove member",
+    "remove_member_confirm_title": "Remove member",
+    "remove_member_confirm_description": "Are you sure you want to remove this member from the workspace?",
+    "change_role": "Change role",
+    "change_role_submit": "Save",
+    "change_role_submitting": "Saving...",
+    "change_role_success": "Role updated",
+    "change_role_error": "Could not update role",
+    "role_owner": "Owner",
+    "role_admin": "Admin",
+    "role_member": "Member",
+    "role_guest": "Guest",
+    "role_info_label": "Role information",
+    "role_admin_description": "Can invite members, change roles, and manage content. Cannot delete the workspace.",
+    "role_member_description": "Standard access to workspace content. Cannot manage members.",
+    "role_guest_description": "Limited access to selected resources only."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "mark_all_read": "Mark all as read",
+    "delete_all": "Delete all",
+    "delete_confirm_title": "Delete notification",
+    "delete_confirm_description": "Are you sure you want to delete this notification?",
+    "delete_all_confirm_title": "Delete all notifications",
+    "delete_all_confirm_description": "Are you sure you want to delete all notifications? This action cannot be undone.",
+    "empty": "No notifications",
+    "new_badge": "New",
+    "delete": "Delete",
+    "view": "View",
+    "workspace_invitation_title": "{inviterName} invited you to \"{workspaceName}\""
+  },
+  "invite_page": {
+    "title": "Workspace invitation",
+    "invited_by": "{name} is inviting you to",
+    "role_label": "Your role",
+    "accept": "Accept",
+    "decline": "Decline",
+    "accepting": "Accepting...",
+    "declining": "Declining...",
+    "error_not_found": "This invitation does not exist or has already been used.",
+    "error_expired": "This invitation has expired.",
+    "error_email_mismatch": "This invitation was sent to a different email address."
   }
 }

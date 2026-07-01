@@ -6,63 +6,40 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarHeader,
-  SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import { ChartNoAxesGantt, ChevronDown, LayoutDashboard } from "lucide-react";
-import { ThemeSwitcher } from "./theme-switcher";
-import LanguageSwitcher from "./language-switcher";
-import Link from "next/link";
-import { cn } from "@/lib/utils";
-import { usePathname } from "@/i18n/navigation";
 import { LINKS } from "@/const";
+import { usePathname } from "@/i18n/navigation";
+import { cn, isActivePath } from "@/utils";
+import { LayoutDashboard } from "lucide-react";
+import Link from "next/link";
+import LanguageSwitcher from "./language-switcher";
+import { ThemeSwitcher } from "./theme-switcher";
+import { WorkspaceSwitcher } from "./workspaces/workspace-switcher";
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const { setOpenMobile } = useSidebar();
 
-  const isActive = (href: string) => {
-    const cleanPathname = pathname.replace(/^\/[a-z]{2}(?=\/|$)/, "");
+  const isActive = (href: string) =>
+    isActivePath(pathname, href) &&
+    "bg-accent text-accent-foreground pointer-events-none!";
 
-    return (
-      cleanPathname === href &&
-      "bg-accent text-accent-foreground cursor-default!"
-    );
-  };
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton>
-                  <ChartNoAxesGantt className="mr-2" />
-                  <span className="line-clamp-1">Select Workspace</span>
-                  <ChevronDown className="ml-auto" />
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width)">
-                <DropdownMenuItem>Workspace 1</DropdownMenuItem>
-                <DropdownMenuItem>Workspace 2</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarMenuItem>
-        </SidebarMenu>
+        <WorkspaceSwitcher />
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <Link
-                href={LINKS.dashboard}
-                className={cn(isActive(LINKS.dashboard))}
+                href={LINKS.DASHBOARD}
+                className={cn(isActive(LINKS.DASHBOARD))}
+                onClick={() => setOpenMobile(false)}
               >
                 <LayoutDashboard className="mr-2" />
                 Dashboard
@@ -70,8 +47,8 @@ export function AppSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarGroup>
-
-        {/* <SidebarGroup>
+      </SidebarContent>
+      {/* <SidebarGroup>
           <SidebarGroupLabel>Projects</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -84,7 +61,6 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup> */}
-      </SidebarContent>
       <SidebarFooter className="border-t">
         <div className="flex items-center gap-2 group-data-[collapsible=icon]:hidden">
           <LanguageSwitcher />

@@ -1,13 +1,12 @@
-import type { Metadata } from "next";
-import { Geist } from "next/font/google";
-import { ThemeProvider } from "next-themes";
-import "../globals.css";
-import { hasLocale, NextIntlClientProvider } from "next-intl";
-import { notFound } from "next/navigation";
-import { routing } from "@/i18n/routing";
-import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Toaster } from "@/components/ui/sonner";
-import AppFooter from "@/components/app-footer";
+import { routing } from "@/i18n/routing";
+import type { Metadata } from "next";
+import { hasLocale, NextIntlClientProvider } from "next-intl";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { ThemeProvider } from "next-themes";
+import { Geist } from "next/font/google";
+import { notFound } from "next/navigation";
+import "../globals.css";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("metadata");
@@ -48,7 +47,7 @@ export default async function RootLayout({ children, params }: Props) {
   setRequestLocale(locale);
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning data-scroll-behavior="smooth">
       <body className={`${geistSans.className} antialiased`}>
         <ThemeProvider
           attribute="class"
@@ -59,7 +58,6 @@ export default async function RootLayout({ children, params }: Props) {
           <NextIntlClientProvider locale={locale}>
             {children}
             <Toaster />
-            <AppFooter />
           </NextIntlClientProvider>
         </ThemeProvider>
       </body>

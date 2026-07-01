@@ -1,28 +1,22 @@
-"use client";
+﻿"use client";
 
-import { useState } from "react";
-import { useTranslations, useLocale } from "next-intl";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { ControlledInputField } from "@/components/ui/controlled-input-field";
-import { ControlledPasswordField } from "@/components/ui/controlled-password-field";
-import { profileSettingsSchema, ProfileSettingsSchema } from "@/schema";
-import { updateProfileAction } from "@/actions/profile/update-profile";
 import { updateEmailAction } from "@/actions/profile/update-email";
 import { updatePasswordAction } from "@/actions/profile/update-password";
+import { updateProfileAction } from "@/actions/profile/update-profile";
 import { useUser } from "@/components/providers/user-provider";
-import { formatDate } from "@/lib/utils";
-import { ERRORS } from "@/const";
+import { Button } from "@/components/ui/button";
+import { ControlledInputField } from "@/components/ui/controlled-input-field";
+import { ControlledPasswordField } from "@/components/ui/controlled-password-field";
+import { Separator } from "@/components/ui/separator";
+import { ERRORS, VALIDATION_MAX } from "@/const";
+import { profileSettingsSchema, ProfileSettingsSchema } from "@/schema";
+import { formatDate } from "@/utils";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useLocale, useTranslations } from "next-intl";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { SubHeader } from "../sub-header";
 
 export function ProfileForm() {
   const { profile, user } = useUser();
@@ -35,7 +29,7 @@ export function ProfileForm() {
       profileSettingsSchema(useTranslations("fields.errors")),
     ),
     defaultValues: {
-      full_name: profile.full_name ?? "",
+      full_name: profile.fullName ?? "",
       email: profile.email,
       password: "",
       confirmPassword: "",
@@ -45,10 +39,10 @@ export function ProfileForm() {
   async function onSubmit(data: ProfileSettingsSchema) {
     const tasks: Promise<string | null>[] = [];
 
-    if (data.full_name !== profile.full_name) {
+    if (data.full_name !== profile.fullName) {
       tasks.push(
         updateProfileAction({ full_name: data.full_name }).then(result =>
-          "error" in result ? t("save_failed") : null,
+          result.error ? t("save_failed") : null,
         ),
       );
     }
@@ -56,7 +50,7 @@ export function ProfileForm() {
     if (data.email !== profile.email && !pendingEmail) {
       tasks.push(
         updateEmailAction({ email: data.email }).then(result => {
-          if ("error" in result) return t("email_update_failed");
+          if (result.error) return t("email_update_failed");
           setPendingEmail(data.email);
           return null;
         }),
@@ -69,8 +63,8 @@ export function ProfileForm() {
           password: data.password,
           confirmPassword: data.confirmPassword,
         }).then(result => {
-          if (!("error" in result)) return null;
-          if (result.error === ERRORS.samePassword)
+          if (!result.error) return null;
+          if (result.error === ERRORS.SAME_PASSWORD)
             return t("password_same_as_old");
           return t("password_update_failed");
         }),
@@ -87,88 +81,85 @@ export function ProfileForm() {
   }
 
   return (
-    <Card className="flex-1 border-0 max-w-5xl">
-      <CardHeader>
-        <CardTitle>{t("title")}</CardTitle>
-        <CardDescription>{t("description")}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="flex flex-col gap-6"
-        >
+    <>
+      <SubHeader title={t("title")} description={t("description")} />
+
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-col gap-6"
+      >
+        <ControlledInputField
+          control={form.control}
+          name="full_name"
+          label={t("full_name")}
+          placeholder={t("full_name")}
+          maxLength={VALIDATION_MAX.FULL_NAME}
+          autoComplete="name"
+        />
+
+        <Separator />
+
+        <div className="flex flex-col gap-4">
           <ControlledInputField
             control={form.control}
-            name="full_name"
-            label={t("full_name")}
-            placeholder={t("full_name")}
-            autoComplete="name"
+            name="email"
+            label={t("email")}
+            type="email"
+            placeholder="m@example.com"
+            autoComplete="email"
+            disabled={Boolean(pendingEmail)}
+            readOnly={Boolean(pendingEmail)}
           />
-
-          <Separator />
-
-          <div className="flex flex-col gap-4">
-            <ControlledInputField
-              control={form.control}
-              name="email"
-              label={t("email")}
-              type="email"
-              placeholder="m@example.com"
-              autoComplete="email"
-              disabled={Boolean(pendingEmail)}
-              readOnly={Boolean(pendingEmail)}
-            />
-            {pendingEmail && (
-              <p className="text-sm text-muted-foreground">
-                {t("pending_email_info", {
-                  pendingEmail,
-                  currentEmail: profile.email,
-                })}
-              </p>
-            )}
-          </div>
-
-          <Separator />
-
-          <div className="flex flex-col gap-4">
+          {pendingEmail && (
             <p className="text-sm text-muted-foreground">
-              {t("password_change_placeholder")}
+              {t("pending_email_info", {
+                pendingEmail,
+                currentEmail: profile.email,
+              })}
             </p>
-            <ControlledPasswordField
-              control={form.control}
-              name="password"
-              label={t("new_password")}
-              autoComplete="new-password"
-            />
-            <ControlledPasswordField
-              control={form.control}
-              name="confirmPassword"
-              label={t("confirm_password")}
-              autoComplete="new-password"
-            />
-          </div>
+          )}
+        </div>
 
-          <Separator />
+        <Separator />
 
-          <div className="flex flex-col-reverse md:flex-row gap-6 md:items-end justify-between">
-            <div className="space-y-1 text-xs text-muted-foreground">
-              <p>
-                {t("created_at")}: {formatDate(profile.created_at, locale)}
-              </p>
-              <p>
-                {t("updated_at")}: {formatDate(profile.updated_at, locale)}
-              </p>
-            </div>
-            <Button
-              type="submit"
-              className="w-full md:w-fit"
-              disabled={form.formState.isSubmitting || !form.formState.isDirty}
-            >
-              {form.formState.isSubmitting ? t("submitting") : t("submit")}
-            </Button>
+        <div className="flex flex-col gap-4">
+          <p className="text-sm text-muted-foreground">
+            {t("password_change_placeholder")}
+          </p>
+          <ControlledPasswordField
+            control={form.control}
+            name="password"
+            label={t("new_password")}
+            autoComplete="new-password"
+          />
+          <ControlledPasswordField
+            control={form.control}
+            name="confirmPassword"
+            label={t("confirm_password")}
+            autoComplete="new-password"
+          />
+        </div>
+
+        <Separator />
+
+        <div className="flex flex-col-reverse md:flex-row gap-6 md:items-end justify-between">
+          <div className="space-y-1 text-xs text-muted-foreground">
+            <p>
+              {t("created_at")}: {formatDate(profile.createdAt, locale)}
+            </p>
+            <p>
+              {t("updated_at")}: {formatDate(profile.updatedAt, locale)}
+            </p>
           </div>
-        </form>
-      </CardContent>
-    </Card>
+          <Button
+            type="submit"
+            className="w-full md:w-fit"
+            disabled={form.formState.isSubmitting || !form.formState.isDirty}
+          >
+            {form.formState.isSubmitting ? t("submitting") : t("submit")}
+          </Button>
+        </div>
+      </form>
+    </>
   );
 }

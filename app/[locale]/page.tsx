@@ -3,6 +3,7 @@ import { HeroSection } from "@/components/landing/hero-section";
 import { ProblemSolutionSection } from "@/components/landing/problem-solution-section";
 import { FeaturesSection } from "@/components/landing/features-section";
 import { CtaSection } from "@/components/landing/cta-section";
+import AppFooter from "@/components/app-footer";
 import { LocaleProp } from "@/types/props";
 import { setRequestLocale } from "next-intl/server";
 import { use } from "react";
@@ -24,6 +25,7 @@ export default function LandingPage({ params }: { params: LocaleProp }) {
         <Separator />
         <CtaSection />
       </main>
+      <AppFooter />
     </>
   );
 }
