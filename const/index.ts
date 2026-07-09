@@ -1,4 +1,10 @@
-import { InvitationStatus, UserRole, WorkspaceRole } from "@/types/entities";
+import {
+  InvitationStatus,
+  TaskPriority,
+  TaskStatus,
+  UserRole,
+  WorkspaceRole,
+} from "@/types/entities";
 
 export const LINKS = {
   HOME: "/",
@@ -12,16 +18,17 @@ export const LINKS = {
 
   APP: "/app",
   DASHBOARD: "/app/dashboard",
+  PROJECTS: "/app/projects",
   PROFILE_SETTINGS: "/app/settings/profile",
   PROFILE_WORKSPACES: "/app/settings/workspaces",
   TEAM: "/app/settings/team",
   NOTIFICATIONS: "/app/notifications",
 } as const;
 
-export const USER_ROLES: Record<string, UserRole> = {
+export const USER_ROLES = {
   ADMIN: "admin",
   USER: "user",
-} as const;
+} as const satisfies Record<string, UserRole>;
 
 export const ERRORS = {
   UNAUTHENTICATED: "unauthenticated",
@@ -40,41 +47,48 @@ export const ERRORS = {
   INSUFFICIENT_ROLE: "insufficient_role",
   CANNOT_REMOVE_OWNER: "cannot_remove_owner",
   CANNOT_LEAVE_AS_OWNER: "cannot_leave_as_owner",
+  PROJECT_NOT_FOUND: "project_not_found",
+  CANNOT_DELETE_LAST_LIST: "cannot_delete_last_list",
 } as const;
 
 export const VALIDATION_MAX = {
   FULL_NAME: 100,
   WORKSPACE_NAME: 50,
   WORKSPACE_DESCRIPTION: 500,
+  PROJECT_NAME: 50,
+  PROJECT_DESCRIPTION: 500,
+  TASK_LIST_NAME: 50,
+  TASK_TITLE: 200,
+  TASK_DESCRIPTION: 2000,
 } as const;
 
 export const COOKIES = {
   ACTIVE_WORKSPACE_ID: "active_workspace_id",
 } as const;
 
-export const WORKSPACE_ROLES: Record<string, WorkspaceRole> = {
+export const WORKSPACE_ROLES = {
   OWNER: "owner",
   ADMIN: "admin",
   MEMBER: "member",
   GUEST: "guest",
-} as const;
+} as const satisfies Record<string, WorkspaceRole>;
 
-export const INVITABLE_ROLES = [
+export const INVITABLE_ROLES: readonly WorkspaceRole[] = [
   WORKSPACE_ROLES.ADMIN,
   WORKSPACE_ROLES.MEMBER,
   WORKSPACE_ROLES.GUEST,
-] as const;
+];
 
-export const MANAGER_ROLES = [
+export const MANAGER_ROLES: readonly WorkspaceRole[] = [
   WORKSPACE_ROLES.OWNER,
   WORKSPACE_ROLES.ADMIN,
-] as const;
+];
 
-export const INVITATION_STATUSES: Record<string, InvitationStatus> = {
+export const INVITATION_STATUSES = {
   PENDING: "pending",
   ACCEPTED: "accepted",
   DECLINED: "declined",
-} as const;
+} as const satisfies Record<string, InvitationStatus>;
 
 export const EMAIL_TEMPLATES = {
   WORKSPACE_INVITATION: "workspace_invitation",
@@ -82,7 +96,25 @@ export const EMAIL_TEMPLATES = {
 
 export const NOTIFICATION_TYPES = {
   WORKSPACE_INVITATION: "workspace_invitation",
+  TASK_ASSIGNED: "task_assigned",
 } as const;
+
+export const TASK_STATUSES = {
+  ON_HOLD: "on_hold",
+  TODO: "todo",
+  IN_PROGRESS: "in_progress",
+  IN_REVIEW: "in_review",
+  IN_TESTS: "in_tests",
+  DONE: "done",
+  CANCELLED: "cancelled",
+} as const satisfies Record<string, TaskStatus>;
+
+export const TASK_PRIORITIES = {
+  LOW: "low",
+  MEDIUM: "medium",
+  HIGH: "high",
+  URGENT: "urgent",
+} as const satisfies Record<string, TaskPriority>;
 
 export const APP_CONFIG_KEYS = {
   MAX_WORKSPACES_PER_USER: "max_workspaces_per_user",

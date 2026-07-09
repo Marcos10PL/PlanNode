@@ -1,7 +1,13 @@
+import { LINKS } from "@/const";
+
 const inviteRoute = "/invite";
 
 export const generateInvitationRoute = (token: string) => {
   return `${inviteRoute}/${token}`;
+};
+
+export const generateProjectRoute = (projectId: string) => {
+  return `${LINKS.PROJECTS}/${projectId}`;
 };
 
 export const generateInvitationLink = (token: string) => {

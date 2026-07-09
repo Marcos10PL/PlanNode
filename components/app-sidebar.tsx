@@ -12,14 +12,16 @@ import {
 } from "@/components/ui/sidebar";
 import { LINKS } from "@/const";
 import { usePathname } from "@/i18n/navigation";
-import { cn, isActivePath } from "@/utils";
-import { LayoutDashboard } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { cn, isActivePath, isActiveSubPath } from "@/utils";
+import { FolderKanban, LayoutDashboard } from "lucide-react";
 import Link from "next/link";
 import LanguageSwitcher from "./language-switcher";
 import { ThemeSwitcher } from "./theme-switcher";
 import { WorkspaceSwitcher } from "./workspaces/workspace-switcher";
 
 export function AppSidebar() {
+  const t = useTranslations("sidebar");
   const pathname = usePathname();
   const { setOpenMobile } = useSidebar();
 
@@ -46,21 +48,23 @@ export function AppSidebar() {
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <Link
+                href={LINKS.PROJECTS}
+                className={cn(
+                  isActiveSubPath(pathname, LINKS.PROJECTS) &&
+                    "bg-accent text-accent-foreground pointer-events-none!",
+                )}
+                onClick={() => setOpenMobile(false)}
+              >
+                <FolderKanban className="mr-2" />
+                {t("projects")}
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
         </SidebarGroup>
       </SidebarContent>
-      {/* <SidebarGroup>
-          <SidebarGroupLabel>Projects</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton>
-                  <Plus className="mr-2" />
-                  New Project
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup> */}
       <SidebarFooter className="border-t">
         <div className="flex items-center gap-2 group-data-[collapsible=icon]:hidden">
           <LanguageSwitcher />

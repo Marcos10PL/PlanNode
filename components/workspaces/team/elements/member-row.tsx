@@ -43,7 +43,7 @@ export function MemberRow({
   const isSelf = member.id === currentUserId;
   const isOwner = member.role === WORKSPACE_ROLES.OWNER;
   const canManage =
-    !isSelf && !isOwner && MANAGER_ROLES.includes(currentUserRole as never);
+    !isSelf && !isOwner && MANAGER_ROLES.includes(currentUserRole);
 
   const handleRemove = async () => {
     setIsPending(true);

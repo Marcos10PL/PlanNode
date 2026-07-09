@@ -10,5 +10,11 @@ export function isActivePath(pathname: string, href: string) {
   return clean === href;
 }
 
+export function isActiveSubPath(pathname: string, href: string) {
+  const clean = pathname.replace(/^\/[a-z]{2}(?=\/|$)/, "");
+  return clean === href || clean.startsWith(`${href}/`);
+}
+
 export * from "./formatters";
+export * from "./task";
 export * from "./workspace";
