@@ -1,5 +1,6 @@
 import { TASK_PRIORITIES, TASK_STATUSES } from "@/const";
 import { Translations } from "@/types";
+import { Task } from "@/types/dto";
 import { TaskPriority, TaskStatus } from "@/types/entities";
 
 export const getStatusLabel = (status: TaskStatus, t: Translations) => {
@@ -63,6 +64,12 @@ export const getPriorityVariant = (priority: TaskPriority) => {
       return "destructive";
   }
 };
+
+export const isTaskOverdue = (task: Pick<Task, "dueDate" | "status">) =>
+  !!task.dueDate &&
+  task.status !== TASK_STATUSES.DONE &&
+  task.status !== TASK_STATUSES.CANCELLED &&
+  new Date(task.dueDate) < new Date();
 
 export const getProjectProgress = (
   total: number,

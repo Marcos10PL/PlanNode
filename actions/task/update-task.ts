@@ -1,7 +1,7 @@
 "use server";
 
 import { ERRORS, LINKS, NOTIFICATION_TYPES } from "@/const";
-import { createClient } from "@/lib/supabase/server";
+import { getUserContext } from "@/lib/supabase/server";
 import { updateTaskSchema, UpdateTaskSchema } from "@/schema";
 import { generateProjectRoute } from "@/utils/helpers";
 import { revalidatePath } from "next/cache";
@@ -10,10 +10,7 @@ export async function updateTaskAction(taskId: string, data: UpdateTaskSchema) {
   const parsed = updateTaskSchema().safeParse(data);
   if (!parsed.success) return { error: ERRORS.INVALID_DATA };
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase, user } = await getUserContext();
 
   if (!user) return { error: ERRORS.UNAUTHENTICATED };
 

@@ -1,17 +1,18 @@
 import { ProjectActions } from "@/components/projects/project-actions";
-import { SubHeader } from "@/components/sub-header";
-import { TaskListSections } from "@/components/tasks/task-list-sections";
-import { TasksRealtimeRefresher } from "@/components/tasks/tasks-realtime-refresher";
+import { ProjectMembersSection } from "@/components/projects/project-members-section";
+import { AddTaskListButton } from "@/components/tasks/add-task-list-button";
+import { TaskListCard } from "@/components/tasks/task-list-card";
 import { Badge } from "@/components/ui/badge";
-import { COOKIES, MANAGER_ROLES, WORKSPACE_ROLES } from "@/const";
+import { TaskProgress } from "@/components/ui/task-progress";
+import { COOKIES } from "@/const";
 import {
   getProject,
   getProjectMemberIds,
-  getTaskLists,
-  getWorkspaceMembers,
+  getProjects,
+  getWorkspaceContext,
 } from "@/lib/data";
-import { createClient } from "@/lib/supabase/server";
-import { Lock } from "lucide-react";
+import { getProjectColorTextClass, getProjectIcon } from "@/utils";
+import { List, Lock } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
@@ -33,49 +34,76 @@ export default async function ProjectPage({ params }: Props) {
     notFound();
   }
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [projects, { members, canEdit, canManage }, memberIds] =
+    await Promise.all([
+      getProjects(project.workspaceId),
+      getWorkspaceContext(project.workspaceId),
+      getProjectMemberIds(project.id),
+    ]);
 
-  const [lists, members, memberIds] = await Promise.all([
-    getTaskLists(project.id),
-    getWorkspaceMembers(project.workspaceId),
-    getProjectMemberIds(project.id),
-  ]);
+  const projectWithProgress = projects.find(p => p.id === project.id);
+  const lists = projectWithProgress?.lists ?? [];
 
-  const currentMember = members.find(m => m.id === user?.id);
-  const currentRole = currentMember?.role ?? WORKSPACE_ROLES.GUEST;
-  const canEdit = currentRole !== WORKSPACE_ROLES.GUEST;
-  const canManageMembers = MANAGER_ROLES.includes(currentRole);
+  const ProjectIcon = getProjectIcon(project.icon);
 
   return (
     <>
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col mt-4 mb-6">
         <div className="flex items-center gap-2 min-w-0">
-          <SubHeader title={project.name} description={project.description ?? undefined} />
+          <ProjectIcon
+            className={`h-5 w-5 shrink-0 ${getProjectColorTextClass(project.color)}`}
+          />
+          <h1 className="min-w-0 truncate">{project.name}</h1>
           {project.isPrivate && (
-            <Badge variant="outline" className="shrink-0 pointer-events-none mt-4">
+            <Badge variant="outline" className="shrink-0 pointer-events-none">
               <Lock className="h-3 w-3 mr-1" />
               {t("private_badge")}
             </Badge>
           )}
+          <ProjectActions project={project} canManage={canManage} />
         </div>
-        {canEdit && (
-          <div className="mt-4">
-            <ProjectActions
-              project={project}
-              members={members}
-              memberIds={memberIds}
-              canManage={canManageMembers}
-            />
-          </div>
+        {project.description && (
+          <p className="text-sm text-muted-foreground">{project.description}</p>
         )}
       </div>
 
-      <TaskListSections lists={lists} members={members} canEdit={canEdit} />
+      <div className="flex flex-col gap-8">
+        <section className="max-w-md">
+          <TaskProgress
+            total={projectWithProgress?.totalTasks ?? 0}
+            done={projectWithProgress?.doneTasks ?? 0}
+            cancelled={projectWithProgress?.cancelledTasks ?? 0}
+            showLabel
+          />
+        </section>
 
-      <TasksRealtimeRefresher projectId={project.id} />
+        <section className="flex flex-col gap-2">
+          <div className="flex items-center gap-x-3">
+            <List className="h-4 w-4 text-muted-foreground" />
+            <h2 className="text-sm font-semibold">{t("lists_section")}</h2>
+            {canEdit && <AddTaskListButton projectId={project.id} />}
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {lists.map(list => (
+              <TaskListCard
+                key={list.id}
+                list={list}
+                projectId={project.id}
+                canEdit={canEdit}
+              />
+            ))}
+          </div>
+        </section>
+
+        {project.isPrivate && (
+          <ProjectMembersSection
+            projectId={project.id}
+            members={members}
+            memberIds={memberIds}
+            canManage={canManage}
+          />
+        )}
+      </div>
     </>
   );
 }

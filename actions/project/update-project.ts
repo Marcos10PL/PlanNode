@@ -1,7 +1,7 @@
 "use server";
 
 import { ERRORS, LINKS } from "@/const";
-import { createClient } from "@/lib/supabase/server";
+import { getUserContext } from "@/lib/supabase/server";
 import { updateProjectSchema, UpdateProjectSchema } from "@/schema";
 import { generateProjectRoute } from "@/utils/helpers";
 import { revalidatePath } from "next/cache";
@@ -13,14 +13,11 @@ export async function updateProjectAction(
   const parsed = updateProjectSchema().safeParse(data);
   if (!parsed.success) return { error: ERRORS.INVALID_DATA };
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase, user } = await getUserContext();
 
   if (!user) return { error: ERRORS.UNAUTHENTICATED };
 
-  const { name, description, isPrivate } = parsed.data;
+  const { name, description, isPrivate, icon, color } = parsed.data;
 
   const { error: updateError } = await supabase
     .from("projects")
@@ -28,6 +25,8 @@ export async function updateProjectAction(
       name,
       description: description || null,
       is_private: isPrivate,
+      icon,
+      color,
     })
     .eq("id", projectId);
 

@@ -1,15 +1,12 @@
 ﻿"use server";
 
 import { COOKIES, ERRORS, LINKS } from "@/const";
-import { createClient } from "@/lib/supabase/server";
+import { getUserContext } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 
 export async function deleteWorkspaceAction(workspaceId: string) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase, user } = await getUserContext();
 
   if (!user) return { error: ERRORS.UNAUTHENTICATED };
 

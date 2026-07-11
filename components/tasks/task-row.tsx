@@ -6,6 +6,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -29,6 +34,7 @@ import {
   getPriorityVariant,
   getStatusLabel,
   getStatusVariant,
+  isTaskOverdue,
 } from "@/utils";
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
@@ -49,11 +55,7 @@ export function TaskRow({ task, members, canEdit }: Props) {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [isPending, setIsPending] = useState(false);
 
-  const isOverdue =
-    task.dueDate &&
-    task.status !== TASK_STATUSES.DONE &&
-    task.status !== TASK_STATUSES.CANCELLED &&
-    new Date(task.dueDate) < new Date();
+  const isOverdue = isTaskOverdue(task);
 
   const handleStatusChange = async (status: TaskStatus) => {
     setIsPending(true);
@@ -148,11 +150,16 @@ export function TaskRow({ task, members, canEdit }: Props) {
 
         {canEdit && (
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" disabled={isPending}>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" disabled={isPending}>
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+              </TooltipTrigger>
+              <TooltipContent>{t("common.manage")}</TooltipContent>
+            </Tooltip>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => setEditOpen(true)}>
                 <Pencil className="mr-2 h-4 w-4" />

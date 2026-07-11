@@ -71,7 +71,14 @@ export type WorkspaceMember = {
 export type Project = ToCamelCase<
   Pick<
     ProjectTable,
-    "id" | "workspace_id" | "name" | "description" | "is_private" | "created_by"
+    | "id"
+    | "workspace_id"
+    | "name"
+    | "description"
+    | "is_private"
+    | "icon"
+    | "color"
+    | "created_by"
   >
 >;
 
@@ -79,6 +86,7 @@ export type ProjectWithProgress = Project & {
   totalTasks: number;
   doneTasks: number;
   cancelledTasks: number;
+  lists: ProjectListSummary[];
 };
 
 export type TaskAssignee = {
@@ -110,6 +118,14 @@ export type TaskListWithTasks = ToCamelCase<
   Pick<TaskListTable, "id" | "project_id" | "name" | "position">
 > & {
   tasks: Task[];
+};
+
+export type ProjectListSummary = {
+  id: TaskListTable["id"];
+  name: TaskListTable["name"];
+  taskCount: number;
+  doneCount: number;
+  cancelledCount: number;
 };
 
 export type MyTask = Task & {

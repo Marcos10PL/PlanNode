@@ -9,6 +9,8 @@ CREATE TABLE public.projects (
   name text NOT NULL,
   description text,
   is_private boolean NOT NULL DEFAULT false,
+  icon text NOT NULL DEFAULT 'folder-kanban',
+  color text NOT NULL DEFAULT 'neutral',
   created_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()

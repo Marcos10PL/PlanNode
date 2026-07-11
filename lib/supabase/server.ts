@@ -1,6 +1,8 @@
+import { LINKS } from "@/const";
+import { Database } from "@/types/supabase";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import { Database } from "@/types/supabase";
+import { redirect } from "next/navigation";
 
 export async function createClient() {
   const cookieStore = await cookies();
@@ -23,4 +25,21 @@ export async function createClient() {
       },
     },
   );
+}
+
+export async function getUserContext() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  return { supabase, user };
+}
+
+export async function requireUserContext() {
+  const { supabase, user } = await getUserContext();
+
+  if (!user) redirect(LINKS.LOGIN);
+
+  return { supabase, user };
 }

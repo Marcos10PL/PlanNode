@@ -1,4 +1,4 @@
-import { VALIDATION_MAX } from "@/const";
+import { PROJECT_COLORS, PROJECT_ICONS, VALIDATION_MAX } from "@/const";
 import { Translations } from "@/types";
 import { z } from "zod";
 import { descriptionField, nameField } from "./defaults";
@@ -8,6 +8,8 @@ export const createProjectSchema = (t?: Translations) =>
     name: nameField(VALIDATION_MAX.PROJECT_NAME, t),
     description: descriptionField(VALIDATION_MAX.PROJECT_DESCRIPTION),
     isPrivate: z.boolean(),
+    icon: z.enum(PROJECT_ICONS),
+    color: z.enum(PROJECT_COLORS),
   });
 
 export const updateProjectSchema = createProjectSchema;

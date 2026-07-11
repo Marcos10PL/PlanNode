@@ -16,5 +16,6 @@ export function isActiveSubPath(pathname: string, href: string) {
 }
 
 export * from "./formatters";
+export * from "./project";
 export * from "./task";
 export * from "./workspace";

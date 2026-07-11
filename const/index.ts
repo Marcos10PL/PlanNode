@@ -116,6 +116,44 @@ export const TASK_PRIORITIES = {
   URGENT: "urgent",
 } as const satisfies Record<string, TaskPriority>;
 
+export const PROJECT_ICONS = {
+  FOLDER_KANBAN: "folder-kanban",
+  ROCKET: "rocket",
+  LIGHTBULB: "lightbulb",
+  BAR_CHART: "bar-chart",
+  TARGET: "target",
+  SHIELD: "shield",
+  WRENCH: "wrench",
+  BOOK: "book",
+  GLOBE: "globe",
+  HEART: "heart",
+  ZAP: "zap",
+  FLAG: "flag",
+  BRIEFCASE: "briefcase",
+  CALENDAR: "calendar",
+  CODE: "code",
+  PALETTE: "palette",
+} as const;
+
+export const PROJECT_COLORS = {
+  NEUTRAL: "neutral",
+  RED: "red",
+  ORANGE: "orange",
+  AMBER: "amber",
+  YELLOW: "yellow",
+  LIME: "lime",
+  GREEN: "green",
+  EMERALD: "emerald",
+  TEAL: "teal",
+  CYAN: "cyan",
+  SKY: "sky",
+  BLUE: "blue",
+  INDIGO: "indigo",
+  VIOLET: "violet",
+  PURPLE: "purple",
+  PINK: "pink",
+} as const;
+
 export const APP_CONFIG_KEYS = {
   MAX_WORKSPACES_PER_USER: "max_workspaces_per_user",
 } as const;

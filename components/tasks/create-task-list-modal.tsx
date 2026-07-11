@@ -22,7 +22,7 @@ import { toast } from "sonner";
 
 type Props = {
   projectId: string;
-  list?: TaskListWithTasks;
+  list?: Pick<TaskListWithTasks, "id" | "name">;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 };

@@ -1,20 +1,23 @@
 "use client";
 
-import { deleteTaskListAction } from "@/actions/task/delete-task-list";
 import { Button } from "@/components/ui/button";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ERRORS } from "@/const";
+import { useDeleteTaskList } from "@/hooks/use-delete-task-list";
 import { TaskListWithTasks, WorkspaceMember } from "@/types/dto";
 import { MoreHorizontal, Pencil, Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-import { toast } from "sonner";
 import { TaskListModal } from "./create-task-list-modal";
 import { TaskModal } from "./task-modal";
 import { TaskRow } from "./task-row";
@@ -23,80 +26,63 @@ type Props = {
   list: TaskListWithTasks;
   members: WorkspaceMember[];
   canEdit: boolean;
+  children?: React.ReactNode;
 };
 
-export function TaskListSection({ list, members, canEdit }: Props) {
+export function TaskListSection({ list, members, canEdit, children }: Props) {
   const t = useTranslations("tasks");
   const tCommon = useTranslations("common");
   const [renameOpen, setRenameOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [createTaskOpen, setCreateTaskOpen] = useState(false);
-  const [isPending, setIsPending] = useState(false);
+
+  const { remove, isPending } = useDeleteTaskList();
 
   const handleDelete = async () => {
-    setIsPending(true);
-    try {
-      const result = await deleteTaskListAction(list.id);
-      if (result?.error) {
-        toast.error(
-          result.error === ERRORS.CANNOT_DELETE_LAST_LIST
-            ? t("list_delete.last_list_error")
-            : t("list_delete.error"),
-        );
-      } else {
-        toast.success(t("list_delete.success"));
-      }
-    } catch {
-      toast.error(tCommon("unexpected_error"));
-    } finally {
-      setIsPending(false);
-      setDeleteOpen(false);
-    }
+    await remove(list.id);
+    setDeleteOpen(false);
   };
 
   return (
     <>
       <div className="flex flex-col">
-        <div className="flex items-center gap-2">
-          <h2 className="text-sm font-semibold flex-1 min-w-0 line-clamp-1">
+        <div className="flex items-center gap-1">
+          <h2 className="text-sm font-semibold min-w-0 line-clamp-1">
             {list.name}{" "}
             <span className="text-muted-foreground font-normal">
               ({list.tasks.length})
             </span>
           </h2>
           {canEdit && (
-            <>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setCreateTaskOpen(true)}
-              >
-                <Plus className="h-4 w-4 mr-1" />
-                {t("add_task")}
-              </Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" disabled={isPending}>
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => setRenameOpen(true)}>
-                    <Pencil className="mr-2 h-4 w-4" />
-                    {t("list_rename.trigger")}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="text-destructive focus:text-destructive"
-                    onClick={() => setDeleteOpen(true)}
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    {t("list_delete.trigger")}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </>
+            <DropdownMenu>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" disabled={isPending}>
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                </TooltipTrigger>
+                <TooltipContent>{tCommon("manage")}</TooltipContent>
+              </Tooltip>
+              <DropdownMenuContent align="start">
+                <DropdownMenuItem onClick={() => setRenameOpen(true)}>
+                  <Pencil className="mr-2 h-4 w-4" />
+                  {t("list_rename.trigger")}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="text-destructive focus:text-destructive"
+                  onClick={() => setDeleteOpen(true)}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  {t("list_delete.trigger")}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
         </div>
+
+        {children}
 
         {list.tasks.length === 0 ? (
           <p className="text-sm text-muted-foreground py-2">{t("empty")}</p>
@@ -111,6 +97,17 @@ export function TaskListSection({ list, members, canEdit }: Props) {
               />
             ))}
           </div>
+        )}
+
+        {canEdit && (
+          <Button
+            variant="ghost"
+            className="w-full justify-start text-muted-foreground mt-1"
+            onClick={() => setCreateTaskOpen(true)}
+          >
+            <Plus className="h-4 w-4 mr-1" />
+            {t("add_task")}
+          </Button>
         )}
       </div>
 

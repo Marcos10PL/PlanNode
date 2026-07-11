@@ -4,10 +4,17 @@ import { NotificationsIndicator } from "@/components/notifications/notifications
 import { AppConfigProvider } from "@/components/providers/app-config-provider";
 import { UserProvider } from "@/components/providers/user-provider";
 import { WorkspaceProvider } from "@/components/providers/workspace-provider";
+import { TasksRealtimeRefresher } from "@/components/tasks/tasks-realtime-refresher";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { COOKIES, LINKS } from "@/const";
 import { routing } from "@/i18n/routing";
-import { getAppConfig, getProfile, getWorkspaces } from "@/lib/data";
+import {
+  getAppConfig,
+  getProfile,
+  getProjects,
+  getWorkspaceContext,
+  getWorkspaces,
+} from "@/lib/data";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -28,6 +35,15 @@ export async function DashboardShell({
     getAppConfig(),
   ]);
 
+  const [projects, workspaceContext] = activeWorkspaceId
+    ? await Promise.all([
+        getProjects(activeWorkspaceId),
+        getWorkspaceContext(activeWorkspaceId),
+      ])
+    : [[], null];
+
+  const canManageProjects = workspaceContext?.canEdit ?? false;
+
   if (
     profile &&
     profile.locale !== locale &&
@@ -44,7 +60,11 @@ export async function DashboardShell({
           activeWorkspaceId={activeWorkspaceId}
         >
           <SidebarProvider>
-            <AppSidebar />
+            <AppSidebar
+              projects={projects}
+              workspaceId={activeWorkspaceId}
+              canManageProjects={canManageProjects}
+            />
 
             <div className="flex-1 min-w-0 flex flex-col h-screen">
               <div className="flex justify-between items-center border-b p-2">
@@ -58,6 +78,8 @@ export async function DashboardShell({
                 {children}
               </div>
             </div>
+
+            <TasksRealtimeRefresher />
           </SidebarProvider>
         </WorkspaceProvider>
       </UserProvider>

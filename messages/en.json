@@ -1,7 +1,8 @@
 {
   "logo": "PlanNode",
   "common": {
-    "unexpected_error": "Something went wrong. Please try again."
+    "unexpected_error": "Something went wrong. Please try again.",
+    "manage": "Manage"
   },
   "footer": {
     "all_rights_reserved": "PlanNode. All rights reserved."
@@ -373,6 +374,10 @@
     "workspace_context": "Projects in the active workspace",
     "empty": "No projects yet",
     "private_badge": "Private",
+    "appearance": {
+      "icon_label": "Icon",
+      "color_label": "Color"
+    },
     "progress": "Progress",
     "task_count": "{done} of {total} tasks done",
     "not_found_title": "Project not found",
@@ -422,8 +427,12 @@
       "submit": "Save",
       "submitting": "Saving...",
       "success": "Project members updated",
-      "error": "Could not update project members"
-    }
+      "error": "Could not update project members",
+      "empty": "No members to assign. Invite people to the workspace first.",
+      "manage": "Manage"
+    },
+    "lists_section": "Task lists",
+    "no_lists": "No task lists"
   },
   "tasks": {
     "empty": "No tasks in this list",

@@ -177,9 +177,11 @@ export type Database = {
       }
       projects: {
         Row: {
+          color: string
           created_at: string | null
           created_by: string | null
           description: string | null
+          icon: string
           id: string
           is_private: boolean
           name: string
@@ -187,9 +189,11 @@ export type Database = {
           workspace_id: string
         }
         Insert: {
+          color?: string
           created_at?: string | null
           created_by?: string | null
           description?: string | null
+          icon?: string
           id?: string
           is_private?: boolean
           name: string
@@ -197,9 +201,11 @@ export type Database = {
           workspace_id: string
         }
         Update: {
+          color?: string
           created_at?: string | null
           created_by?: string | null
           description?: string | null
+          icon?: string
           id?: string
           is_private?: boolean
           name?: string

@@ -12,16 +12,22 @@ import {
 } from "@/components/ui/sidebar";
 import { LINKS } from "@/const";
 import { usePathname } from "@/i18n/navigation";
-import { useTranslations } from "next-intl";
-import { cn, isActivePath, isActiveSubPath } from "@/utils";
-import { FolderKanban, LayoutDashboard } from "lucide-react";
+import { ProjectWithProgress } from "@/types/dto";
+import { cn, isActivePath } from "@/utils";
+import { LayoutDashboard } from "lucide-react";
 import Link from "next/link";
 import LanguageSwitcher from "./language-switcher";
+import { SidebarProjects } from "./nav/sidebar-projects";
 import { ThemeSwitcher } from "./theme-switcher";
 import { WorkspaceSwitcher } from "./workspaces/workspace-switcher";
 
-export function AppSidebar() {
-  const t = useTranslations("sidebar");
+type Props = {
+  projects: ProjectWithProgress[];
+  workspaceId: string | null;
+  canManageProjects: boolean;
+};
+
+export function AppSidebar({ projects, workspaceId, canManageProjects }: Props) {
   const pathname = usePathname();
   const { setOpenMobile } = useSidebar();
 
@@ -37,7 +43,7 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild>
+            <SidebarMenuButton asChild tooltip="Dashboard">
               <Link
                 href={LINKS.DASHBOARD}
                 className={cn(isActive(LINKS.DASHBOARD))}
@@ -48,22 +54,13 @@ export function AppSidebar() {
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <Link
-                href={LINKS.PROJECTS}
-                className={cn(
-                  isActiveSubPath(pathname, LINKS.PROJECTS) &&
-                    "bg-accent text-accent-foreground pointer-events-none!",
-                )}
-                onClick={() => setOpenMobile(false)}
-              >
-                <FolderKanban className="mr-2" />
-                {t("projects")}
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
         </SidebarGroup>
+
+        <SidebarProjects
+          projects={projects}
+          workspaceId={workspaceId}
+          canManage={canManageProjects}
+        />
       </SidebarContent>
       <SidebarFooter className="border-t">
         <div className="flex items-center gap-2 group-data-[collapsible=icon]:hidden">

@@ -1,7 +1,8 @@
 {
   "logo": "PlanNode",
   "common": {
-    "unexpected_error": "Coś poszło nie tak. Spróbuj ponownie."
+    "unexpected_error": "Coś poszło nie tak. Spróbuj ponownie.",
+    "manage": "Zarządzaj"
   },
   "footer": {
     "all_rights_reserved": "PlanNode. Wszelkie prawa zastrzeżone."
@@ -373,6 +374,10 @@
     "workspace_context": "Projekty w aktywnej przestrzeni",
     "empty": "Brak projektów",
     "private_badge": "Prywatny",
+    "appearance": {
+      "icon_label": "Ikona",
+      "color_label": "Kolor"
+    },
     "progress": "Postęp",
     "task_count": "{done} z {total} zadań ukończonych",
     "not_found_title": "Nie znaleziono projektu",
@@ -422,8 +427,12 @@
       "submit": "Zapisz",
       "submitting": "Zapisywanie...",
       "success": "Członkowie projektu zaktualizowani",
-      "error": "Nie udało się zaktualizować członków projektu"
-    }
+      "error": "Nie udało się zaktualizować członków projektu",
+      "empty": "Brak członków do przypisania. Najpierw zaproś osoby do przestrzeni.",
+      "manage": "Zarządzaj"
+    },
+    "lists_section": "Listy zadań",
+    "no_lists": "Brak list zadań"
   },
   "tasks": {
     "empty": "Brak zadań na tej liście",

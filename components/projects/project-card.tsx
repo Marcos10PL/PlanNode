@@ -1,6 +1,5 @@
 "use client";
 
-import { deleteProjectAction } from "@/actions/project/delete-project";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,20 +10,26 @@ import {
 } from "@/components/ui/card";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { TaskProgress } from "@/components/ui/task-progress";
+import { useDeleteProject } from "@/hooks/use-delete-project";
 import { ProjectWithProgress } from "@/types/dto";
-import { getProjectProgress } from "@/utils";
+import { getProjectColorTextClass, getProjectIcon } from "@/utils";
 import { generateProjectRoute } from "@/utils/helpers";
 import { Lock, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useState } from "react";
-import { toast } from "sonner";
-import { EditProjectModal } from "./edit-project-modal";
+import { ProjectModal } from "./project-modal";
 
 type Props = {
   project: ProjectWithProgress;
@@ -36,28 +41,14 @@ export function ProjectCard({ project, canManage }: Props) {
   const tCommon = useTranslations("common");
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [isPending, setIsPending] = useState(false);
 
-  const progress = getProjectProgress(
-    project.totalTasks,
-    project.doneTasks,
-    project.cancelledTasks,
-  );
+  const { remove, isPending } = useDeleteProject();
+
+  const ProjectIcon = getProjectIcon(project.icon);
 
   const handleDelete = async () => {
-    setIsPending(true);
-    try {
-      const result = await deleteProjectAction(project.id);
-      if (result?.error) {
-        toast.error(t("delete.error"));
-      } else {
-        toast.success(t("delete.success"));
-      }
-    } catch {
-      toast.error(tCommon("unexpected_error"));
-    } finally {
-      setIsPending(false);
-    }
+    await remove(project.id);
+    setDeleteOpen(false);
   };
 
   return (
@@ -65,6 +56,9 @@ export function ProjectCard({ project, canManage }: Props) {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
+            <ProjectIcon
+              className={`h-4 w-4 shrink-0 ${getProjectColorTextClass(project.color)}`}
+            />
             <CardTitle className="flex-1 min-w-0">
               <Link
                 href={generateProjectRoute(project.id)}
@@ -81,11 +75,16 @@ export function ProjectCard({ project, canManage }: Props) {
             )}
             {canManage && (
               <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" disabled={isPending}>
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" disabled={isPending}>
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>{tCommon("manage")}</TooltipContent>
+                </Tooltip>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={() => setEditOpen(true)}>
                     <Pencil className="mr-2 h-4 w-4" />
@@ -109,28 +108,17 @@ export function ProjectCard({ project, canManage }: Props) {
               {project.description}
             </p>
           )}
-          <div className="flex flex-col gap-1">
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>{t("progress")}</span>
-              <span>{progress}%</span>
-            </div>
-            <div className="h-2 rounded-full bg-accent overflow-hidden">
-              <div
-                className="h-full rounded-full bg-primary transition-all"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {t("task_count", {
-                done: project.doneTasks,
-                total: project.totalTasks - project.cancelledTasks,
-              })}
-            </p>
-          </div>
+          <TaskProgress
+            total={project.totalTasks}
+            done={project.doneTasks}
+            cancelled={project.cancelledTasks}
+            showLabel
+          />
         </CardContent>
       </Card>
 
-      <EditProjectModal
+      <ProjectModal
+        workspaceId={project.workspaceId}
         project={project}
         open={editOpen}
         onOpenChange={setEditOpen}

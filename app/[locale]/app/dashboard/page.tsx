@@ -1,11 +1,18 @@
 import { ProjectList } from "@/components/projects/project-list";
 import { SubHeader } from "@/components/sub-header";
-import { TasksRealtimeRefresher } from "@/components/tasks/tasks-realtime-refresher";
 import { Badge } from "@/components/ui/badge";
 import { NoWorkspaceBanner } from "@/components/workspaces/no-workspace-banner";
 import { COOKIES } from "@/const";
 import { getMyTasks, getProjects } from "@/lib/data";
-import { cn, formatDate, getPriorityLabel, getPriorityVariant, getStatusLabel, getStatusVariant } from "@/utils";
+import {
+  cn,
+  formatDate,
+  getPriorityLabel,
+  getPriorityVariant,
+  getStatusLabel,
+  getStatusVariant,
+  isTaskOverdue,
+} from "@/utils";
 import { generateProjectRoute } from "@/utils/helpers";
 import { getLocale, getTranslations } from "next-intl/server";
 import { cookies } from "next/headers";
@@ -31,8 +38,6 @@ export default async function DashboardPage() {
     getProjects(activeWorkspaceId),
   ]);
 
-  const now = new Date();
-
   return (
     <div className="flex-1 border-0 shadow-none max-w-5xl overflow-hidden *:px-4 md:*:px-6">
       <SubHeader
@@ -50,8 +55,7 @@ export default async function DashboardPage() {
           ) : (
             <div className="flex flex-col divide-y divide-accent/70">
               {myTasks.map(task => {
-                const isOverdue =
-                  task.dueDate && new Date(task.dueDate) < now;
+                const isOverdue = isTaskOverdue(task);
 
                 return (
                   <div key={task.id} className="flex items-center gap-3 py-2">
@@ -107,8 +111,6 @@ export default async function DashboardPage() {
           <ProjectList projects={projects} canManage={false} />
         </section>
       </div>
-
-      <TasksRealtimeRefresher />
     </div>
   );
 }

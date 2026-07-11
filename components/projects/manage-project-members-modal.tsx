@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import UserAvatar from "@/components/user-avatar";
+import { MANAGER_ROLES } from "@/const";
 import { WorkspaceMember } from "@/types/dto";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
@@ -35,6 +36,10 @@ export function ManageProjectMembersModal({
   const tCommon = useTranslations("common");
   const [selected, setSelected] = useState<string[]>(memberIds);
   const [isPending, setIsPending] = useState(false);
+
+  const assignableMembers = members.filter(
+    m => !MANAGER_ROLES.includes(m.role),
+  );
 
   useEffect(() => {
     if (open) setSelected(memberIds);
@@ -74,8 +79,11 @@ export function ManageProjectMembersModal({
           <DialogTitle>{t("title")}</DialogTitle>
           <DialogDescription>{t("description")}</DialogDescription>
         </DialogHeader>
+        {assignableMembers.length === 0 && (
+          <p className="text-sm text-muted-foreground">{t("empty")}</p>
+        )}
         <div className="flex flex-col divide-y divide-accent/70 max-h-80 overflow-y-auto">
-          {members.map(member => (
+          {assignableMembers.map(member => (
             <label
               key={member.id}
               className="flex items-center gap-3 py-2 cursor-pointer"

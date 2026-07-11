@@ -1,16 +1,13 @@
 ﻿"use server";
 
 import { ERRORS, LINKS } from "@/const";
-import { createClient } from "@/lib/supabase/server";
+import { getUserContext } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
 export async function deleteNotificationAction(
   opts: { id: string } | { deleteAll: true },
 ) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase, user } = await getUserContext();
 
   if (!user) return { error: ERRORS.UNAUTHENTICATED };
 

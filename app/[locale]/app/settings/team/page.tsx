@@ -9,9 +9,8 @@ import { NoWorkspaceBanner } from "@/components/workspaces/no-workspace-banner";
 import { InviteMemberForm } from "@/components/workspaces/team/elements/invite-member-form";
 import { MemberList } from "@/components/workspaces/team/member-list";
 import { PendingInvitationsList } from "@/components/workspaces/team/pending-invitations-list";
-import { COOKIES, WORKSPACE_ROLES } from "@/const";
-import { getWorkspaceInvitations, getWorkspaceMembers } from "@/lib/data";
-import { createClient } from "@/lib/supabase/server";
+import { COOKIES } from "@/const";
+import { getWorkspaceContext, getWorkspaceInvitations } from "@/lib/data";
 import { getTranslations } from "next-intl/server";
 import { cookies } from "next/headers";
 
@@ -29,23 +28,10 @@ export default async function TeamPage() {
     );
   }
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const [members, invitations] = await Promise.all([
-    getWorkspaceMembers(activeWorkspaceId),
+  const [{ user, members, role, canManage }, invitations] = await Promise.all([
+    getWorkspaceContext(activeWorkspaceId),
     getWorkspaceInvitations(activeWorkspaceId),
   ]);
-
-  const currentMember = members.find(m => m.id === user?.id);
-
-  const currentUserRole = currentMember?.role ?? WORKSPACE_ROLES.MEMBER;
-
-  const isAdminOrOwner =
-    currentUserRole === WORKSPACE_ROLES.OWNER ||
-    currentUserRole === WORKSPACE_ROLES.ADMIN;
 
   const ACCORDION_VALUES = {
     MEMBERS: "members",
@@ -53,19 +39,19 @@ export default async function TeamPage() {
   };
 
   const values = [ACCORDION_VALUES.MEMBERS];
-  if (isAdminOrOwner) values.push(ACCORDION_VALUES.INVITATIONS);
+  if (canManage) values.push(ACCORDION_VALUES.INVITATIONS);
 
   return (
     <>
       <SubHeader title={t("title")} description={t("workspace_context")} />
 
       <div className="flex flex-col gap-4">
-        {isAdminOrOwner && <InviteMemberForm workspaceId={activeWorkspaceId} />}
+        {canManage && <InviteMemberForm workspaceId={activeWorkspaceId} />}
 
         <Accordion type="multiple" defaultValue={values}>
           <AccordionItem
             value={ACCORDION_VALUES.MEMBERS}
-            disabled={!isAdminOrOwner} // for better UX - only one section, no accordion needed
+            disabled={!canManage} // for better UX - only one section, no accordion needed
           >
             <AccordionTrigger
               className={"disabled:opacity-100! disabled:[&>svg]:hidden"}
@@ -76,13 +62,13 @@ export default async function TeamPage() {
               <MemberList
                 members={members}
                 currentUserId={user?.id ?? ""}
-                currentUserRole={currentUserRole}
+                currentUserRole={role}
                 workspaceId={activeWorkspaceId}
               />
             </AccordionContent>
           </AccordionItem>
 
-          {isAdminOrOwner && (
+          {canManage && (
             <AccordionItem value={ACCORDION_VALUES.INVITATIONS}>
               <AccordionTrigger>
                 {t("invitations_section")} ({invitations.length})

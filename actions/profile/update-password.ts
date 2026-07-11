@@ -1,6 +1,6 @@
 ﻿"use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { getUserContext } from "@/lib/supabase/server";
 import { updatePasswordSchema, UpdatePasswordSchema } from "@/schema";
 import { ERRORS } from "@/const";
 
@@ -8,10 +8,7 @@ export async function updatePasswordAction(data: UpdatePasswordSchema) {
   const parsed = updatePasswordSchema().safeParse(data);
   if (!parsed.success) return { error: ERRORS.INVALID_DATA };
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase, user } = await getUserContext();
 
   if (!user) return { error: ERRORS.UNAUTHENTICATED };
 
