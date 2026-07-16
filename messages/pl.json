@@ -2,7 +2,8 @@
   "logo": "PlanNode",
   "common": {
     "unexpected_error": "Coś poszło nie tak. Spróbuj ponownie.",
-    "manage": "Zarządzaj"
+    "manage": "Zarządzaj",
+    "description": "Opis"
   },
   "footer": {
     "all_rights_reserved": "PlanNode. Wszelkie prawa zastrzeżone."
@@ -266,7 +267,7 @@
     "team": "Zespół"
   },
   "no_workspace_banner": {
-    "title": "Utwórz swoją pierwszą przestrzeń roboczą",
+    "title": "Utwórz przestrzeń roboczą",
     "description": "Przestrzeń robocza to wspólne miejsce dla Twojego zespołu do zarządzania projektami i zadaniami.",
     "cta": "Utwórz przestrzeń"
   },
@@ -360,7 +361,8 @@
     "error_email_mismatch": "To zaproszenie zostało wysłane na inny adres e-mail."
   },
   "sidebar": {
-    "projects": "Projekty"
+    "projects": "Projekty",
+    "no_workspaces": "Utwórz przestrzeń roboczą, aby móc tworzyć projekty i dodawać zadania."
   },
   "dashboard": {
     "title": "Panel",
@@ -370,8 +372,7 @@
     "projects_progress": "Postęp projektów"
   },
   "projects": {
-    "title": "Projekty",
-    "workspace_context": "Projekty w aktywnej przestrzeni",
+    "title": "Projekty w aktywnej przestrzeni",
     "empty": "Brak projektów",
     "private_badge": "Prywatny",
     "appearance": {
@@ -383,6 +384,15 @@
     "not_found_title": "Nie znaleziono projektu",
     "not_found_description": "Ten projekt nie istnieje lub nie masz do niego dostępu.",
     "back_to_projects": "Wróć do projektów",
+    "show_more": "Pokaż więcej",
+    "show_less": "Pokaż mniej",
+    "created_at": "Utworzono {date}",
+    "sort": {
+      "newest": "Najnowsze",
+      "date": "Najstarsze",
+      "name": "Nazwa",
+      "progress": "Postęp"
+    },
     "create": {
       "trigger": "Utwórz projekt",
       "title": "Utwórz projekt",

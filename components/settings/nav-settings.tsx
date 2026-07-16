@@ -27,7 +27,7 @@ export function NavSettings() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex overflow-x-auto border-b mt-5 mb-2 px-4 md:px-6">
+    <nav className="flex overflow-x-auto border-b mt-5 mb-2 px-4 md:px-6 justify-center max-w-fit mx-auto">
       {navItems(t).map(item => (
         <Link
           key={item.href}

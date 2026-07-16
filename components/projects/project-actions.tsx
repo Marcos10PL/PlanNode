@@ -1,22 +1,11 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { ManageMenu } from "@/components/ui/manage-menu";
 import { LINKS } from "@/const";
 import { useDeleteProject } from "@/hooks/use-delete-project";
 import { Project } from "@/types/dto";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -45,31 +34,23 @@ export function ProjectActions({ project, canManage }: Props) {
 
   return (
     <>
-      <DropdownMenu>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" disabled={isPending}>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-          </TooltipTrigger>
-          <TooltipContent>{t("common.manage")}</TooltipContent>
-        </Tooltip>
-        <DropdownMenuContent align="start">
-          <DropdownMenuItem onClick={() => setEditOpen(true)}>
-            <Pencil className="mr-2 h-4 w-4" />
-            {t("projects.edit.trigger")}
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            className="text-destructive focus:text-destructive"
-            onClick={() => setDeleteOpen(true)}
-          >
-            <Trash2 className="mr-2 h-4 w-4" />
-            {t("projects.delete.trigger")}
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <ManageMenu
+        disabled={isPending}
+        align="start"
+        items={[
+          {
+            label: t("projects.edit.trigger"),
+            icon: Pencil,
+            onClick: () => setEditOpen(true),
+          },
+          {
+            label: t("projects.delete.trigger"),
+            icon: Trash2,
+            onClick: () => setDeleteOpen(true),
+            destructive: true,
+          },
+        ]}
+      />
 
       <ProjectModal
         workspaceId={project.workspaceId}

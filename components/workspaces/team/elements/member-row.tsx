@@ -2,21 +2,15 @@
 
 import { removeMemberAction } from "@/actions/workspace/remove-member";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { ManageMenu } from "@/components/ui/manage-menu";
 import UserAvatar from "@/components/user-avatar";
 import { MANAGER_ROLES, WORKSPACE_ROLES } from "@/const";
 
 import { WorkspaceMember } from "@/types/dto";
 import { WorkspaceRole } from "@/types/entities";
 import { getRoleLabel, getRoleVariant } from "@/utils";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -76,26 +70,22 @@ export function MemberRow({
         </div>
 
         {canManage && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" disabled={isPending}>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setChangeRoleOpen(true)}>
-                <Pencil className="mr-2 h-4 w-4" />
-                {t("team.change_role")}
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="text-destructive focus:text-destructive"
-                onClick={() => setRemoveOpen(true)}
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                {t("team.remove_member")}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <ManageMenu
+            disabled={isPending}
+            items={[
+              {
+                label: t("team.change_role"),
+                icon: Pencil,
+                onClick: () => setChangeRoleOpen(true),
+              },
+              {
+                label: t("team.remove_member"),
+                icon: Trash2,
+                onClick: () => setRemoveOpen(true),
+                destructive: true,
+              },
+            ]}
+          />
         )}
 
         <Badge

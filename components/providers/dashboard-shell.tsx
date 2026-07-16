@@ -4,7 +4,7 @@ import { NotificationsIndicator } from "@/components/notifications/notifications
 import { AppConfigProvider } from "@/components/providers/app-config-provider";
 import { UserProvider } from "@/components/providers/user-provider";
 import { WorkspaceProvider } from "@/components/providers/workspace-provider";
-import { TasksRealtimeRefresher } from "@/components/tasks/tasks-realtime-refresher";
+import { RealtimeRefresher } from "@/components/realtime-refresher";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { COOKIES, LINKS } from "@/const";
 import { routing } from "@/i18n/routing";
@@ -79,7 +79,7 @@ export async function DashboardShell({
               </div>
             </div>
 
-            <TasksRealtimeRefresher />
+            <RealtimeRefresher />
           </SidebarProvider>
         </WorkspaceProvider>
       </UserProvider>

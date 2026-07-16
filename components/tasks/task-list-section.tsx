@@ -2,20 +2,10 @@
 
 import { Button } from "@/components/ui/button";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { ManageMenu } from "@/components/ui/manage-menu";
 import { useDeleteTaskList } from "@/hooks/use-delete-task-list";
 import { TaskListWithTasks, WorkspaceMember } from "@/types/dto";
-import { MoreHorizontal, Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { TaskListModal } from "./create-task-list-modal";
@@ -31,7 +21,6 @@ type Props = {
 
 export function TaskListSection({ list, members, canEdit, children }: Props) {
   const t = useTranslations("tasks");
-  const tCommon = useTranslations("common");
   const [renameOpen, setRenameOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [createTaskOpen, setCreateTaskOpen] = useState(false);
@@ -54,31 +43,23 @@ export function TaskListSection({ list, members, canEdit, children }: Props) {
             </span>
           </h2>
           {canEdit && (
-            <DropdownMenu>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" disabled={isPending}>
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                </TooltipTrigger>
-                <TooltipContent>{tCommon("manage")}</TooltipContent>
-              </Tooltip>
-              <DropdownMenuContent align="start">
-                <DropdownMenuItem onClick={() => setRenameOpen(true)}>
-                  <Pencil className="mr-2 h-4 w-4" />
-                  {t("list_rename.trigger")}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="text-destructive focus:text-destructive"
-                  onClick={() => setDeleteOpen(true)}
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  {t("list_delete.trigger")}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <ManageMenu
+              disabled={isPending}
+              align="start"
+              items={[
+                {
+                  label: t("list_rename.trigger"),
+                  icon: Pencil,
+                  onClick: () => setRenameOpen(true),
+                },
+                {
+                  label: t("list_delete.trigger"),
+                  icon: Trash2,
+                  onClick: () => setDeleteOpen(true),
+                  destructive: true,
+                },
+              ]}
+            />
           )}
         </div>
 

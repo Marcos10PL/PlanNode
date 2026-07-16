@@ -9,7 +9,7 @@ export const getProjects = cache(async (workspaceId: string) => {
   const { data } = await supabase
     .from("projects")
     .select(
-      "id, workspace_id, name, description, is_private, icon, color, created_by, task_lists(id, name, position, tasks(status))",
+      "id, workspace_id, name, description, is_private, icon, color, created_by, created_at, task_lists(id, name, position, tasks(status))",
     )
     .eq("workspace_id", workspaceId)
     .order("created_at", { ascending: true })
@@ -28,6 +28,7 @@ export const getProjects = cache(async (workspaceId: string) => {
         icon: p.icon,
         color: p.color,
         createdBy: p.created_by,
+        createdAt: p.created_at,
         totalTasks: tasks.length,
         doneTasks: tasks.filter(t => t.status === TASK_STATUSES.DONE).length,
         cancelledTasks: tasks.filter(t => t.status === TASK_STATUSES.CANCELLED)
@@ -53,7 +54,7 @@ export const getProject = cache(async (projectId: string) => {
   const { data } = await supabase
     .from("projects")
     .select(
-      "id, workspace_id, name, description, is_private, icon, color, created_by",
+      "id, workspace_id, name, description, is_private, icon, color, created_by, created_at",
     )
     .eq("id", projectId)
     .maybeSingle();
@@ -69,6 +70,7 @@ export const getProject = cache(async (projectId: string) => {
     icon: data.icon,
     color: data.color,
     createdBy: data.created_by,
+    createdAt: data.created_at,
   } satisfies Project;
 });
 

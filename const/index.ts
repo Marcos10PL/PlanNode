@@ -56,7 +56,7 @@ export const VALIDATION_MAX = {
   WORKSPACE_NAME: 50,
   WORKSPACE_DESCRIPTION: 500,
   PROJECT_NAME: 50,
-  PROJECT_DESCRIPTION: 500,
+  PROJECT_DESCRIPTION: 1500,
   TASK_LIST_NAME: 50,
   TASK_TITLE: 200,
   TASK_DESCRIPTION: 2000,
@@ -115,6 +115,13 @@ export const TASK_PRIORITIES = {
   HIGH: "high",
   URGENT: "urgent",
 } as const satisfies Record<string, TaskPriority>;
+
+export const PROJECT_SORTS = {
+  NEWEST: "newest",
+  DATE: "date",
+  NAME: "name",
+  PROGRESS: "progress",
+} as const;
 
 export const PROJECT_ICONS = {
   FOLDER_KANBAN: "folder-kanban",

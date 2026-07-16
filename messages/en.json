@@ -2,7 +2,8 @@
   "logo": "PlanNode",
   "common": {
     "unexpected_error": "Something went wrong. Please try again.",
-    "manage": "Manage"
+    "manage": "Manage",
+    "description": "Description"
   },
   "footer": {
     "all_rights_reserved": "PlanNode. All rights reserved."
@@ -266,7 +267,7 @@
     "team": "Team"
   },
   "no_workspace_banner": {
-    "title": "Create your first workspace",
+    "title": "Create your workspace",
     "description": "A workspace is a shared space for your team to manage projects and tasks.",
     "cta": "Create workspace"
   },
@@ -360,7 +361,8 @@
     "error_email_mismatch": "This invitation was sent to a different email address."
   },
   "sidebar": {
-    "projects": "Projects"
+    "projects": "Projects",
+    "no_workspaces": "Create a workspace to start adding projects and tasks."
   },
   "dashboard": {
     "title": "Dashboard",
@@ -370,8 +372,7 @@
     "projects_progress": "Projects progress"
   },
   "projects": {
-    "title": "Projects",
-    "workspace_context": "Projects in the active workspace",
+    "title": "Projects in the active workspace",
     "empty": "No projects yet",
     "private_badge": "Private",
     "appearance": {
@@ -383,6 +384,15 @@
     "not_found_title": "Project not found",
     "not_found_description": "This project does not exist or you don't have access to it.",
     "back_to_projects": "Back to projects",
+    "show_more": "Show more",
+    "show_less": "Show less",
+    "created_at": "Created {date}",
+    "sort": {
+      "newest": "Newest",
+      "date": "Oldest",
+      "name": "Name",
+      "progress": "Progress"
+    },
     "create": {
       "trigger": "Create project",
       "title": "Create project",

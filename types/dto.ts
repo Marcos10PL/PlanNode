@@ -79,6 +79,7 @@ export type Project = ToCamelCase<
     | "icon"
     | "color"
     | "created_by"
+    | "created_at"
   >
 >;
 

@@ -1,33 +1,15 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { TaskProgress } from "@/components/ui/task-progress";
+import { EntityCard } from "@/components/ui/entity-card";
+import { ManageMenu } from "@/components/ui/manage-menu";
 import { useDeleteProject } from "@/hooks/use-delete-project";
 import { ProjectWithProgress } from "@/types/dto";
 import { getProjectColorTextClass, getProjectIcon } from "@/utils";
 import { generateProjectRoute } from "@/utils/helpers";
-import { Lock, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { Lock, Pencil, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import Link from "next/link";
 import { useState } from "react";
 import { ProjectModal } from "./project-modal";
 
@@ -38,7 +20,6 @@ type Props = {
 
 export function ProjectCard({ project, canManage }: Props) {
   const t = useTranslations("projects");
-  const tCommon = useTranslations("common");
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
@@ -53,69 +34,50 @@ export function ProjectCard({ project, canManage }: Props) {
 
   return (
     <>
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <ProjectIcon
-              className={`h-4 w-4 shrink-0 ${getProjectColorTextClass(project.color)}`}
-            />
-            <CardTitle className="flex-1 min-w-0">
-              <Link
-                href={generateProjectRoute(project.id)}
-                className="hover:underline line-clamp-1"
-              >
-                {project.name}
-              </Link>
-            </CardTitle>
-            {project.isPrivate && (
-              <Badge variant="outline" className="shrink-0 pointer-events-none">
-                <Lock className="h-3 w-3 mr-1" />
-                {t("private_badge")}
-              </Badge>
-            )}
-            {canManage && (
-              <DropdownMenu>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" disabled={isPending}>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                  </TooltipTrigger>
-                  <TooltipContent>{tCommon("manage")}</TooltipContent>
-                </Tooltip>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => setEditOpen(true)}>
-                    <Pencil className="mr-2 h-4 w-4" />
-                    {t("edit.trigger")}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="text-destructive focus:text-destructive"
-                    onClick={() => setDeleteOpen(true)}
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    {t("delete.trigger")}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-3">
-          {project.description && (
-            <p className="text-sm text-muted-foreground line-clamp-2">
-              {project.description}
-            </p>
-          )}
-          <TaskProgress
-            total={project.totalTasks}
-            done={project.doneTasks}
-            cancelled={project.cancelledTasks}
-            showLabel
+      <EntityCard
+        href={generateProjectRoute(project.id)}
+        title={project.name}
+        icon={
+          <ProjectIcon
+            className={`h-4 w-4 shrink-0 ${getProjectColorTextClass(project.color)}`}
           />
-        </CardContent>
-      </Card>
+        }
+        badge={
+          project.isPrivate ? (
+            <Badge variant="outline" className="shrink-0 pointer-events-none">
+              <Lock className="h-3 w-3 mr-1" />
+              {t("private_badge")}
+            </Badge>
+          ) : undefined
+        }
+        description={project.description ?? undefined}
+        actions={
+          canManage ? (
+            <ManageMenu
+              disabled={isPending}
+              triggerClassName="h-7 w-7"
+              items={[
+                {
+                  label: t("edit.trigger"),
+                  icon: Pencil,
+                  onClick: () => setEditOpen(true),
+                },
+                {
+                  label: t("delete.trigger"),
+                  icon: Trash2,
+                  onClick: () => setDeleteOpen(true),
+                  destructive: true,
+                },
+              ]}
+            />
+          ) : undefined
+        }
+        progress={{
+          total: project.totalTasks,
+          done: project.doneTasks,
+          cancelled: project.cancelledTasks,
+        }}
+      />
 
       <ProjectModal
         workspaceId={project.workspaceId}

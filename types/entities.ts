@@ -1,10 +1,11 @@
 import { Database } from "./supabase";
 
-type Table<T extends keyof Database["public"]["Tables"]> =
-  Database["public"]["Tables"][T]["Row"];
+type Table<T extends TableName> = Database["public"]["Tables"][T]["Row"];
 
 type Enum<T extends keyof Database["public"]["Enums"]> =
   Database["public"]["Enums"][T];
+
+export type TableName = keyof Database["public"]["Tables"];
 
 export type UserRole = Enum<"user_role">;
 export type WorkspaceRole = Enum<"workspace_role">;
