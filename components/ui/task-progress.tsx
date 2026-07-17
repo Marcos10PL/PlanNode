@@ -24,7 +24,9 @@ export function TaskProgress({
 
   return (
     <div className={cn("flex flex-col gap-1.5", className)}>
-      <div className="flex justify-between text-xs text-muted-foreground">
+      <div
+        className={`flex justify-between ${size === "sm" ? "text-xs" : "text-sm"}  text-muted-foreground`}
+      >
         <span>{t("progress")}</span>
         <span>{progress}%</span>
       </div>
@@ -37,7 +39,9 @@ export function TaskProgress({
           style={{ width: `${progress}%` }}
         />
       </div>
-      <div className="flex items-center justify-between text-xs text-muted-foreground">
+      <div
+        className={`flex items-center justify-between ${size === "sm" ? "text-xs" : "text-sm"} text-muted-foreground`}
+      >
         <span>{t("task_count", { done, total: total - cancelled })}</span>
       </div>
     </div>

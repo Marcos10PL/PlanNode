@@ -3,7 +3,6 @@
 import { createProjectAction } from "@/actions/project/create-project";
 import { updateProjectAction } from "@/actions/project/update-project";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { ControlledInputField } from "@/components/ui/controlled-input-field";
 import { ControlledTextareaField } from "@/components/ui/controlled-textarea-field";
 import {
@@ -14,7 +13,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { FieldLabel } from "@/components/ui/field";
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldLabel,
+  FieldTitle,
+} from "@/components/ui/field";
+import { Switch } from "@/components/ui/switch";
 import { PROJECT_COLORS, PROJECT_ICONS, VALIDATION_MAX } from "@/const";
 import { createProjectSchema, CreateProjectSchema } from "@/schema";
 import { Project } from "@/types/dto";
@@ -121,14 +127,20 @@ export function ProjectModal({
           <DialogDescription>{t("description")}</DialogDescription>
         </DialogHeader>
         <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
-          <ProjectAppearancePicker control={form.control} />
-          <ControlledInputField
-            control={form.control}
-            name="name"
-            label={t("name_label")}
-            placeholder={t("name_placeholder")}
-            maxLength={VALIDATION_MAX.PROJECT_NAME}
-          />
+          <div className="flex items-start gap-2">
+            <div className="flex-1 min-w-0">
+              <ControlledInputField
+                control={form.control}
+                name="name"
+                label={t("name_label")}
+                placeholder={t("name_placeholder")}
+                maxLength={VALIDATION_MAX.PROJECT_NAME}
+              />
+            </div>
+            <div className="self-start mt-7">
+              <ProjectAppearancePicker control={form.control} />
+            </div>
+          </div>
           <ControlledTextareaField
             control={form.control}
             name="description"
@@ -140,16 +152,25 @@ export function ProjectModal({
             control={form.control}
             name="isPrivate"
             render={({ field }) => (
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  id={project ? "editIsPrivate" : "isPrivate"}
-                  checked={field.value}
-                  onCheckedChange={v => field.onChange(v === true)}
-                />
-                <FieldLabel htmlFor={project ? "editIsPrivate" : "isPrivate"}>
-                  {t("private_label")}
-                </FieldLabel>
-              </div>
+              <FieldLabel
+                htmlFor={project ? "editIsPrivate" : "isPrivate"}
+                className="has-data-[state=checked]:border-accent has-data-[state=checked]:bg-accent/50 dark:has-data-[state=checked]:bg-accent/50"
+              >
+                <Field orientation="horizontal">
+                  <FieldContent>
+                    <FieldTitle>{t("private_label")}</FieldTitle>
+                    <FieldDescription>
+                      {t("private_description")}
+                    </FieldDescription>
+                  </FieldContent>
+                  <Switch
+                    id={project ? "editIsPrivate" : "isPrivate"}
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                    className="data-[state=checked]:bg-foreground"
+                  />
+                </Field>
+              </FieldLabel>
             )}
           />
           <div className="flex gap-2 justify-end">

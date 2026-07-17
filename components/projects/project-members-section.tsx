@@ -6,13 +6,11 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import UserAvatar from "@/components/user-avatar";
+import { UserRow } from "@/components/ui/user-row";
 import { WorkspaceMember } from "@/types/dto";
-import { getRoleLabel, getRoleVariant } from "@/utils";
 import { Settings, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-import { Badge } from "../ui/badge";
 import { ManageProjectMembersModal } from "./manage-project-members-modal";
 
 type Props = {
@@ -63,23 +61,14 @@ export function ProjectMembersSection({
       ) : (
         <div className="flex flex-col divide-y divide-accent/70">
           {projectMembers.map(member => (
-            <div key={member.id} className="flex items-center gap-3 py-2">
-              <UserAvatar name={member.fullName} />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium line-clamp-1">
-                  {member.fullName}
-                </p>
-                <p className="text-sm text-muted-foreground line-clamp-1">
-                  {member.email}
-                </p>
-              </div>
-              <Badge
-                variant={getRoleVariant(member.role)}
-                className="shrink-0 pointer-events-none"
-              >
-                {getRoleLabel(member.role, t)}
-              </Badge>
-            </div>
+            <UserRow
+              key={member.id}
+              userId={member.id}
+              name={member.fullName}
+              email={member.email}
+              role={member.role}
+              showBadge={false}
+            />
           ))}
         </div>
       )}

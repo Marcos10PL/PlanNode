@@ -41,6 +41,8 @@ export function TaskListModal({ projectId, list, open, onOpenChange }: Props) {
     if (open) form.reset({ name: list?.name ?? "" });
   }, [open, list]);
 
+  const isChanged = list ? form.watch("name") !== list.name : true;
+
   const onSubmit = async (data: CreateTaskListSchema) => {
     try {
       const result = list
@@ -82,7 +84,10 @@ export function TaskListModal({ projectId, list, open, onOpenChange }: Props) {
             >
               {t("cancel")}
             </Button>
-            <Button type="submit" disabled={form.formState.isSubmitting}>
+            <Button
+              type="submit"
+              disabled={form.formState.isSubmitting || !isChanged}
+            >
               {form.formState.isSubmitting ? t("submitting") : t("submit")}
             </Button>
           </div>

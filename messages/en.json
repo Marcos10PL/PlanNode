@@ -302,6 +302,8 @@
     "members_section": "Members",
     "invitations_section": "Pending invitations",
     "no_members": "No members yet.",
+    "search_placeholder": "Search by name or email...",
+    "no_results": "No results",
     "no_invitations": "No pending invitations.",
     "invite_email_label": "Email address",
     "invite_email_placeholder": "colleague@example.com",
@@ -377,7 +379,8 @@
     "private_badge": "Private",
     "appearance": {
       "icon_label": "Icon",
-      "color_label": "Color"
+      "color_label": "Color",
+      "trigger_label": "Project icon and color"
     },
     "progress": "Progress",
     "task_count": "{done} of {total} tasks done",
@@ -401,7 +404,8 @@
       "name_placeholder": "My project",
       "description_label": "Description",
       "description_placeholder": "What is this project about?",
-      "private_label": "Private project (visible only to assigned members)",
+      "private_label": "Private project",
+      "private_description": "Visible only to assigned members. Once enabled, you can manage assignments in the \"Project members\" section.",
       "submit": "Create",
       "submitting": "Creating...",
       "success": "Project created",
@@ -415,7 +419,8 @@
       "name_placeholder": "My project",
       "description_label": "Description",
       "description_placeholder": "What is this project about?",
-      "private_label": "Private project (visible only to assigned members)",
+      "private_label": "Private project",
+      "private_description": "Visible only to assigned members. Once enabled, you can manage assignments in the \"Project members\" section.",
       "cancel": "Cancel",
       "submit": "Save",
       "submitting": "Saving...",
@@ -439,7 +444,9 @@
       "success": "Project members updated",
       "error": "Could not update project members",
       "empty": "No members to assign. Invite people to the workspace first.",
-      "manage": "Manage"
+      "manage": "Manage",
+      "search_placeholder": "Search by name or email...",
+      "no_results": "No results"
     },
     "lists_section": "Task lists",
     "no_lists": "No task lists"

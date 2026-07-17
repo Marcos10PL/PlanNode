@@ -28,7 +28,7 @@ export default async function TeamPage() {
     );
   }
 
-  const [{ user, members, role, canManage }, invitations] = await Promise.all([
+  const [{ members, role, canManage }, invitations] = await Promise.all([
     getWorkspaceContext(activeWorkspaceId),
     getWorkspaceInvitations(activeWorkspaceId),
   ]);
@@ -61,7 +61,6 @@ export default async function TeamPage() {
             <AccordionContent>
               <MemberList
                 members={members}
-                currentUserId={user?.id ?? ""}
                 currentUserRole={role}
                 workspaceId={activeWorkspaceId}
               />

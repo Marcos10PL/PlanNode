@@ -302,6 +302,8 @@
     "members_section": "Członkowie",
     "invitations_section": "Oczekujące zaproszenia",
     "no_members": "Brak członków.",
+    "search_placeholder": "Szukaj po imieniu lub adresie e-mail...",
+    "no_results": "Brak wyników",
     "no_invitations": "Brak oczekujących zaproszeń.",
     "invite_email_label": "Adres e-mail",
     "invite_email_placeholder": "kolega@firma.pl",
@@ -377,7 +379,8 @@
     "private_badge": "Prywatny",
     "appearance": {
       "icon_label": "Ikona",
-      "color_label": "Kolor"
+      "color_label": "Kolor",
+      "trigger_label": "Ikona i kolor projektu"
     },
     "progress": "Postęp",
     "task_count": "{done} z {total} zadań ukończonych",
@@ -401,7 +404,8 @@
       "name_placeholder": "Mój projekt",
       "description_label": "Opis",
       "description_placeholder": "Czego dotyczy ten projekt?",
-      "private_label": "Projekt prywatny (widoczny tylko dla przypisanych członków)",
+      "private_label": "Projekt prywatny",
+      "private_description": "Widoczny tylko dla przypisanych członków. Po włączeniu tej opcji przypisaniami możesz zarządzać w sekcji „Członkowie projektu”.",
       "submit": "Utwórz",
       "submitting": "Tworzenie...",
       "success": "Projekt utworzony",
@@ -415,7 +419,8 @@
       "name_placeholder": "Mój projekt",
       "description_label": "Opis",
       "description_placeholder": "Czego dotyczy ten projekt?",
-      "private_label": "Projekt prywatny (widoczny tylko dla przypisanych członków)",
+      "private_label": "Projekt prywatny",
+      "private_description": "Widoczny tylko dla przypisanych członków. Po włączeniu tej opcji przypisaniami możesz zarządzać w sekcji „Członkowie projektu”.",
       "cancel": "Anuluj",
       "submit": "Zapisz",
       "submitting": "Zapisywanie...",
@@ -439,7 +444,9 @@
       "success": "Członkowie projektu zaktualizowani",
       "error": "Nie udało się zaktualizować członków projektu",
       "empty": "Brak członków do przypisania. Najpierw zaproś osoby do przestrzeni.",
-      "manage": "Zarządzaj"
+      "manage": "Zarządzaj",
+      "search_placeholder": "Szukaj po imieniu lub adresie e-mail...",
+      "no_results": "Brak wyników"
     },
     "lists_section": "Listy zadań",
     "no_lists": "Brak list zadań"
