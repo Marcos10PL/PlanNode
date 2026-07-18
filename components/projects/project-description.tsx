@@ -23,7 +23,7 @@ export function ProjectDescription({ description }: { description: string }) {
     <div>
       <div
         ref={ref}
-        className={`text-sm text-muted-foreground max-w-7xl ${showMore ? "" : "truncate"}`}
+        className={`text-sm text-muted-foreground ${showMore ? "" : "truncate"}`}
       >
         {description}
       </div>

@@ -1,19 +1,8 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { InfoPopover } from "@/components/ui/info-popover";
 import { TaskProgress } from "@/components/ui/task-progress";
-import { Info } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 
@@ -49,25 +38,13 @@ export function EntityCard({
           </span>
           {badge}
           {description && (
-            <Popover>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7 shrink-0 relative z-10 -my-1"
-                    >
-                      <Info className="h-4 w-4" />
-                    </Button>
-                  </PopoverTrigger>
-                </TooltipTrigger>
-                <TooltipContent>{t("description")}</TooltipContent>
-              </Tooltip>
-              <PopoverContent className="text-sm" align="end">
-                {description}
-              </PopoverContent>
-            </Popover>
+            <InfoPopover
+              label={t("description")}
+              variant="ghost"
+              className="size-7 shrink-0 relative z-10 -my-1 [&_svg]:size-4"
+            >
+              {description}
+            </InfoPopover>
           )}
           {actions && (
             <div className="shrink-0 relative z-10 -my-1">{actions}</div>

@@ -20,10 +20,9 @@ import {
 } from "lucide-react";
 
 export type ProjectIcon = (typeof PROJECT_ICONS)[keyof typeof PROJECT_ICONS];
-export type ProjectColor =
-  (typeof PROJECT_COLORS)[keyof typeof PROJECT_COLORS];
+export type ProjectColor = (typeof PROJECT_COLORS)[keyof typeof PROJECT_COLORS];
 
-const PROJECT_ICON_MAP: Record<ProjectIcon, LucideIcon> = {
+const PROJECT_ICON_MAP = {
   [PROJECT_ICONS.FOLDER_KANBAN]: FolderKanban,
   [PROJECT_ICONS.ROCKET]: Rocket,
   [PROJECT_ICONS.LIGHTBULB]: Lightbulb,
@@ -40,9 +39,9 @@ const PROJECT_ICON_MAP: Record<ProjectIcon, LucideIcon> = {
   [PROJECT_ICONS.CALENDAR]: Calendar,
   [PROJECT_ICONS.CODE]: Code,
   [PROJECT_ICONS.PALETTE]: Palette,
-};
+} as const satisfies Record<ProjectIcon, LucideIcon>;
 
-const PROJECT_COLOR_TEXT_MAP: Record<ProjectColor, string> = {
+const PROJECT_COLOR_TEXT_MAP = {
   [PROJECT_COLORS.NEUTRAL]: "text-foreground",
   [PROJECT_COLORS.RED]: "text-red-500",
   [PROJECT_COLORS.ORANGE]: "text-orange-500",
@@ -59,9 +58,9 @@ const PROJECT_COLOR_TEXT_MAP: Record<ProjectColor, string> = {
   [PROJECT_COLORS.VIOLET]: "text-violet-500",
   [PROJECT_COLORS.PURPLE]: "text-purple-500",
   [PROJECT_COLORS.PINK]: "text-pink-500",
-};
+} as const satisfies Record<ProjectColor, string>;
 
-const PROJECT_COLOR_BORDER_MAP: Record<ProjectColor, string> = {
+const PROJECT_COLOR_BORDER_MAP = {
   [PROJECT_COLORS.NEUTRAL]: "border-foreground/30",
   [PROJECT_COLORS.RED]: "border-red-500/40",
   [PROJECT_COLORS.ORANGE]: "border-orange-500/40",
@@ -78,9 +77,9 @@ const PROJECT_COLOR_BORDER_MAP: Record<ProjectColor, string> = {
   [PROJECT_COLORS.VIOLET]: "border-violet-500/40",
   [PROJECT_COLORS.PURPLE]: "border-purple-500/40",
   [PROJECT_COLORS.PINK]: "border-pink-500/40",
-};
+} as const satisfies Record<ProjectColor, string>;
 
-const PROJECT_COLOR_BG_MAP: Record<ProjectColor, string> = {
+const PROJECT_COLOR_BG_MAP = {
   [PROJECT_COLORS.NEUTRAL]: "bg-foreground",
   [PROJECT_COLORS.RED]: "bg-red-500",
   [PROJECT_COLORS.ORANGE]: "bg-orange-500",
@@ -97,7 +96,7 @@ const PROJECT_COLOR_BG_MAP: Record<ProjectColor, string> = {
   [PROJECT_COLORS.VIOLET]: "bg-violet-500",
   [PROJECT_COLORS.PURPLE]: "bg-purple-500",
   [PROJECT_COLORS.PINK]: "bg-pink-500",
-};
+} as const satisfies Record<ProjectColor, string>;
 
 const isProjectIcon = (icon: string): icon is ProjectIcon =>
   Object.values(PROJECT_ICONS).includes(icon as ProjectIcon);

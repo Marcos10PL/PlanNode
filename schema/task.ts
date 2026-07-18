@@ -18,18 +18,11 @@ export const createTaskSchema = (t?: Translations) =>
     dueDate: z.iso.date().nullable(),
   });
 
-export const updateTaskSchema = createTaskSchema;
-
-export const updateTaskStatusSchema = () =>
-  z.object({
-    status: z.enum(TASK_STATUSES),
-  });
+export const updateTaskSchema = (t?: Translations) =>
+  createTaskSchema(t).partial();
 
 export type CreateTaskListSchema = z.infer<
   ReturnType<typeof createTaskListSchema>
 >;
 export type CreateTaskSchema = z.infer<ReturnType<typeof createTaskSchema>>;
 export type UpdateTaskSchema = z.infer<ReturnType<typeof updateTaskSchema>>;
-export type UpdateTaskStatusSchema = z.infer<
-  ReturnType<typeof updateTaskStatusSchema>
->;

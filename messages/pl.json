@@ -3,7 +3,11 @@
   "common": {
     "unexpected_error": "Coś poszło nie tak. Spróbuj ponownie.",
     "manage": "Zarządzaj",
-    "description": "Opis"
+    "description": "Opis",
+    "edit": "Edytuj",
+    "delete": "Usuń",
+    "pick_date": "Wybierz datę",
+    "clear_date": "Wyczyść datę"
   },
   "footer": {
     "all_rights_reserved": "PlanNode. Wszelkie prawa zastrzeżone."
@@ -455,6 +459,11 @@
     "empty": "Brak zadań na tej liście",
     "add_task": "Dodaj zadanie",
     "no_assignee": "Brak przypisania",
+    "assign": "Przypisz osobę",
+    "assignee_change_error": "Nie udało się zmienić przypisania",
+    "due_date_change_error": "Nie udało się zmienić terminu",
+    "set_due_date": "Ustaw termin",
+    "priority_change_error": "Nie udało się zmienić priorytetu",
     "status_change_error": "Nie udało się zmienić statusu zadania",
     "status_on_hold": "Wstrzymane",
     "status_todo": "Do zrobienia",

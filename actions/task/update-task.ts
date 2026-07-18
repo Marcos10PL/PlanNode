@@ -3,6 +3,7 @@
 import { ERRORS, LINKS, NOTIFICATION_TYPES } from "@/const";
 import { getUserContext } from "@/lib/supabase/server";
 import { updateTaskSchema, UpdateTaskSchema } from "@/schema";
+import { TablesUpdate } from "@/types/supabase";
 import { generateProjectRoute } from "@/utils/helpers";
 import { revalidatePath } from "next/cache";
 
@@ -16,7 +17,7 @@ export async function updateTaskAction(taskId: string, data: UpdateTaskSchema) {
 
   const { data: existing, error: fetchError } = await supabase
     .from("tasks")
-    .select("project_id, assignee_id")
+    .select("project_id, assignee_id, title")
     .eq("id", taskId)
     .single();
 
@@ -25,16 +26,19 @@ export async function updateTaskAction(taskId: string, data: UpdateTaskSchema) {
   const { title, description, status, priority, assigneeId, dueDate } =
     parsed.data;
 
+  const updates: TablesUpdate<"tasks"> = {};
+  if (title !== undefined) updates.title = title;
+  if (description !== undefined) updates.description = description || null;
+  if (status !== undefined) updates.status = status;
+  if (priority !== undefined) updates.priority = priority;
+  if (assigneeId !== undefined) updates.assignee_id = assigneeId;
+  if (dueDate !== undefined) updates.due_date = dueDate;
+
+  if (Object.keys(updates).length === 0) return { success: true };
+
   const { error: updateError } = await supabase
     .from("tasks")
-    .update({
-      title,
-      description: description || null,
-      status,
-      priority,
-      assignee_id: assigneeId,
-      due_date: dueDate,
-    })
+    .update(updates)
     .eq("id", taskId);
 
   if (updateError) return { error: ERRORS.SERVER_ERROR };
@@ -57,7 +61,7 @@ export async function updateTaskAction(taskId: string, data: UpdateTaskSchema) {
         p_user_id: assigneeId,
         p_type: NOTIFICATION_TYPES.TASK_ASSIGNED,
         p_metadata: {
-          taskTitle: title,
+          taskTitle: title ?? existing.title,
           projectName: project.name,
           assignerName: assignerProfile.full_name,
           taskId,

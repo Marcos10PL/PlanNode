@@ -3,7 +3,11 @@
   "common": {
     "unexpected_error": "Something went wrong. Please try again.",
     "manage": "Manage",
-    "description": "Description"
+    "description": "Description",
+    "edit": "Edit",
+    "delete": "Delete",
+    "pick_date": "Pick a date",
+    "clear_date": "Clear date"
   },
   "footer": {
     "all_rights_reserved": "PlanNode. All rights reserved."
@@ -455,6 +459,11 @@
     "empty": "No tasks in this list",
     "add_task": "Add task",
     "no_assignee": "No assignee",
+    "assign": "Assign someone",
+    "assignee_change_error": "Could not change assignee",
+    "due_date_change_error": "Could not change due date",
+    "set_due_date": "Set due date",
+    "priority_change_error": "Could not change priority",
     "status_change_error": "Could not change task status",
     "status_on_hold": "On hold",
     "status_todo": "To do",

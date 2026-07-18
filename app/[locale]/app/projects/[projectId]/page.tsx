@@ -94,7 +94,7 @@ export default async function ProjectPage({ params }: Props) {
         )}
 
         <div className="flex flex-col gap-8">
-          <section className="max-w-7xl">
+          <section>
             <ArrowRight color={project.color} className="mt-1" />
             <TaskProgress
               total={projectWithProgress?.totalTasks ?? 0}

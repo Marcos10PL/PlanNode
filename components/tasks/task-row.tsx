@@ -1,36 +1,27 @@
 "use client";
 
 import { deleteTaskAction } from "@/actions/task/delete-task";
-import { updateTaskStatusAction } from "@/actions/task/update-task-status";
-import { Badge } from "@/components/ui/badge";
+import { updateTaskAction } from "@/actions/task/update-task";
 import { Button } from "@/components/ui/button";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
-import { ManageMenu } from "@/components/ui/manage-menu";
+import { InfoPopover } from "@/components/ui/info-popover";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import UserAvatar from "@/components/user-avatar";
-import { TASK_STATUSES } from "@/const";
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Task, WorkspaceMember } from "@/types/dto";
-import { TaskStatus } from "@/types/entities";
-import {
-  cn,
-  formatDate,
-  getPriorityLabel,
-  getPriorityVariant,
-  getStatusLabel,
-  getStatusVariant,
-  isTaskOverdue,
-} from "@/utils";
+import { TaskPriority, TaskStatus } from "@/types/entities";
+import { cn, getPriorityLabel, isTaskOverdue } from "@/utils";
 import { Pencil, Trash2 } from "lucide-react";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
+import { TaskAssigneePopover } from "./task-assignee-popover";
 import { TaskModal } from "./task-modal";
+import { TaskPrioritySelect } from "./task-priority-select";
+import { TaskStatusSelect } from "./task-status-select";
+import { TaskDueDatePopover } from "./task-due-date-popover"
 
 type Props = {
   task: Task;
@@ -40,7 +31,6 @@ type Props = {
 
 export function TaskRow({ task, members, canEdit }: Props) {
   const t = useTranslations();
-  const locale = useLocale();
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [isPending, setIsPending] = useState(false);
@@ -50,8 +40,20 @@ export function TaskRow({ task, members, canEdit }: Props) {
   const handleStatusChange = async (status: TaskStatus) => {
     setIsPending(true);
     try {
-      const result = await updateTaskStatusAction(task.id, { status });
+      const result = await updateTaskAction(task.id, { status });
       if (result?.error) toast.error(t("tasks.status_change_error"));
+    } catch {
+      toast.error(t("common.unexpected_error"));
+    } finally {
+      setIsPending(false);
+    }
+  };
+
+  const handlePriorityChange = async (priority: TaskPriority) => {
+    setIsPending(true);
+    try {
+      const result = await updateTaskAction(task.id, { priority });
+      if (result?.error) toast.error(t("tasks.priority_change_error"));
     } catch {
       toast.error(t("common.unexpected_error"));
     } finally {
@@ -75,86 +77,107 @@ export function TaskRow({ task, members, canEdit }: Props) {
     }
   };
 
+  const stopPropagation = (e: React.MouseEvent) => e.stopPropagation();
+
   return (
     <>
-      <div className="flex items-center gap-3 py-2">
-        <div className="flex-1 min-w-0">
+      <div
+        className={cn(
+          "flex items-center gap-2 px-2 py-1.5 transition-colors hover:bg-accent/50",
+          canEdit && "cursor-pointer",
+        )}
+        onClick={canEdit ? () => setEditOpen(true) : undefined}
+      >
+        <div className="flex flex-1 items-center gap-2 min-w-0">
           <p className="text-sm font-medium line-clamp-1">{task.title}</p>
           {task.description && (
-            <p className="text-sm text-muted-foreground line-clamp-1">
-              {task.description}
-            </p>
+            <div onClick={stopPropagation} className="shrink-0">
+              <InfoPopover
+                label={t("common.description")}
+                variant="ghost"
+                className="size-7 text-muted-foreground [&_svg]:size-4"
+              >
+                {task.description}
+              </InfoPopover>
+            </div>
           )}
         </div>
 
-        {task.dueDate && (
-          <span
-            className={cn(
-              "text-xs shrink-0",
-              isOverdue ? "text-destructive font-medium" : "text-muted-foreground",
-            )}
-          >
-            {formatDate(task.dueDate, locale)}
-          </span>
-        )}
-
-        <Badge
-          variant={getPriorityVariant(task.priority)}
-          className="shrink-0 pointer-events-none hidden sm:inline-flex"
-        >
-          {getPriorityLabel(task.priority, t)}
-        </Badge>
-
-        {canEdit ? (
-          <Select
-            value={task.status}
-            onValueChange={v => handleStatusChange(v as TaskStatus)}
-            disabled={isPending}
-          >
-            <SelectTrigger className="w-36 shrink-0" size="sm">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {Object.values(TASK_STATUSES).map(status => (
-                <SelectItem key={status} value={status}>
-                  {getStatusLabel(status, t)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        ) : (
-          <Badge
-            variant={getStatusVariant(task.status)}
-            className="shrink-0 pointer-events-none"
-          >
-            {getStatusLabel(task.status, t)}
-          </Badge>
-        )}
-
-        {task.assignee && (
-          <UserAvatar
-            name={task.assignee.fullName}
-            className="h-7 w-7 shrink-0"
+        <div onClick={stopPropagation} className="hidden lg:block shrink-0">
+          <TaskAssigneePopover
+            taskId={task.id}
+            assignee={task.assignee}
+            members={members}
+            canEdit={canEdit}
           />
+        </div>
+
+        <div onClick={stopPropagation} className="hidden lg:block shrink-0">
+          <TaskPrioritySelect
+            value={task.priority}
+            onValueChange={handlePriorityChange}
+            disabled={isPending || !canEdit}
+            iconOnly
+            size="sm"
+            ariaLabel={getPriorityLabel(task.priority, t)}
+          />
+        </div>
+
+        <div onClick={stopPropagation} className="hidden lg:block shrink-0">
+          <TaskStatusSelect
+            value={task.status}
+            onValueChange={handleStatusChange}
+            disabled={isPending || !canEdit}
+            size="sm"
+            className="w-40"
+          />
+        </div>
+
+        <div onClick={stopPropagation} className="hidden lg:block shrink-0">
+          <TaskDueDatePopover
+            taskId={task.id}
+            dueDate={task.dueDate}
+            isOverdue={isOverdue}
+            canEdit={canEdit}
+          />
+        </div>
+
+        {canEdit && (
+          <div onClick={stopPropagation} className="lg:hidden shrink-0">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 text-info"
+                  disabled={isPending}
+                  onClick={() => setEditOpen(true)}
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{t("common.edit")}</TooltipContent>
+            </Tooltip>
+          </div>
         )}
 
         {canEdit && (
-          <ManageMenu
-            disabled={isPending}
-            items={[
-              {
-                label: t("tasks.edit.trigger"),
-                icon: Pencil,
-                onClick: () => setEditOpen(true),
-              },
-              {
-                label: t("tasks.delete.trigger"),
-                icon: Trash2,
-                onClick: () => setDeleteOpen(true),
-                destructive: true,
-              },
-            ]}
-          />
+          <div onClick={stopPropagation} className="shrink-0">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 text-destructive"
+                  disabled={isPending}
+                  onClick={() => setDeleteOpen(true)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{t("common.delete")}</TooltipContent>
+            </Tooltip>
+          </div>
         )}
       </div>
 
