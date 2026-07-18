@@ -54,11 +54,17 @@ export default async function ProjectPage({ params }: Props) {
 
   const ProjectIcon = getProjectIcon(project.icon);
 
+  const iconClassName = cn(
+    "h-5 w-5 shrink-0",
+    getProjectColorTextClass(project.color),
+  );
+
   return (
     <>
       <div className="flex flex-col gap-2 mt-4 mb-6">
-        <div className="flex flex-col md:flex-row-reverse md:items-center gap-2 min-w-0 md:max-w-fit">
-          <div className="flex items-center gap-2 min-w-0 self-end">
+        <div className="flex flex-col md:flex-row-reverse md:items-center gap-x-2 min-w-0 md:max-w-fit">
+          <div className="flex items-center gap-2 min-w-0 self-end w-full md:w-fit">
+            <ProjectIcon className={`${iconClassName} md:hidden mr-auto`} />
             {project.isPrivate && (
               <Badge variant="outline" className="shrink-0 pointer-events-none">
                 <Lock className="h-3 w-3 mr-1" />
@@ -68,9 +74,7 @@ export default async function ProjectPage({ params }: Props) {
             <ProjectActions project={project} canManage={canManage} />
           </div>
           <div className="flex items-center gap-2 min-w-0">
-            <ProjectIcon
-              className={`h-5 w-5 shrink-0 ${getProjectColorTextClass(project.color)}`}
-            />
+            <ProjectIcon className={`${iconClassName} hidden md:block`} />
             <h1 className="min-w-0">{project.name}</h1>
           </div>
         </div>
@@ -78,12 +82,16 @@ export default async function ProjectPage({ params }: Props) {
 
       <div
         className={cn(
-          "md:border-l md:ml-8 pt-4 -mt-6 space-y-6 relative",
+          "md:border-l md:ml-8 pt-6 -mt-6 space-y-6 relative",
           getProjectColorBorderClass(project.color),
         )}
       >
-        <ArrowRight color={project.color} className="mt-1" />
-        <ProjectDescription description={project.description ?? ""} />
+        {project.description && (
+          <>
+            <ArrowRight color={project.color} className="mt-1" />
+            <ProjectDescription description={project.description} />
+          </>
+        )}
 
         <div className="flex flex-col gap-8">
           <section className="max-w-7xl">

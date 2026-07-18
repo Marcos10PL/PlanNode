@@ -3,6 +3,8 @@
 import { Button } from "@/components/ui/button";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { ManageMenu } from "@/components/ui/manage-menu";
+import { TaskProgress } from "@/components/ui/task-progress";
+import { TASK_STATUSES } from "@/const";
 import { useDeleteTaskList } from "@/hooks/use-delete-task-list";
 import { TaskListWithTasks, WorkspaceMember } from "@/types/dto";
 import { Pencil, Plus, Trash2 } from "lucide-react";
@@ -16,16 +18,22 @@ type Props = {
   list: TaskListWithTasks;
   members: WorkspaceMember[];
   canEdit: boolean;
-  children?: React.ReactNode;
 };
 
-export function TaskListSection({ list, members, canEdit, children }: Props) {
+export function TaskListSection({ list, members, canEdit }: Props) {
   const t = useTranslations("tasks");
   const [renameOpen, setRenameOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [createTaskOpen, setCreateTaskOpen] = useState(false);
 
   const { remove, isPending } = useDeleteTaskList();
+
+  const doneTasks = list.tasks.filter(
+    task => task.status === TASK_STATUSES.DONE,
+  ).length;
+  const cancelledTasks = list.tasks.filter(
+    task => task.status === TASK_STATUSES.CANCELLED,
+  ).length;
 
   const handleDelete = async () => {
     await remove(list.id);
@@ -34,36 +42,42 @@ export function TaskListSection({ list, members, canEdit, children }: Props) {
 
   return (
     <>
-      <div className="flex flex-col">
-        <div className="flex items-center gap-1">
-          <h2 className="text-sm font-semibold min-w-0 line-clamp-1">
-            {list.name}{" "}
-            <span className="text-muted-foreground font-normal">
-              ({list.tasks.length})
-            </span>
+      <div className="flex flex-col mt-4">
+        <div className="flex flex-col-reverse md:flex-row md:items-center gap-1">
+          <h2 className="text-sm font-semibold min-w-0 break-all">
+            {list.name} ({list.tasks.length})
           </h2>
           {canEdit && (
-            <ManageMenu
-              disabled={isPending}
-              align="start"
-              items={[
-                {
-                  label: t("list_rename.trigger"),
-                  icon: Pencil,
-                  onClick: () => setRenameOpen(true),
-                },
-                {
-                  label: t("list_delete.trigger"),
-                  icon: Trash2,
-                  onClick: () => setDeleteOpen(true),
-                  destructive: true,
-                },
-              ]}
-            />
+            <div className="self-end">
+              <ManageMenu
+                disabled={isPending}
+                align="start"
+                items={[
+                  {
+                    label: t("list_rename.trigger"),
+                    icon: Pencil,
+                    onClick: () => setRenameOpen(true),
+                  },
+                  {
+                    label: t("list_delete.trigger"),
+                    icon: Trash2,
+                    onClick: () => setDeleteOpen(true),
+                    destructive: true,
+                  },
+                ]}
+              />
+            </div>
           )}
         </div>
 
-        {children}
+        <section className="max-w-7xl mt-6 mb-7">
+          <TaskProgress
+            total={list.tasks.length}
+            done={doneTasks}
+            cancelled={cancelledTasks}
+            showLabel
+          />
+        </section>
 
         {list.tasks.length === 0 ? (
           <p className="text-sm text-muted-foreground py-2">{t("empty")}</p>

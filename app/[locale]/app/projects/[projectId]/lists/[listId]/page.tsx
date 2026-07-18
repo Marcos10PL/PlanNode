@@ -1,6 +1,5 @@
 import { TaskListSection } from "@/components/tasks/task-list-section";
-import { TaskProgress } from "@/components/ui/task-progress";
-import { COOKIES, TASK_STATUSES } from "@/const";
+import { COOKIES } from "@/const";
 import { getProject, getTaskList, getWorkspaceContext } from "@/lib/data";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
@@ -31,25 +30,5 @@ export default async function TaskListPage({ params }: Props) {
 
   const { members, canEdit } = await getWorkspaceContext(project.workspaceId);
 
-  const doneTasks = list.tasks.filter(
-    task => task.status === TASK_STATUSES.DONE,
-  ).length;
-  const cancelledTasks = list.tasks.filter(
-    task => task.status === TASK_STATUSES.CANCELLED,
-  ).length;
-
-  return (
-    <div className="mt-4">
-      <TaskListSection list={list} members={members} canEdit={canEdit}>
-        <section className="max-w-md mt-2 mb-4">
-          <TaskProgress
-            total={list.tasks.length}
-            done={doneTasks}
-            cancelled={cancelledTasks}
-            showLabel
-          />
-        </section>
-      </TaskListSection>
-    </div>
-  );
+  return <TaskListSection list={list} members={members} canEdit={canEdit} />;
 }

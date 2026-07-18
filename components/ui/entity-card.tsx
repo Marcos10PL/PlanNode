@@ -39,12 +39,12 @@ export function EntityCard({
   const t = useTranslations("common");
 
   return (
-    <Card className="relative hover:bg-accent/50 transition-colors">
+    <Card className="relative min-w-0 hover:bg-accent/50 transition-colors">
       <Link href={href} className="absolute inset-0" aria-label={title} />
       <CardContent className="flex flex-col gap-2 p-4">
         <div className="flex items-center gap-2">
           {icon}
-          <span className="min-w-0 flex-1 text-sm font-medium line-clamp-1">
+          <span className="min-w-0 flex-1 text-sm font-medium truncate">
             {title}
           </span>
           {badge}
