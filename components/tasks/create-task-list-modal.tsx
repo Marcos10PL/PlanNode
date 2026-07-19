@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { VALIDATION_MAX } from "@/const";
+import { ERRORS, VALIDATION_MAX } from "@/const";
 import { createTaskListSchema, CreateTaskListSchema } from "@/schema";
 import { TaskListWithTasks } from "@/types/dto";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -50,7 +50,11 @@ export function TaskListModal({ projectId, list, open, onOpenChange }: Props) {
         : await createTaskListAction(projectId, data);
 
       if (result.error) {
-        toast.error(t("error"));
+        toast.error(
+          result.error === ERRORS.INSUFFICIENT_ROLE
+            ? tCommon("insufficient_role")
+            : t("error"),
+        );
         return;
       }
 

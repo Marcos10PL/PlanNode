@@ -14,7 +14,12 @@ import {
 } from "@/components/ui/dialog";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Field, FieldLabel } from "@/components/ui/field";
-import { TASK_PRIORITIES, TASK_STATUSES, VALIDATION_MAX } from "@/const";
+import {
+  ERRORS,
+  TASK_PRIORITIES,
+  TASK_STATUSES,
+  VALIDATION_MAX,
+} from "@/const";
 import { createTaskSchema, CreateTaskSchema } from "@/schema";
 import { Task, WorkspaceMember } from "@/types/dto";
 import { TaskStatus } from "@/types/entities";
@@ -47,6 +52,7 @@ export function TaskModal({
   const t = useTranslations(task ? "tasks.edit" : "tasks.create");
   const tErrors = useTranslations("fields.errors");
   const tCommon = useTranslations("common");
+  const tTasks = useTranslations("tasks");
 
   const defaultValues: CreateTaskSchema = {
     title: task?.title ?? "",
@@ -73,7 +79,13 @@ export function TaskModal({
         : await createTaskAction(listId, data);
 
       if (result.error) {
-        toast.error(t("error"));
+        toast.error(
+          result.error === ERRORS.INSUFFICIENT_ROLE
+            ? tCommon("insufficient_role")
+            : result.error === ERRORS.INVALID_ASSIGNEE
+              ? tTasks("invalid_assignee")
+              : t("error"),
+        );
         return;
       }
 
@@ -183,7 +195,13 @@ export function TaskModal({
             >
               {t("cancel")}
             </Button>
-            <Button type="submit" disabled={form.formState.isSubmitting}>
+            <Button
+              type="submit"
+              disabled={
+                form.formState.isSubmitting ||
+                (!!task && !form.formState.isDirty)
+              }
+            >
               {form.formState.isSubmitting ? t("submitting") : t("submit")}
             </Button>
           </div>

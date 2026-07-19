@@ -14,10 +14,16 @@ import {
   getStatusDotClass,
   getStatusLabel,
 } from "@/utils";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { ChevronDown, Pencil, Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { TaskListModal } from "./create-task-list-modal";
+import {
+  DEFAULT_TASK_FILTERS,
+  filterTasks,
+  sortTasks,
+  TaskFilters,
+} from "./task-filters";
 import { TaskModal } from "./task-modal";
 import { TaskRow } from "./task-row";
 
@@ -44,8 +50,27 @@ export function TaskListSection({ list, members, canEdit }: Props) {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [createTaskOpen, setCreateTaskOpen] = useState(false);
   const [selectedTaskStatus, setSelectedTaskStatus] = useState<TaskStatus>();
+  const [filters, setFilters] = useState(DEFAULT_TASK_FILTERS);
+  const [collapsed, setCollapsed] = useState<Set<TaskStatus>>(new Set());
 
   const { remove, isPending } = useDeleteTaskList();
+
+  const toggleGroup = (status: TaskStatus) => {
+    setCollapsed(prev => {
+      const next = new Set(prev);
+      if (next.has(status)) {
+        next.delete(status);
+      } else {
+        next.add(status);
+      }
+      return next;
+    });
+  };
+
+  const visibleTasks = useMemo(
+    () => sortTasks(filterTasks(list.tasks, filters), filters.sort),
+    [list.tasks, filters],
+  );
 
   const doneTasks = list.tasks.filter(
     task => task.status === TASK_STATUSES.DONE,
@@ -89,7 +114,7 @@ export function TaskListSection({ list, members, canEdit }: Props) {
           )}
         </div>
 
-        <section className="mt-6 mb-7">
+        <section className="my-4">
           <TaskProgress
             total={list.tasks.length}
             done={doneTasks}
@@ -98,17 +123,50 @@ export function TaskListSection({ list, members, canEdit }: Props) {
           />
         </section>
 
+        {list.tasks.length > 0 && (
+          <div className="my-4">
+            <TaskFilters
+              members={members}
+              filters={filters}
+              onChange={setFilters}
+            />
+          </div>
+        )}
+
         {list.tasks.length === 0 ? (
-          <p className="text-sm text-muted-foreground py-2">{t("empty")}</p>
+          <>
+            <p className="text-sm text-muted-foreground py-2">{t("empty")}</p>
+            {canEdit && (
+              <Button
+                variant="ghost"
+                className="w-full justify-start text-muted-foreground rounded-none hover:bg-accent/50 h-11 pl-2"
+                onClick={() => setCreateTaskOpen(true)}
+              >
+                <Plus className="h-4 w-4" />
+                {t("add_task")}
+              </Button>
+            )}
+          </>
+        ) : visibleTasks.length === 0 ? (
+          <p className="text-sm text-muted-foreground py-2">
+            {t("filters.no_results")}
+          </p>
         ) : (
           <div className="flex flex-col gap-4">
             {STATUS_GROUP_ORDER.map(status => {
-              const tasks = list.tasks.filter(task => task.status === status);
+              const tasks = visibleTasks.filter(task => task.status === status);
               if (tasks.length === 0) return null;
+
+              const isCollapsed = collapsed.has(status);
 
               return (
                 <div key={status} className="flex flex-col gap-1 -ml-2">
-                  <div className="flex items-center gap-2 px-2 pt-3 pb-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => toggleGroup(status)}
+                    className="h-auto w-fit justify-start gap-2 py-2"
+                  >
                     <span
                       className={`h-2 w-2 rounded-full ${getStatusDotClass(status)}`}
                     />
@@ -118,36 +176,44 @@ export function TaskListSection({ list, members, canEdit }: Props) {
                     <span className="text-xs text-muted-foreground">
                       {tasks.length}
                     </span>
-                  </div>
+                    <ChevronDown
+                      className={cn(
+                        "size-3.5 text-muted-foreground transition-transform",
+                        isCollapsed && "-rotate-90",
+                      )}
+                    />
+                  </Button>
 
-                  <div
-                    className={cn(
-                      "flex flex-col divide-y border-l pl-2 ml-[.71rem]",
-                      getStatusBorderClass(status),
-                    )}
-                  >
-                    {tasks.map(task => (
-                      <TaskRow
-                        key={task.id}
-                        task={task}
-                        members={members}
-                        canEdit={canEdit}
-                      />
-                    ))}
-                    {canEdit && (
-                      <Button
-                        variant="ghost"
-                        className="w-full justify-start text-muted-foreground rounded-none hover:bg-accent/50 h-11 pl-2"
-                        onClick={() => {
-                          setCreateTaskOpen(true);
-                          setSelectedTaskStatus(status);
-                        }}
-                      >
-                        <Plus className="h-4 w-4" />
-                        {t("add_task")}
-                      </Button>
-                    )}
-                  </div>
+                  {!isCollapsed && (
+                    <div
+                      className={cn(
+                        "flex flex-col divide-y border-l pl-2 ml-[0.95rem]",
+                        getStatusBorderClass(status),
+                      )}
+                    >
+                      {tasks.map(task => (
+                        <TaskRow
+                          key={task.id}
+                          task={task}
+                          members={members}
+                          canEdit={canEdit}
+                        />
+                      ))}
+                      {canEdit && (
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-start text-muted-foreground rounded-none hover:bg-accent/50 h-11 pl-2"
+                          onClick={() => {
+                            setCreateTaskOpen(true);
+                            setSelectedTaskStatus(status);
+                          }}
+                        >
+                          <Plus className="h-4 w-4" />
+                          {t("add_task")}
+                        </Button>
+                      )}
+                    </div>
+                  )}
                 </div>
               );
             })}

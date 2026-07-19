@@ -1,6 +1,7 @@
 "use client";
 
 import { deleteProjectAction } from "@/actions/project/delete-project";
+import { ERRORS } from "@/const";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -14,7 +15,11 @@ export function useDeleteProject() {
     try {
       const result = await deleteProjectAction(projectId);
       if (result?.error) {
-        toast.error(t("projects.delete.error"));
+        toast.error(
+          result.error === ERRORS.INSUFFICIENT_ROLE
+            ? t("common.insufficient_role")
+            : t("projects.delete.error"),
+        );
         return false;
       }
 

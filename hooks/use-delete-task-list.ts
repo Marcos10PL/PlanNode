@@ -18,7 +18,9 @@ export function useDeleteTaskList() {
         toast.error(
           result.error === ERRORS.CANNOT_DELETE_LAST_LIST
             ? t("tasks.list_delete.last_list_error")
-            : t("tasks.list_delete.error"),
+            : result.error === ERRORS.INSUFFICIENT_ROLE
+              ? t("common.insufficient_role")
+              : t("tasks.list_delete.error"),
         );
         return false;
       }

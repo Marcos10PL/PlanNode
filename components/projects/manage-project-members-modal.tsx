@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { MemberSelectList } from "@/components/ui/member-select-list";
-import { MANAGER_ROLES } from "@/const";
+import { ERRORS, MANAGER_ROLES } from "@/const";
 import { WorkspaceMember } from "@/types/dto";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
@@ -62,7 +62,11 @@ export function ManageProjectMembersModal({
       });
 
       if (result.error) {
-        toast.error(t("error"));
+        toast.error(
+          result.error === ERRORS.INSUFFICIENT_ROLE
+            ? tCommon("insufficient_role")
+            : t("error"),
+        );
         return;
       }
 

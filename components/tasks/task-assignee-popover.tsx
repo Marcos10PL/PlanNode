@@ -2,6 +2,7 @@
 
 import { updateTaskAction } from "@/actions/task/update-task";
 import { Button } from "@/components/ui/button";
+import { ERRORS } from "@/const";
 import UserAvatar from "@/components/user-avatar";
 import { TaskAssignee, WorkspaceMember } from "@/types/dto";
 import { UserRoundPlus } from "lucide-react";
@@ -38,7 +39,15 @@ export function TaskAssigneePopover({
     setIsPending(true);
     try {
       const result = await updateTaskAction(taskId, { assigneeId });
-      if (result?.error) toast.error(t("tasks.assignee_change_error"));
+      if (result?.error) {
+        toast.error(
+          result.error === ERRORS.INSUFFICIENT_ROLE
+            ? t("common.insufficient_role")
+            : result.error === ERRORS.INVALID_ASSIGNEE
+              ? t("tasks.invalid_assignee")
+              : t("tasks.assignee_change_error"),
+        );
+      }
     } catch {
       toast.error(t("common.unexpected_error"));
     } finally {

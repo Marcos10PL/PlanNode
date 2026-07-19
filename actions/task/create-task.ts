@@ -1,15 +1,12 @@
 "use server";
 
 import { ERRORS, LINKS, NOTIFICATION_TYPES } from "@/const";
-import { getUserContext } from "@/lib/supabase/server";
+import { canEditProject, getUserContext } from "@/lib/supabase/server";
 import { createTaskSchema, CreateTaskSchema } from "@/schema";
 import { generateProjectRoute } from "@/utils/helpers";
 import { revalidatePath } from "next/cache";
 
-export async function createTaskAction(
-  listId: string,
-  data: CreateTaskSchema,
-) {
+export async function createTaskAction(listId: string, data: CreateTaskSchema) {
   const parsed = createTaskSchema().safeParse(data);
   if (!parsed.success) return { error: ERRORS.INVALID_DATA };
 
@@ -25,6 +22,9 @@ export async function createTaskAction(
 
   if (listError || !list) return { error: ERRORS.SERVER_ERROR };
 
+  if (!(await canEditProject(supabase, list.project_id, user.id)))
+    return { error: ERRORS.INSUFFICIENT_ROLE };
+
   const { data: lastTask } = await supabase
     .from("tasks")
     .select("position")
@@ -35,6 +35,15 @@ export async function createTaskAction(
 
   const { title, description, status, priority, assigneeId, dueDate } =
     parsed.data;
+
+  if (assigneeId) {
+    const { data: canAssign } = await supabase.rpc("can_access_project", {
+      p_project_id: list.project_id,
+      p_user_id: assigneeId,
+    });
+
+    if (!canAssign) return { error: ERRORS.INVALID_ASSIGNEE };
+  }
 
   const { data: task, error: insertError } = await supabase
     .from("tasks")

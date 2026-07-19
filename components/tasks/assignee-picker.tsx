@@ -14,7 +14,8 @@ import {
 } from "@/components/ui/tooltip";
 import UserAvatar from "@/components/user-avatar";
 import { WorkspaceMember } from "@/types/dto";
-import { ChevronDown, X } from "lucide-react";
+import { cn } from "@/utils";
+import { ChevronDown } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
@@ -26,6 +27,7 @@ type Props = {
   trigger?: React.ReactNode;
   tooltip?: string;
   id?: string;
+  className?: string;
 };
 
 export function AssigneePicker({
@@ -36,14 +38,15 @@ export function AssigneePicker({
   trigger,
   tooltip,
   id,
+  className,
 }: Props) {
   const t = useTranslations();
   const [open, setOpen] = useState(false);
 
   const selected = members.find(m => m.id === value) ?? null;
 
-  const handleSelect = (memberId: string | null) => {
-    onChange(memberId);
+  const handleSelect = (memberId: string) => {
+    onChange(memberId === value ? null : memberId);
     setOpen(false);
   };
 
@@ -55,7 +58,10 @@ export function AssigneePicker({
           variant="outline"
           id={id}
           disabled={disabled}
-          className="w-full justify-between font-normal"
+          className={cn(
+            "w-full justify-between font-normal px-3 bg-transparent dark:bg-input/30 dark:hover:bg-input/50",
+            className,
+          )}
         >
           <span className="flex items-center gap-2 min-w-0">
             {selected ? (
@@ -69,7 +75,7 @@ export function AssigneePicker({
               </span>
             )}
           </span>
-          <ChevronDown className="h-4 w-4 opacity-50" />
+          <ChevronDown className="ml-auto size-4 shrink-0 text-muted-foreground opacity-50" />
         </Button>
       )}
     </PopoverTrigger>
@@ -86,28 +92,16 @@ export function AssigneePicker({
         popoverTrigger
       )}
       <PopoverContent className="w-80 p-2" align="end">
-        <div className="flex flex-col gap-2">
-          {value && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="justify-start px-2 font-normal text-muted-foreground"
-              onClick={() => handleSelect(null)}
-              disabled={disabled}
-            >
-              <X className="h-4 w-4" />
-              {t("tasks.no_assignee")}
-            </Button>
-          )}
-
-          <MemberSelectList
-            members={members}
-            selectedIds={value ? [value] : []}
-            onSelect={handleSelect}
-            disabled={disabled}
-          />
-        </div>
+        <MemberSelectList
+          members={members}
+          selectedIds={value ? [value] : []}
+          onSelect={handleSelect}
+          onClear={() => {
+            onChange(null);
+            setOpen(false);
+          }}
+          disabled={disabled}
+        />
       </PopoverContent>
     </Popover>
   );

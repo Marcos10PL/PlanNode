@@ -6,8 +6,10 @@
     "description": "Opis",
     "edit": "Edytuj",
     "delete": "Usuń",
+    "insufficient_role": "Brak uprawnień do tej operacji",
     "pick_date": "Wybierz datę",
-    "clear_date": "Wyczyść datę"
+    "clear_date": "Wyczyść datę",
+    "sort_by": "Sortuj:"
   },
   "footer": {
     "all_rights_reserved": "PlanNode. Wszelkie prawa zastrzeżone."
@@ -306,6 +308,7 @@
     "members_section": "Członkowie",
     "invitations_section": "Oczekujące zaproszenia",
     "no_members": "Brak członków.",
+    "clear_selection": "Wyczyść wybór",
     "search_placeholder": "Szukaj po imieniu lub adresie e-mail...",
     "no_results": "Brak wyników",
     "no_invitations": "Brak oczekujących zaproszeń.",
@@ -462,7 +465,23 @@
     "assign": "Przypisz osobę",
     "assignee_change_error": "Nie udało się zmienić przypisania",
     "due_date_change_error": "Nie udało się zmienić terminu",
+    "invalid_assignee": "Ta osoba nie ma dostępu do tego projektu",
     "set_due_date": "Ustaw termin",
+    "filters": {
+      "search_placeholder": "Szukaj zadań...",
+      "all_priorities": "Wszystkie priorytety",
+      "all_assignees": "Wszyscy członkowie",
+      "priorities_selected": "Priorytety ({count})",
+      "members_selected": "Członkowie ({count})",
+      "clear": "Wyczyść filtry",
+      "no_results": "Brak zadań spełniających kryteria"
+    },
+    "sort": {
+      "default": "Domyślne",
+      "due_date": "Termin",
+      "priority": "Priorytet",
+      "name": "Nazwa"
+    },
     "priority_change_error": "Nie udało się zmienić priorytetu",
     "status_change_error": "Nie udało się zmienić statusu zadania",
     "status_on_hold": "Wstrzymane",

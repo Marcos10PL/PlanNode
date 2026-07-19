@@ -1,7 +1,7 @@
 "use server";
 
 import { ERRORS, LINKS } from "@/const";
-import { getUserContext } from "@/lib/supabase/server";
+import { canEditProject, getUserContext } from "@/lib/supabase/server";
 import { updateProjectSchema, UpdateProjectSchema } from "@/schema";
 import { generateProjectRoute } from "@/utils/helpers";
 import { revalidatePath } from "next/cache";
@@ -16,6 +16,9 @@ export async function updateProjectAction(
   const { supabase, user } = await getUserContext();
 
   if (!user) return { error: ERRORS.UNAUTHENTICATED };
+
+  if (!(await canEditProject(supabase, projectId, user.id)))
+    return { error: ERRORS.INSUFFICIENT_ROLE };
 
   const { name, description, isPrivate, icon, color } = parsed.data;
 

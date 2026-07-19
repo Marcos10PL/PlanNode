@@ -1,7 +1,7 @@
 "use server";
 
 import { ERRORS } from "@/const";
-import { getUserContext } from "@/lib/supabase/server";
+import { canEditProject, getUserContext } from "@/lib/supabase/server";
 import { generateProjectRoute } from "@/utils/helpers";
 import { revalidatePath } from "next/cache";
 
@@ -17,6 +17,9 @@ export async function deleteTaskListAction(listId: string) {
     .single();
 
   if (fetchError || !list) return { error: ERRORS.SERVER_ERROR };
+
+  if (!(await canEditProject(supabase, list.project_id, user.id)))
+    return { error: ERRORS.INSUFFICIENT_ROLE };
 
   const { count } = await supabase
     .from("task_lists")

@@ -1,7 +1,7 @@
 "use server";
 
 import { ERRORS } from "@/const";
-import { getUserContext } from "@/lib/supabase/server";
+import { canEditProject, getUserContext } from "@/lib/supabase/server";
 import { createTaskListSchema, CreateTaskListSchema } from "@/schema";
 import { generateProjectRoute } from "@/utils/helpers";
 import { revalidatePath } from "next/cache";
@@ -16,6 +16,9 @@ export async function createTaskListAction(
   const { supabase, user } = await getUserContext();
 
   if (!user) return { error: ERRORS.UNAUTHENTICATED };
+
+  if (!(await canEditProject(supabase, projectId, user.id)))
+    return { error: ERRORS.INSUFFICIENT_ROLE };
 
   const { data: lastList } = await supabase
     .from("task_lists")

@@ -10,6 +10,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { ERRORS } from "@/const";
 import { Task, WorkspaceMember } from "@/types/dto";
 import { TaskPriority, TaskStatus } from "@/types/entities";
 import { cn, getPriorityLabel, isTaskOverdue } from "@/utils";
@@ -41,7 +42,12 @@ export function TaskRow({ task, members, canEdit }: Props) {
     setIsPending(true);
     try {
       const result = await updateTaskAction(task.id, { status });
-      if (result?.error) toast.error(t("tasks.status_change_error"));
+      if (result?.error)
+        toast.error(
+          result.error === ERRORS.INSUFFICIENT_ROLE
+            ? t("common.insufficient_role")
+            : t("tasks.status_change_error"),
+        );
     } catch {
       toast.error(t("common.unexpected_error"));
     } finally {
@@ -53,7 +59,12 @@ export function TaskRow({ task, members, canEdit }: Props) {
     setIsPending(true);
     try {
       const result = await updateTaskAction(task.id, { priority });
-      if (result?.error) toast.error(t("tasks.priority_change_error"));
+      if (result?.error)
+        toast.error(
+          result.error === ERRORS.INSUFFICIENT_ROLE
+            ? t("common.insufficient_role")
+            : t("tasks.priority_change_error"),
+        );
     } catch {
       toast.error(t("common.unexpected_error"));
     } finally {
@@ -66,7 +77,11 @@ export function TaskRow({ task, members, canEdit }: Props) {
     try {
       const result = await deleteTaskAction(task.id);
       if (result?.error) {
-        toast.error(t("tasks.delete.error"));
+        toast.error(
+          result.error === ERRORS.INSUFFICIENT_ROLE
+            ? t("common.insufficient_role")
+            : t("tasks.delete.error"),
+        );
       } else {
         toast.success(t("tasks.delete.success"));
       }

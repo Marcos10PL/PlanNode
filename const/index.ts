@@ -48,6 +48,7 @@ export const ERRORS = {
   CANNOT_REMOVE_OWNER: "cannot_remove_owner",
   CANNOT_LEAVE_AS_OWNER: "cannot_leave_as_owner",
   PROJECT_NOT_FOUND: "project_not_found",
+  INVALID_ASSIGNEE: "invalid_assignee",
   CANNOT_DELETE_LAST_LIST: "cannot_delete_last_list",
 } as const;
 
@@ -73,16 +74,16 @@ export const WORKSPACE_ROLES = {
   GUEST: "guest",
 } as const satisfies Record<string, WorkspaceRole>;
 
-export const INVITABLE_ROLES: readonly WorkspaceRole[] = [
+export const INVITABLE_ROLES = [
   WORKSPACE_ROLES.ADMIN,
   WORKSPACE_ROLES.MEMBER,
   WORKSPACE_ROLES.GUEST,
-];
+] as const as readonly WorkspaceRole[];
 
-export const MANAGER_ROLES: readonly WorkspaceRole[] = [
+export const MANAGER_ROLES = [
   WORKSPACE_ROLES.OWNER,
   WORKSPACE_ROLES.ADMIN,
-];
+] as const as readonly WorkspaceRole[];
 
 export const INVITATION_STATUSES = {
   PENDING: "pending",
@@ -121,6 +122,13 @@ export const PROJECT_SORTS = {
   DATE: "date",
   NAME: "name",
   PROGRESS: "progress",
+} as const;
+
+export const TASK_SORTS = {
+  DEFAULT: "default",
+  DUE_DATE: "due_date",
+  PRIORITY: "priority",
+  NAME: "name",
 } as const;
 
 export const PROJECT_ICONS = {

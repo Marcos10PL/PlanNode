@@ -3,6 +3,7 @@
 import { updateTaskAction } from "@/actions/task/update-task";
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/ui/date-picker";
+import { ERRORS } from "@/const";
 import { cn, formatDate } from "@/utils";
 import { CalendarIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
@@ -45,7 +46,12 @@ export function TaskDueDatePopover({
     setIsPending(true);
     try {
       const result = await updateTaskAction(taskId, { dueDate: value });
-      if (result?.error) toast.error(t("tasks.due_date_change_error"));
+      if (result?.error)
+        toast.error(
+          result.error === ERRORS.INSUFFICIENT_ROLE
+            ? t("common.insufficient_role")
+            : t("tasks.due_date_change_error"),
+        );
     } catch {
       toast.error(t("common.unexpected_error"));
     } finally {

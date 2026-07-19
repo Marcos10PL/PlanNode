@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { UserRow } from "@/components/ui/user-row";
 import { WorkspaceMember } from "@/types/dto";
 import { cn } from "@/utils";
-import { Check } from "lucide-react";
+import { Check, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
@@ -13,6 +13,7 @@ type Props = {
   members: WorkspaceMember[];
   selectedIds: string[];
   onSelect: (id: string) => void;
+  onClear?: () => void;
   multiple?: boolean;
   disabled?: boolean;
 };
@@ -21,6 +22,7 @@ export function MemberSelectList({
   members,
   selectedIds,
   onSelect,
+  onClear,
   multiple = false,
   disabled,
 }: Props) {
@@ -34,6 +36,20 @@ export function MemberSelectList({
 
   return (
     <div className="flex flex-col gap-2">
+      {onClear && (
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          disabled={disabled || selectedIds.length === 0}
+          onClick={onClear}
+          className="justify-start px-2 font-normal text-muted-foreground"
+        >
+          <X className="h-4 w-4" />
+          {t("clear_selection")}
+        </Button>
+      )}
+
       {members.length > 5 && (
         <Input
           value={query}

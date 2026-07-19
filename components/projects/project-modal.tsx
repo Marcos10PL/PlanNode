@@ -21,7 +21,12 @@ import {
   FieldTitle,
 } from "@/components/ui/field";
 import { Switch } from "@/components/ui/switch";
-import { PROJECT_COLORS, PROJECT_ICONS, VALIDATION_MAX } from "@/const";
+import {
+  ERRORS,
+  PROJECT_COLORS,
+  PROJECT_ICONS,
+  VALIDATION_MAX,
+} from "@/const";
 import { createProjectSchema, CreateProjectSchema } from "@/schema";
 import { Project } from "@/types/dto";
 import { toProjectColor, toProjectIcon } from "@/utils";
@@ -82,7 +87,11 @@ export function ProjectModal({
         const result = await updateProjectAction(project.id, data);
 
         if (result.error) {
-          toast.error(t("error"));
+          toast.error(
+            result.error === ERRORS.INSUFFICIENT_ROLE
+              ? tCommon("insufficient_role")
+              : t("error"),
+          );
           return;
         }
 
@@ -94,7 +103,11 @@ export function ProjectModal({
       const result = await createProjectAction(workspaceId, data);
 
       if (result.error) {
-        toast.error(t("error"));
+        toast.error(
+          result.error === ERRORS.INSUFFICIENT_ROLE
+            ? tCommon("insufficient_role")
+            : t("error"),
+        );
         return;
       }
 

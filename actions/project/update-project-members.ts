@@ -1,7 +1,7 @@
 "use server";
 
 import { ERRORS } from "@/const";
-import { getUserContext } from "@/lib/supabase/server";
+import { getUserContext, isProjectManager } from "@/lib/supabase/server";
 import { updateProjectMembersSchema, UpdateProjectMembersSchema } from "@/schema";
 import { generateProjectRoute } from "@/utils/helpers";
 import { revalidatePath } from "next/cache";
@@ -16,6 +16,9 @@ export async function updateProjectMembersAction(
   const { supabase, user } = await getUserContext();
 
   if (!user) return { error: ERRORS.UNAUTHENTICATED };
+
+  if (!(await isProjectManager(supabase, projectId, user.id)))
+    return { error: ERRORS.INSUFFICIENT_ROLE };
 
   const { data: currentMembers, error: fetchError } = await supabase
     .from("project_members")
@@ -37,7 +40,7 @@ export async function updateProjectMembersAction(
       .eq("project_id", projectId)
       .in("id", toRemove);
 
-    if (removeError) return { error: ERRORS.INSUFFICIENT_ROLE };
+    if (removeError) return { error: ERRORS.SERVER_ERROR };
   }
 
   if (toAdd.length > 0) {
@@ -49,7 +52,7 @@ export async function updateProjectMembersAction(
       })),
     );
 
-    if (addError) return { error: ERRORS.INSUFFICIENT_ROLE };
+    if (addError) return { error: ERRORS.SERVER_ERROR };
   }
 
   revalidatePath(generateProjectRoute(projectId));

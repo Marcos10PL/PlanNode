@@ -1,6 +1,11 @@
 import { TaskListSection } from "@/components/tasks/task-list-section";
 import { COOKIES } from "@/const";
-import { getProject, getTaskList, getWorkspaceContext } from "@/lib/data";
+import {
+  getProject,
+  getProjectMemberIds,
+  getTaskList,
+  getWorkspaceContext,
+} from "@/lib/data";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 
@@ -30,5 +35,17 @@ export default async function TaskListPage({ params }: Props) {
 
   const { members, canEdit } = await getWorkspaceContext(project.workspaceId);
 
-  return <TaskListSection list={list} members={members} canEdit={canEdit} />;
+  let assignableMembers = members;
+  if (project.isPrivate) {
+    const projectMemberIds = await getProjectMemberIds(project.id);
+    assignableMembers = members.filter(m => projectMemberIds.includes(m.id));
+  }
+
+  return (
+    <TaskListSection
+      list={list}
+      members={assignableMembers}
+      canEdit={canEdit}
+    />
+  );
 }

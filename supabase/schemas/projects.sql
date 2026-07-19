@@ -168,11 +168,16 @@ ON public.tasks FOR INSERT
 WITH CHECK (
   public.can_edit_project(project_id, (SELECT auth.uid()))
   AND created_by = (SELECT auth.uid())
+  AND (assignee_id IS NULL OR public.can_access_project(project_id, assignee_id))
 );
 
 CREATE POLICY "Non-guest members can update tasks"
 ON public.tasks FOR UPDATE
-USING (public.can_edit_project(project_id, (SELECT auth.uid())));
+USING (public.can_edit_project(project_id, (SELECT auth.uid())))
+WITH CHECK (
+  public.can_edit_project(project_id, (SELECT auth.uid()))
+  AND (assignee_id IS NULL OR public.can_access_project(project_id, assignee_id))
+);
 
 CREATE POLICY "Non-guest members can delete tasks"
 ON public.tasks FOR DELETE
@@ -210,6 +215,40 @@ CREATE OR REPLACE TRIGGER set_task_lists_updated_at
 CREATE OR REPLACE TRIGGER set_tasks_updated_at
   BEFORE UPDATE ON public.tasks
   FOR EACH ROW EXECUTE PROCEDURE public.set_updated_at();
+
+-- Triggers: clear assignee when project member is removed
+CREATE OR REPLACE FUNCTION public.clear_assignee_on_project_member_removed()
+RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE public.tasks
+  SET assignee_id = NULL
+  WHERE project_id = OLD.project_id
+    AND assignee_id = OLD.id
+    AND NOT public.can_access_project(OLD.project_id, OLD.id);
+  RETURN OLD;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
+
+CREATE OR REPLACE TRIGGER on_project_member_removed
+  AFTER DELETE ON public.project_members
+  FOR EACH ROW EXECUTE PROCEDURE public.clear_assignee_on_project_member_removed();
+
+CREATE OR REPLACE FUNCTION public.clear_assignee_on_workspace_member_removed()
+RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE public.tasks t
+  SET assignee_id = NULL
+  FROM public.projects p
+  WHERE p.id = t.project_id
+    AND p.workspace_id = OLD.workspace_id
+    AND t.assignee_id = OLD.id;
+  RETURN OLD;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
+
+CREATE OR REPLACE TRIGGER on_workspace_member_removed_clear_assignee
+  AFTER DELETE ON public.workspace_members
+  FOR EACH ROW EXECUTE PROCEDURE public.clear_assignee_on_workspace_member_removed();
 
 -- Indexes
 CREATE INDEX idx_projects_workspace_id ON public.projects(workspace_id);

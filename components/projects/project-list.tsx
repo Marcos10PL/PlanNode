@@ -1,5 +1,7 @@
+"use client";
+
 import { ProjectWithProgress } from "@/types/dto";
-import { getTranslations } from "next-intl/server";
+import { useTranslations } from "next-intl";
 import { ProjectCard } from "./project-card";
 
 type Props = {
@@ -7,8 +9,8 @@ type Props = {
   canManage: boolean;
 };
 
-export async function ProjectList({ projects, canManage }: Props) {
-  const t = await getTranslations("projects");
+export function ProjectList({ projects, canManage }: Props) {
+  const t = useTranslations("projects");
 
   if (projects.length === 0) {
     return <p className="text-sm text-muted-foreground">{t("empty")}</p>;

@@ -67,7 +67,7 @@ export function TaskPrioritySelect({
           <SelectValue />
         )}
       </SelectTrigger>
-      <SelectContent position="popper">
+      <SelectContent position={iconOnly ? "popper" : "item-aligned"}>
         {Object.values(TASK_PRIORITIES).map(priority => (
           <SelectItem key={priority} value={priority}>
             <PriorityOptionLabel priority={priority} />

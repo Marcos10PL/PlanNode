@@ -27,6 +27,8 @@ export async function createClient() {
   );
 }
 
+type Client = Awaited<ReturnType<typeof createClient>>;
+
 export async function getUserContext() {
   const supabase = await createClient();
   const {
@@ -42,4 +44,30 @@ export async function requireUserContext() {
   if (!user) redirect(LINKS.LOGIN);
 
   return { supabase, user };
+}
+
+export async function canEditProject(
+  supabase: Client,
+  projectId: string,
+  userId: string,
+) {
+  const { data } = await supabase.rpc("can_edit_project", {
+    p_project_id: projectId,
+    p_user_id: userId,
+  });
+
+  return !!data;
+}
+
+export async function isProjectManager(
+  supabase: Client,
+  projectId: string,
+  userId: string,
+) {
+  const { data } = await supabase.rpc("is_project_manager", {
+    p_project_id: projectId,
+    p_user_id: userId,
+  });
+
+  return !!data;
 }

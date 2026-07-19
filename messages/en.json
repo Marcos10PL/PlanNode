@@ -6,8 +6,10 @@
     "description": "Description",
     "edit": "Edit",
     "delete": "Delete",
+    "insufficient_role": "You don't have permission for this action",
     "pick_date": "Pick a date",
-    "clear_date": "Clear date"
+    "clear_date": "Clear date",
+    "sort_by": "Sort by:"
   },
   "footer": {
     "all_rights_reserved": "PlanNode. All rights reserved."
@@ -306,6 +308,7 @@
     "members_section": "Members",
     "invitations_section": "Pending invitations",
     "no_members": "No members yet.",
+    "clear_selection": "Clear selection",
     "search_placeholder": "Search by name or email...",
     "no_results": "No results",
     "no_invitations": "No pending invitations.",
@@ -462,7 +465,23 @@
     "assign": "Assign someone",
     "assignee_change_error": "Could not change assignee",
     "due_date_change_error": "Could not change due date",
+    "invalid_assignee": "This person has no access to this project",
     "set_due_date": "Set due date",
+    "filters": {
+      "search_placeholder": "Search tasks...",
+      "all_priorities": "All priorities",
+      "all_assignees": "All members",
+      "priorities_selected": "Priorities ({count})",
+      "members_selected": "Members ({count})",
+      "clear": "Clear filters",
+      "no_results": "No tasks match the filters"
+    },
+    "sort": {
+      "default": "Default",
+      "due_date": "Due date",
+      "priority": "Priority",
+      "name": "Name"
+    },
     "priority_change_error": "Could not change priority",
     "status_change_error": "Could not change task status",
     "status_on_hold": "On hold",

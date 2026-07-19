@@ -1,7 +1,7 @@
 "use server";
 
 import { ERRORS, LINKS, NOTIFICATION_TYPES } from "@/const";
-import { getUserContext } from "@/lib/supabase/server";
+import { canEditProject, getUserContext } from "@/lib/supabase/server";
 import { updateTaskSchema, UpdateTaskSchema } from "@/schema";
 import { TablesUpdate } from "@/types/supabase";
 import { generateProjectRoute } from "@/utils/helpers";
@@ -23,6 +23,9 @@ export async function updateTaskAction(taskId: string, data: UpdateTaskSchema) {
 
   if (fetchError || !existing) return { error: ERRORS.SERVER_ERROR };
 
+  if (!(await canEditProject(supabase, existing.project_id, user.id)))
+    return { error: ERRORS.INSUFFICIENT_ROLE };
+
   const { title, description, status, priority, assigneeId, dueDate } =
     parsed.data;
 
@@ -35,6 +38,15 @@ export async function updateTaskAction(taskId: string, data: UpdateTaskSchema) {
   if (dueDate !== undefined) updates.due_date = dueDate;
 
   if (Object.keys(updates).length === 0) return { success: true };
+
+  if (assigneeId) {
+    const { data: canAssign } = await supabase.rpc("can_access_project", {
+      p_project_id: existing.project_id,
+      p_user_id: assigneeId,
+    });
+
+    if (!canAssign) return { error: ERRORS.INVALID_ASSIGNEE };
+  }
 
   const { error: updateError } = await supabase
     .from("tasks")

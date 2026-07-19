@@ -1,6 +1,6 @@
 "use server";
 
-import { ERRORS, LINKS } from "@/const";
+import { ERRORS, LINKS, WORKSPACE_ROLES } from "@/const";
 import { getUserContext } from "@/lib/supabase/server";
 import { createProjectSchema, CreateProjectSchema } from "@/schema";
 import { revalidatePath } from "next/cache";
@@ -15,6 +15,14 @@ export async function createProjectAction(
   const { supabase, user } = await getUserContext();
 
   if (!user) return { error: ERRORS.UNAUTHENTICATED };
+
+  const { data: role } = await supabase.rpc("get_workspace_member_role", {
+    p_workspace_id: workspaceId,
+    p_user_id: user.id,
+  });
+
+  if (!role || role === WORKSPACE_ROLES.GUEST)
+    return { error: ERRORS.INSUFFICIENT_ROLE };
 
   const { name, description, isPrivate, icon, color } = parsed.data;
 
