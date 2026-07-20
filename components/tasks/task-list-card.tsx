@@ -15,9 +15,15 @@ type Props = {
   list: ProjectListSummary;
   projectId: string;
   canEdit: boolean;
+  dragHandle?: React.ReactNode;
 };
 
-export function TaskListCard({ list, projectId, canEdit }: Props) {
+export function TaskListCard({
+  list,
+  projectId,
+  canEdit,
+  dragHandle,
+}: Props) {
   const t = useTranslations("tasks");
   const [renameOpen, setRenameOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -34,6 +40,7 @@ export function TaskListCard({ list, projectId, canEdit }: Props) {
       <EntityCard
         href={generateListRoute(projectId, list.id)}
         title={list.name}
+        dragHandle={dragHandle}
         actions={
           canEdit ? (
             <ManageMenu

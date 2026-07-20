@@ -19,18 +19,19 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 import { TaskAssigneePopover } from "./task-assignee-popover";
+import { TaskDueDatePopover } from "./task-due-date-popover";
 import { TaskModal } from "./task-modal";
 import { TaskPrioritySelect } from "./task-priority-select";
 import { TaskStatusSelect } from "./task-status-select";
-import { TaskDueDatePopover } from "./task-due-date-popover"
 
 type Props = {
   task: Task;
   members: WorkspaceMember[];
   canEdit: boolean;
+  dragHandle?: React.ReactNode;
 };
 
-export function TaskRow({ task, members, canEdit }: Props) {
+export function TaskRow({ task, members, canEdit, dragHandle }: Props) {
   const t = useTranslations();
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -98,11 +99,17 @@ export function TaskRow({ task, members, canEdit }: Props) {
     <>
       <div
         className={cn(
-          "flex items-center gap-2 px-2 py-1.5 transition-colors hover:bg-accent/50",
+          "flex items-center gap-2 px-2.5 py-1.5 transition-colors hover:bg-accent/50",
           canEdit && "cursor-pointer",
         )}
         onClick={canEdit ? () => setEditOpen(true) : undefined}
       >
+        {dragHandle && (
+          <div onClick={stopPropagation} className="shrink-0 absolute">
+            {dragHandle}
+          </div>
+        )}
+
         <div className="flex flex-1 items-center gap-2 min-w-0">
           <p className="text-sm font-medium line-clamp-1">{task.title}</p>
           {task.description && (

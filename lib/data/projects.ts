@@ -9,10 +9,10 @@ export const getProjects = cache(async (workspaceId: string) => {
   const { data } = await supabase
     .from("projects")
     .select(
-      "id, workspace_id, name, description, is_private, icon, color, created_by, created_at, task_lists(id, name, position, tasks(status))",
+      "id, workspace_id, name, description, is_private, icon, color, position, created_by, created_at, task_lists(id, name, position, tasks(status))",
     )
     .eq("workspace_id", workspaceId)
-    .order("created_at", { ascending: true })
+    .order("position", { ascending: true })
     .order("position", { referencedTable: "task_lists", ascending: true });
 
   return (

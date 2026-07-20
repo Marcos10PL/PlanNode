@@ -2,19 +2,26 @@
 
 import { SubHeader } from "@/components/sub-header";
 import { SortSelect } from "@/components/ui/sort-select";
-import { PROJECT_SORTS } from "@/const";
+import { COOKIES, PROJECT_SORTS } from "@/const";
+import { useCookieState } from "@/hooks/use-cookie-state";
 import { ProjectWithProgress } from "@/types/dto";
 import { getProjectProgress } from "@/utils";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
 import { AddProjectButton } from "./add-project-button";
 import { ProjectList } from "./project-list";
 
 type ProjectSort = (typeof PROJECT_SORTS)[keyof typeof PROJECT_SORTS];
 
 const SORTERS = {
-  [PROJECT_SORTS.NEWEST]: projects => [...projects].reverse(),
-  [PROJECT_SORTS.DATE]: projects => projects,
+  [PROJECT_SORTS.CUSTOM]: projects => projects,
+  [PROJECT_SORTS.NEWEST]: projects =>
+    [...projects].sort((a, b) =>
+      (b.createdAt ?? "").localeCompare(a.createdAt ?? ""),
+    ),
+  [PROJECT_SORTS.DATE]: projects =>
+    [...projects].sort((a, b) =>
+      (a.createdAt ?? "").localeCompare(b.createdAt ?? ""),
+    ),
   [PROJECT_SORTS.NAME]: projects =>
     [...projects].sort((a, b) => a.name.localeCompare(b.name)),
   [PROJECT_SORTS.PROGRESS]: projects =>
@@ -32,13 +39,23 @@ type Props = {
   projects: ProjectWithProgress[];
   canManage: boolean;
   workspaceId: string;
+  defaultSort: ProjectSort;
 };
 
-export function ProjectsView({ projects, canManage, workspaceId }: Props) {
+export function ProjectsView({
+  projects,
+  canManage,
+  workspaceId,
+  defaultSort,
+}: Props) {
   const t = useTranslations("projects");
-  const [sort, setSort] = useState<ProjectSort>(PROJECT_SORTS.NEWEST);
+  const [sort, setSort] = useCookieState<ProjectSort>(
+    COOKIES.PROJECT_SORT,
+    defaultSort,
+  );
 
   const sorted = SORTERS[sort](projects);
+  const dragEnabled = canManage && sort === PROJECT_SORTS.CUSTOM;
 
   return (
     <>
@@ -60,7 +77,12 @@ export function ProjectsView({ projects, canManage, workspaceId }: Props) {
         )}
       </div>
 
-      <ProjectList projects={sorted} canManage={canManage} />
+      <ProjectList
+        projects={sorted}
+        canManage={canManage}
+        workspaceId={workspaceId}
+        dragEnabled={dragEnabled}
+      />
     </>
   );
 }

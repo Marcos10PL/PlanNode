@@ -1,5 +1,7 @@
 "use client";
 
+import { reorderProjectsAction } from "@/actions/project/reorder-projects";
+import { reorderTaskListsAction } from "@/actions/task/reorder-task-lists";
 import { AddProjectButton } from "@/components/projects/add-project-button";
 import { ProjectModal } from "@/components/projects/project-modal";
 import { TaskListModal } from "@/components/tasks/create-task-list-modal";
@@ -9,51 +11,30 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
-import { ManageMenu } from "@/components/ui/manage-menu";
 import {
   SidebarGroup,
   SidebarGroupAction,
   SidebarMenu,
-  SidebarMenuAction,
   SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { LINKS } from "@/const";
+import { COOKIES, LINKS } from "@/const";
+import { useCookieState } from "@/hooks/use-cookie-state";
 import { useDeleteProject } from "@/hooks/use-delete-project";
 import { useDeleteTaskList } from "@/hooks/use-delete-task-list";
 import { usePathname } from "@/i18n/navigation";
 import { ProjectListSummary, ProjectWithProgress } from "@/types/dto";
-import {
-  cn,
-  getProjectColorBorderClass,
-  getProjectColorTextClass,
-  getProjectIcon,
-  isActivePath,
-  isActiveSubPath,
-} from "@/utils";
-import { generateListRoute, generateProjectRoute } from "@/utils/helpers";
-import {
-  ChevronRight,
-  FolderOpenDot,
-  MoreHorizontal,
-  Pencil,
-  Plus,
-  Trash2,
-} from "lucide-react";
+import { cn, isActivePath, isActiveSubPath } from "@/utils";
+import { generateProjectRoute } from "@/utils/helpers";
+import { move } from "@dnd-kit/helpers";
+import { DragDropProvider, type DragEndEvent } from "@dnd-kit/react";
+import { ChevronRight, FolderOpenDot, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useWorkspaces } from "../providers/workspace-provider";
+import { SortableSidebarProjectItem } from "./sortable-sidebar-project-item";
 
 type ListTarget = {
   projectId: string;
@@ -64,9 +45,15 @@ type Props = {
   projects: ProjectWithProgress[];
   workspaceId: string | null;
   canManage: boolean;
+  defaultExpandedProjectIds: string[];
 };
 
-export function SidebarProjects({ projects, workspaceId, canManage }: Props) {
+export function SidebarProjects({
+  projects,
+  workspaceId,
+  canManage,
+  defaultExpandedProjectIds,
+}: Props) {
   const t = useTranslations();
   const pathname = usePathname();
   const router = useRouter();
@@ -88,6 +75,99 @@ export function SidebarProjects({ projects, workspaceId, canManage }: Props) {
     useDeleteProject();
 
   const { workspaces } = useWorkspaces();
+
+  const [expandedIds, setExpandedIds] = useCookieState<string[]>(
+    COOKIES.SIDEBAR_EXPANDED_PROJECTS,
+    defaultExpandedProjectIds,
+  );
+
+  const [localProjects, setLocalProjects] = useState(projects);
+
+  useEffect(() => {
+    setLocalProjects(projects);
+  }, [projects]);
+
+  useEffect(() => {
+    const activeProject = projects.find(project =>
+      isActiveSubPath(pathname, generateProjectRoute(project.id)),
+    );
+    if (!activeProject) return;
+
+    setExpandedIds(prev =>
+      prev.includes(activeProject.id) ? prev : [...prev, activeProject.id],
+    );
+  }, [pathname]);
+
+  const handleListDragEnd = (projectId: string) => (event: DragEndEvent) => {
+    if (event.canceled) return;
+
+    const draggedId = event.operation.source?.id as string | undefined;
+    if (!draggedId) return;
+
+    const project = localProjects.find(p => p.id === projectId);
+    if (!project) return;
+
+    const ids = project.lists.map(list => list.id);
+    const movedIds = move(ids, event);
+
+    const oldPosition = new Map(ids.map((id, index) => [id, index]));
+    const changes = movedIds
+      .map((id, position) => ({ id, position }))
+      .filter(({ id, position }) => oldPosition.get(id) !== position);
+
+    if (changes.length === 0) return;
+
+    setTimeout(() => {
+      setLocalProjects(prev =>
+        prev.map(p =>
+          p.id === projectId
+            ? {
+                ...p,
+                lists: movedIds.map(
+                  id => project.lists.find(list => list.id === id)!,
+                ),
+              }
+            : p,
+        ),
+      );
+      reorderTaskListsAction(projectId, changes);
+    }, 0);
+  };
+
+  const handleProjectDragEnd = (event: DragEndEvent) => {
+    if (event.canceled) return;
+
+    const draggedId = event.operation.source?.id as string | undefined;
+    if (!draggedId || !workspaceId) return;
+
+    const ids = localProjects.map(project => project.id);
+    const movedIds = move(ids, event);
+
+    const oldPosition = new Map(ids.map((id, index) => [id, index]));
+    const changes = movedIds
+      .map((id, position) => ({ id, position }))
+      .filter(({ id, position }) => oldPosition.get(id) !== position);
+
+    if (changes.length === 0) return;
+
+    setTimeout(() => {
+      setLocalProjects(prev => {
+        const byId = new Map(prev.map(project => [project.id, project]));
+        return movedIds.map(id => byId.get(id)!);
+      });
+      reorderProjectsAction(workspaceId, changes);
+    }, 0);
+  };
+
+  const toggleProject = (projectId: string, open: boolean) => {
+    const next = new Set(expandedIds);
+    if (open) {
+      next.add(projectId);
+    } else {
+      next.delete(projectId);
+    }
+    setExpandedIds([...next]);
+  };
 
   const handleDeleteList = async () => {
     if (!deleteTarget) return;
@@ -123,7 +203,7 @@ export function SidebarProjects({ projects, workspaceId, canManage }: Props) {
                 onClick={() => setOpenMobile(false)}
                 className={cn("pr-16", isActive(LINKS.PROJECTS))}
               >
-                <FolderOpenDot className="mr-2" />
+                <FolderOpenDot className="mr-1" />
                 {t("sidebar.projects")}
               </Link>
             </SidebarMenuButton>
@@ -153,158 +233,29 @@ export function SidebarProjects({ projects, workspaceId, canManage }: Props) {
           )}
 
           <CollapsibleContent>
-            <SidebarMenu className="ml-3.5 w-auto translate-x-px border-l dark:border-white/20 pl-2 group-data-[collapsible=icon]:ml-0 group-data-[collapsible=icon]:border-l-0 group-data-[collapsible=icon]:pl-0 pt-1">
-              {projects.map(project => {
-                const projectRoute = generateProjectRoute(project.id);
-                const ProjectIcon = getProjectIcon(project.icon);
-
-                return (
-                  <Collapsible
+            <DragDropProvider onDragEnd={handleProjectDragEnd}>
+              <SidebarMenu className="ml-3.5 w-auto translate-x-px border-l dark:border-white/20 pl-2 group-data-[collapsible=icon]:ml-0 group-data-[collapsible=icon]:border-l-0 group-data-[collapsible=icon]:pl-0 pt-1">
+                {localProjects.map((project, index) => (
+                  <SortableSidebarProjectItem
                     key={project.id}
-                    defaultOpen={isActiveSubPath(pathname, projectRoute)}
-                    className="group/collapsible"
-                  >
-                    <SidebarMenuItem>
-                      <SidebarMenuButton asChild tooltip={project.name}>
-                        <Link
-                          href={projectRoute}
-                          className={cn(
-                            "group-hover/menu-item:pr-22! group-has-[.row-menu[data-state=open]]/menu-item:pr-22!",
-                            isActive(projectRoute),
-                          )}
-                          onClick={() => setOpenMobile(false)}
-                        >
-                          <ProjectIcon
-                            className={`mr-2 ${getProjectColorTextClass(project.color)}`}
-                          />
-                          <span className="truncate">{project.name}</span>
-                        </Link>
-                      </SidebarMenuButton>
-                      <div className="absolute right-1 top-0 flex h-8 items-center">
-                        {canManage && (
-                          <>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <SidebarMenuAction
-                                  className="static aspect-auto h-7 w-7 cursor-pointer opacity-0 group-hover/menu-item:opacity-100 hover:bg-foreground/20"
-                                  onClick={() =>
-                                    setCreateListProjectId(project.id)
-                                  }
-                                >
-                                  <Plus />
-                                </SidebarMenuAction>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                {t("tasks.list_create.trigger")}
-                              </TooltipContent>
-                            </Tooltip>
-                            <ManageMenu
-                              align="start"
-                              side="right"
-                              trigger={
-                                <SidebarMenuAction className="row-menu static aspect-auto h-7 w-7 cursor-pointer opacity-0 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 hover:bg-foreground/20">
-                                  <MoreHorizontal />
-                                </SidebarMenuAction>
-                              }
-                              items={[
-                                {
-                                  label: t("projects.edit.trigger"),
-                                  icon: Pencil,
-                                  onClick: () => setEditProject(project),
-                                },
-                                {
-                                  label: t("projects.delete.trigger"),
-                                  icon: Trash2,
-                                  onClick: () => setDeleteProject(project),
-                                  destructive: true,
-                                },
-                              ]}
-                            />
-                          </>
-                        )}
-                        <CollapsibleTrigger asChild>
-                          <SidebarMenuAction className="static aspect-auto h-7 w-7 cursor-pointer hover:bg-foreground/20 [&>svg]:transition-transform group-data-[state=open]/collapsible:[&>svg]:rotate-90">
-                            <ChevronRight />
-                          </SidebarMenuAction>
-                        </CollapsibleTrigger>
-                      </div>
-                      <CollapsibleContent>
-                        <SidebarMenuSub
-                          className={cn(
-                            "mr-0 pr-0",
-                            getProjectColorBorderClass(project.color),
-                          )}
-                        >
-                          {project.lists.map(list => {
-                            const listRoute = generateListRoute(
-                              project.id,
-                              list.id,
-                            );
-
-                            return (
-                              <SidebarMenuSubItem
-                                key={list.id}
-                                className="group/list"
-                              >
-                                <SidebarMenuSubButton
-                                  asChild
-                                  isActive={isActivePath(pathname, listRoute)}
-                                  className="group-hover/list:pr-7 group-has-data-[state=open]/list:pr-7"
-                                >
-                                  <Link
-                                    href={listRoute}
-                                    onClick={() => setOpenMobile(false)}
-                                  >
-                                    <span className="flex-1 truncate">
-                                      {list.name}
-                                    </span>
-                                    <span className="text-xs text-muted-foreground group-hover/list:opacity-0 group-has-data-[state=open]/list:opacity-0">
-                                      {list.taskCount}
-                                    </span>
-                                  </Link>
-                                </SidebarMenuSubButton>
-                                {canManage && (
-                                  <ManageMenu
-                                    align="start"
-                                    side="right"
-                                    trigger={
-                                      <SidebarMenuAction className="top-0 h-full aspect-auto w-6 cursor-pointer opacity-0 group-hover/list:opacity-100 data-[state=open]:opacity-100 hover:bg-foreground/20">
-                                        <MoreHorizontal />
-                                      </SidebarMenuAction>
-                                    }
-                                    items={[
-                                      {
-                                        label: t("tasks.list_rename.trigger"),
-                                        icon: Pencil,
-                                        onClick: () =>
-                                          setRenameTarget({
-                                            projectId: project.id,
-                                            list,
-                                          }),
-                                      },
-                                      {
-                                        label: t("tasks.list_delete.trigger"),
-                                        icon: Trash2,
-                                        onClick: () =>
-                                          setDeleteTarget({
-                                            projectId: project.id,
-                                            list,
-                                          }),
-                                        destructive: true,
-                                      },
-                                    ]}
-                                  />
-                                )}
-                              </SidebarMenuSubItem>
-                            );
-                          })}
-                        </SidebarMenuSub>
-                      </CollapsibleContent>
-                    </SidebarMenuItem>
-                  </Collapsible>
-                );
-              })}
-            </SidebarMenu>
+                    project={project}
+                    index={index}
+                    isActive={!!isActive(generateProjectRoute(project.id))}
+                    isExpanded={expandedIds.includes(project.id)}
+                    canManage={canManage}
+                    dragEnabled={canManage}
+                    onToggle={toggleProject}
+                    onLinkClick={() => setOpenMobile(false)}
+                    onCreateList={setCreateListProjectId}
+                    onEditProject={setEditProject}
+                    onDeleteProject={setDeleteProject}
+                    onListDragEnd={handleListDragEnd}
+                    onRenameList={setRenameTarget}
+                    onDeleteList={setDeleteTarget}
+                  />
+                ))}
+              </SidebarMenu>
+            </DragDropProvider>
           </CollapsibleContent>
         </SidebarGroup>
       </Collapsible>

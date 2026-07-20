@@ -15,6 +15,7 @@ import {
   getWorkspaceContext,
   getWorkspaces,
 } from "@/lib/data";
+import { parseCookieValue } from "@/utils/helpers";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -28,6 +29,11 @@ export async function DashboardShell({
   const cookieStore = await cookies();
   const activeWorkspaceId =
     cookieStore.get(COOKIES.ACTIVE_WORKSPACE_ID)?.value ?? null;
+  const sidebarOpen = cookieStore.get(COOKIES.SIDEBAR_STATE)?.value !== "false";
+  const defaultExpandedProjectIds = parseCookieValue<string[]>(
+    cookieStore.get(COOKIES.SIDEBAR_EXPANDED_PROJECTS)?.value,
+    [],
+  );
 
   const [{ profile, user }, workspaces, appConfig] = await Promise.all([
     getProfile(),
@@ -59,11 +65,12 @@ export async function DashboardShell({
           workspaces={workspaces}
           activeWorkspaceId={activeWorkspaceId}
         >
-          <SidebarProvider>
+          <SidebarProvider defaultOpen={sidebarOpen}>
             <AppSidebar
               projects={projects}
               workspaceId={activeWorkspaceId}
               canManageProjects={canManageProjects}
+              defaultExpandedProjectIds={defaultExpandedProjectIds}
             />
 
             <div className="flex-1 min-w-0 flex flex-col h-screen">

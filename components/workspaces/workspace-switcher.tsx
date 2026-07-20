@@ -30,7 +30,7 @@ export function WorkspaceSwitcher() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton>
-              <ChartNoAxesGantt className="mr-2" />
+              <ChartNoAxesGantt className="mr-1" />
               <span className="truncate">
                 {activeWorkspace?.name || t("workspaces.title")}
               </span>

@@ -65,6 +65,9 @@ export const VALIDATION_MAX = {
 
 export const COOKIES = {
   ACTIVE_WORKSPACE_ID: "active_workspace_id",
+  SIDEBAR_STATE: "sidebar_state",
+  PROJECT_SORT: "project_sort",
+  SIDEBAR_EXPANDED_PROJECTS: "sidebar_expanded_projects",
 } as const;
 
 export const WORKSPACE_ROLES = {
@@ -118,6 +121,7 @@ export const TASK_PRIORITIES = {
 } as const satisfies Record<string, TaskPriority>;
 
 export const PROJECT_SORTS = {
+  CUSTOM: "custom",
   NEWEST: "newest",
   DATE: "date",
   NAME: "name",

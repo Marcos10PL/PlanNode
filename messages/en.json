@@ -398,6 +398,7 @@
     "show_less": "Show less",
     "created_at": "Created {date}",
     "sort": {
+      "custom": "Default",
       "newest": "Newest",
       "date": "Oldest",
       "name": "Name",

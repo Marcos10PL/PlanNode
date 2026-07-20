@@ -72,7 +72,7 @@ export function ManageMenu({
             )}
             onClick={item.onClick}
           >
-            <item.icon className="mr-2 h-4 w-4" />
+            <item.icon className="mr-1 h-4 w-4" />
             {item.label}
           </DropdownMenuItem>
         ))}

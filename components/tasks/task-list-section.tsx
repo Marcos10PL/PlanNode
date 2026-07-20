@@ -1,12 +1,14 @@
 "use client";
 
+import { reorderTasksAction } from "@/actions/task/reorder-tasks";
 import { Button } from "@/components/ui/button";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { ManageMenu } from "@/components/ui/manage-menu";
 import { TaskProgress } from "@/components/ui/task-progress";
-import { TASK_STATUSES } from "@/const";
+import { TASK_SORTS, TASK_STATUSES } from "@/const";
+import { useCookieState } from "@/hooks/use-cookie-state";
 import { useDeleteTaskList } from "@/hooks/use-delete-task-list";
-import { TaskListWithTasks, WorkspaceMember } from "@/types/dto";
+import { Task, TaskListWithTasks, WorkspaceMember } from "@/types/dto";
 import { TaskStatus } from "@/types/entities";
 import {
   cn,
@@ -14,18 +16,30 @@ import {
   getStatusDotClass,
   getStatusLabel,
 } from "@/utils";
+import {
+  getTaskListCollapsedCookie,
+  getTaskListSortCookie,
+} from "@/utils/helpers";
+import {
+  DragDropProvider,
+  type DragEndEvent,
+  type DragOverEvent,
+} from "@dnd-kit/react";
+import { isSortable } from "@dnd-kit/react/sortable";
+import { move } from "@dnd-kit/helpers";
 import { ChevronDown, Pencil, Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { TaskListModal } from "./create-task-list-modal";
+import { SortableTaskRow } from "./sortable-task-row";
 import {
   DEFAULT_TASK_FILTERS,
   filterTasks,
   sortTasks,
   TaskFilters,
+  TaskSort,
 } from "./task-filters";
 import { TaskModal } from "./task-modal";
-import { TaskRow } from "./task-row";
 
 const STATUS_GROUP_ORDER: TaskStatus[] = [
   TASK_STATUSES.TODO,
@@ -37,13 +51,28 @@ const STATUS_GROUP_ORDER: TaskStatus[] = [
   TASK_STATUSES.CANCELLED,
 ];
 
+const toGroups = (tasks: Task[]): Record<TaskStatus, string[]> => {
+  const groups = {} as Record<TaskStatus, string[]>;
+  for (const status of STATUS_GROUP_ORDER) groups[status] = [];
+  for (const task of tasks) groups[task.status].push(task.id);
+  return groups;
+};
+
 type Props = {
   list: TaskListWithTasks;
   members: WorkspaceMember[];
   canEdit: boolean;
+  defaultSort: TaskSort;
+  defaultCollapsed: TaskStatus[];
 };
 
-export function TaskListSection({ list, members, canEdit }: Props) {
+export function TaskListSection({
+  list,
+  members,
+  canEdit,
+  defaultSort,
+  defaultCollapsed,
+}: Props) {
   const t = useTranslations("tasks");
   const tRoot = useTranslations();
   const [renameOpen, setRenameOpen] = useState(false);
@@ -51,31 +80,98 @@ export function TaskListSection({ list, members, canEdit }: Props) {
   const [createTaskOpen, setCreateTaskOpen] = useState(false);
   const [selectedTaskStatus, setSelectedTaskStatus] = useState<TaskStatus>();
   const [filters, setFilters] = useState(DEFAULT_TASK_FILTERS);
-  const [collapsed, setCollapsed] = useState<Set<TaskStatus>>(new Set());
+  const [sort, setSort] = useCookieState(
+    getTaskListSortCookie(list.id),
+    defaultSort,
+  );
+  const [collapsedList, setCollapsedList] = useCookieState<TaskStatus[]>(
+    getTaskListCollapsedCookie(list.id),
+    defaultCollapsed,
+  );
+  const collapsed = new Set(collapsedList);
+
+  const [tasks, setTasks] = useState<Task[]>(list.tasks);
+
+  useEffect(() => {
+    setTasks(list.tasks);
+  }, [list.tasks]);
+
+  const hasActiveFilters =
+    filters.query.trim() !== "" ||
+    filters.priorities.length > 0 ||
+    filters.assigneeIds.length > 0 ||
+    filters.unassigned;
+
+  const dragEnabled = canEdit && sort === TASK_SORTS.DEFAULT && !hasActiveFilters;
+
+  const handleDragOver = (event: DragOverEvent) => {
+    const { source, target } = event.operation;
+    if (!isSortable(source) || !isSortable(target)) return;
+    if (source.sortable.group !== target.sortable.group) {
+      event.preventDefault();
+    }
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    if (event.canceled) return;
+
+    const draggedId = event.operation.source?.id as string | undefined;
+    if (!draggedId) return;
+
+    const draggedTask = tasks.find(task => task.id === draggedId);
+    if (!draggedTask) return;
+
+    const beforeGroups = toGroups(tasks);
+    const updatedGroups = move(beforeGroups, event);
+
+    const newStatus = STATUS_GROUP_ORDER.find(status =>
+      updatedGroups[status]?.includes(draggedId),
+    );
+    if (!newStatus || newStatus !== draggedTask.status) return;
+
+    const taskById = new Map(tasks.map(task => [task.id, task]));
+    const newTasksOrder = STATUS_GROUP_ORDER.flatMap(status =>
+      (updatedGroups[status] ?? []).map(id => taskById.get(id)!),
+    );
+
+    const beforeOrder = STATUS_GROUP_ORDER.flatMap(
+      status => beforeGroups[status] ?? [],
+    );
+    const oldPosition = new Map(beforeOrder.map((id, index) => [id, index]));
+
+    const changes = newTasksOrder
+      .map((task, position) => ({ id: task.id, position }))
+      .filter(({ id, position }) => oldPosition.get(id) !== position);
+
+    if (changes.length === 0) return;
+
+    setTimeout(() => {
+      setTasks(newTasksOrder);
+      reorderTasksAction(list.id, changes);
+    }, 0);
+  };
 
   const { remove, isPending } = useDeleteTaskList();
 
   const toggleGroup = (status: TaskStatus) => {
-    setCollapsed(prev => {
-      const next = new Set(prev);
-      if (next.has(status)) {
-        next.delete(status);
-      } else {
-        next.add(status);
-      }
-      return next;
-    });
+    const next = new Set(collapsedList);
+    if (next.has(status)) {
+      next.delete(status);
+    } else {
+      next.add(status);
+    }
+    setCollapsedList([...next]);
   };
 
   const visibleTasks = useMemo(
-    () => sortTasks(filterTasks(list.tasks, filters), filters.sort),
-    [list.tasks, filters],
+    () => sortTasks(filterTasks(tasks, filters), sort),
+    [tasks, filters, sort],
   );
 
-  const doneTasks = list.tasks.filter(
+  const doneTasks = tasks.filter(
     task => task.status === TASK_STATUSES.DONE,
   ).length;
-  const cancelledTasks = list.tasks.filter(
+  const cancelledTasks = tasks.filter(
     task => task.status === TASK_STATUSES.CANCELLED,
   ).length;
 
@@ -89,7 +185,7 @@ export function TaskListSection({ list, members, canEdit }: Props) {
       <div className="flex flex-col mt-4">
         <div className="flex flex-col-reverse md:flex-row md:items-center gap-1">
           <h2 className="text-sm font-semibold min-w-0 break-all">
-            {list.name} ({list.tasks.length})
+            {list.name} ({tasks.length})
           </h2>
           {canEdit && (
             <div className="self-end">
@@ -116,24 +212,26 @@ export function TaskListSection({ list, members, canEdit }: Props) {
 
         <section className="my-4">
           <TaskProgress
-            total={list.tasks.length}
+            total={tasks.length}
             done={doneTasks}
             cancelled={cancelledTasks}
             showLabel
           />
         </section>
 
-        {list.tasks.length > 0 && (
+        {tasks.length > 0 && (
           <div className="my-4">
             <TaskFilters
               members={members}
               filters={filters}
               onChange={setFilters}
+              sort={sort}
+              onSortChange={setSort}
             />
           </div>
         )}
 
-        {list.tasks.length === 0 ? (
+        {tasks.length === 0 ? (
           <>
             <p className="text-sm text-muted-foreground py-2">{t("empty")}</p>
             {canEdit && (
@@ -152,72 +250,78 @@ export function TaskListSection({ list, members, canEdit }: Props) {
             {t("filters.no_results")}
           </p>
         ) : (
-          <div className="flex flex-col gap-4">
-            {STATUS_GROUP_ORDER.map(status => {
-              const tasks = visibleTasks.filter(task => task.status === status);
-              if (tasks.length === 0) return null;
+          <DragDropProvider onDragOver={handleDragOver} onDragEnd={handleDragEnd}>
+            <div className="flex flex-col gap-4">
+              {STATUS_GROUP_ORDER.map(status => {
+                const tasks = visibleTasks.filter(
+                  task => task.status === status,
+                );
+                if (tasks.length === 0) return null;
 
-              const isCollapsed = collapsed.has(status);
+                const isCollapsed = collapsed.has(status);
 
-              return (
-                <div key={status} className="flex flex-col gap-1 -ml-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => toggleGroup(status)}
-                    className="h-auto w-fit justify-start gap-2 py-2"
-                  >
-                    <span
-                      className={`h-2 w-2 rounded-full ${getStatusDotClass(status)}`}
-                    />
-                    <h3 className="text-xs font-semibold uppercase tracking-wide">
-                      {getStatusLabel(status, tRoot)}
-                    </h3>
-                    <span className="text-xs text-muted-foreground">
-                      {tasks.length}
-                    </span>
-                    <ChevronDown
-                      className={cn(
-                        "size-3.5 text-muted-foreground transition-transform",
-                        isCollapsed && "-rotate-90",
-                      )}
-                    />
-                  </Button>
-
-                  {!isCollapsed && (
-                    <div
-                      className={cn(
-                        "flex flex-col divide-y border-l pl-2 ml-[0.95rem]",
-                        getStatusBorderClass(status),
-                      )}
+                return (
+                  <div key={status} className="flex flex-col gap-1 -ml-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => toggleGroup(status)}
+                      className="h-auto w-fit justify-start gap-2 py-2"
                     >
-                      {tasks.map(task => (
-                        <TaskRow
-                          key={task.id}
-                          task={task}
-                          members={members}
-                          canEdit={canEdit}
-                        />
-                      ))}
-                      {canEdit && (
-                        <Button
-                          variant="ghost"
-                          className="w-full justify-start text-muted-foreground rounded-none hover:bg-accent/50 h-11 pl-2"
-                          onClick={() => {
-                            setCreateTaskOpen(true);
-                            setSelectedTaskStatus(status);
-                          }}
-                        >
-                          <Plus className="h-4 w-4" />
-                          {t("add_task")}
-                        </Button>
-                      )}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+                      <span
+                        className={`h-2 w-2 rounded-full ${getStatusDotClass(status)}`}
+                      />
+                      <h3 className="text-xs font-semibold uppercase tracking-wide">
+                        {getStatusLabel(status, tRoot)}
+                      </h3>
+                      <span className="text-xs text-muted-foreground">
+                        {tasks.length}
+                      </span>
+                      <ChevronDown
+                        className={cn(
+                          "size-3.5 text-muted-foreground transition-transform",
+                          isCollapsed && "-rotate-90",
+                        )}
+                      />
+                    </Button>
+
+                    {!isCollapsed && (
+                      <div
+                        className={cn(
+                          "flex flex-col divide-y border-l pl-2 ml-[0.95rem]",
+                          getStatusBorderClass(status),
+                        )}
+                      >
+                        {tasks.map((task, index) => (
+                          <SortableTaskRow
+                            key={task.id}
+                            task={task}
+                            index={index}
+                            members={members}
+                            canEdit={canEdit}
+                            dragEnabled={dragEnabled}
+                          />
+                        ))}
+                        {canEdit && (
+                          <Button
+                            variant="ghost"
+                            className="w-full justify-start text-muted-foreground rounded-none hover:bg-accent/50 h-11 pl-2"
+                            onClick={() => {
+                              setCreateTaskOpen(true);
+                              setSelectedTaskStatus(status);
+                            }}
+                          >
+                            <Plus className="h-4 w-4" />
+                            {t("add_task")}
+                          </Button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </DragDropProvider>
         )}
       </div>
 

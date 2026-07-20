@@ -185,6 +185,7 @@ export type Database = {
           id: string
           is_private: boolean
           name: string
+          position: number
           updated_at: string | null
           workspace_id: string
         }
@@ -197,6 +198,7 @@ export type Database = {
           id?: string
           is_private?: boolean
           name: string
+          position?: number
           updated_at?: string | null
           workspace_id: string
         }
@@ -209,6 +211,7 @@ export type Database = {
           id?: string
           is_private?: boolean
           name?: string
+          position?: number
           updated_at?: string | null
           workspace_id?: string
         }

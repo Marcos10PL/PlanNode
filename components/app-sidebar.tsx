@@ -24,12 +24,14 @@ type Props = {
   projects: ProjectWithProgress[];
   workspaceId: string | null;
   canManageProjects: boolean;
+  defaultExpandedProjectIds: string[];
 };
 
 export function AppSidebar({
   projects,
   workspaceId,
   canManageProjects,
+  defaultExpandedProjectIds,
 }: Props) {
   const pathname = usePathname();
   const { setOpenMobile } = useSidebar();
@@ -51,7 +53,7 @@ export function AppSidebar({
               className={cn(isActive(LINKS.DASHBOARD))}
               onClick={() => setOpenMobile(false)}
             >
-              <LayoutDashboard className="mr-2" />
+              <LayoutDashboard className="mr-1" />
               Dashboard
             </Link>
           </SidebarMenuButton>
@@ -61,6 +63,7 @@ export function AppSidebar({
           projects={projects}
           workspaceId={workspaceId}
           canManage={canManageProjects}
+          defaultExpandedProjectIds={defaultExpandedProjectIds}
         />
       </SidebarContent>
 

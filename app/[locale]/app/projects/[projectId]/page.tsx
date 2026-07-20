@@ -2,7 +2,7 @@ import { ProjectActions } from "@/components/projects/project-actions";
 import { ProjectDescription } from "@/components/projects/project-description";
 import { ProjectMembersSection } from "@/components/projects/project-members-section";
 import { AddTaskListButton } from "@/components/tasks/add-task-list-button";
-import { TaskListCard } from "@/components/tasks/task-list-card";
+import { TaskListsGrid } from "@/components/tasks/task-lists-grid";
 import { Badge } from "@/components/ui/badge";
 import { TaskProgress } from "@/components/ui/task-progress";
 import { COOKIES } from "@/const";
@@ -112,16 +112,11 @@ export default async function ProjectPage({ params }: Props) {
               </h2>
               {canEdit && <AddTaskListButton projectId={project.id} />}
             </div>
-            <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
-              {lists.map(list => (
-                <TaskListCard
-                  key={list.id}
-                  list={list}
-                  projectId={project.id}
-                  canEdit={canEdit}
-                />
-              ))}
-            </div>
+            <TaskListsGrid
+              lists={lists}
+              projectId={project.id}
+              canEdit={canEdit}
+            />
           </section>
 
           {project.isPrivate && (

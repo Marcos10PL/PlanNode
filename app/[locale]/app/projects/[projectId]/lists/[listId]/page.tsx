@@ -1,11 +1,17 @@
 import { TaskListSection } from "@/components/tasks/task-list-section";
-import { COOKIES } from "@/const";
+import { COOKIES, TASK_SORTS } from "@/const";
 import {
   getProject,
   getProjectMemberIds,
   getTaskList,
   getWorkspaceContext,
 } from "@/lib/data";
+import { TaskStatus } from "@/types/entities";
+import {
+  getTaskListCollapsedCookie,
+  getTaskListSortCookie,
+  parseCookieValue,
+} from "@/utils/helpers";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 
@@ -41,11 +47,22 @@ export default async function TaskListPage({ params }: Props) {
     assignableMembers = members.filter(m => projectMemberIds.includes(m.id));
   }
 
+  const defaultSort = parseCookieValue(
+    cookieStore.get(getTaskListSortCookie(list.id))?.value,
+    TASK_SORTS.DEFAULT,
+  );
+  const defaultCollapsed = parseCookieValue<TaskStatus[]>(
+    cookieStore.get(getTaskListCollapsedCookie(list.id))?.value,
+    [],
+  );
+
   return (
     <TaskListSection
       list={list}
       members={assignableMembers}
       canEdit={canEdit}
+      defaultSort={defaultSort}
+      defaultCollapsed={defaultCollapsed}
     />
   );
 }

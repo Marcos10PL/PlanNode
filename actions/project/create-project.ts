@@ -26,6 +26,14 @@ export async function createProjectAction(
 
   const { name, description, isPrivate, icon, color } = parsed.data;
 
+  const { data: lastProject } = await supabase
+    .from("projects")
+    .select("position")
+    .eq("workspace_id", workspaceId)
+    .order("position", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
   const { data: project, error: insertError } = await supabase
     .from("projects")
     .insert({
@@ -35,6 +43,7 @@ export async function createProjectAction(
       is_private: isPrivate,
       icon,
       color,
+      position: (lastProject?.position ?? -1) + 1,
       created_by: user.id,
     })
     .select("id")

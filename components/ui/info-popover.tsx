@@ -23,19 +23,20 @@ export function InfoPopover({
   label,
   children,
   className,
-  variant = "outline",
+  variant = "ghost",
 }: Props) {
   return (
     <Popover>
       <Tooltip>
         <TooltipTrigger asChild>
-          <PopoverTrigger asChild className="self-end!">
+          <PopoverTrigger asChild>
             <Button
+              size={"icon"}
               variant={variant}
-              className={cn("size-9 py-4", className)}
+              className={cn("size-7", className)}
               aria-label={label}
             >
-              <Info className="size-8" />
+              <Info className="size-7" />
             </Button>
           </PopoverTrigger>
         </TooltipTrigger>

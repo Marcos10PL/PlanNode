@@ -19,14 +19,13 @@ import { useTranslations } from "next-intl";
 import { ReactNode, useState } from "react";
 import { PriorityOptionLabel } from "./task-priority-select";
 
-type TaskSort = (typeof TASK_SORTS)[keyof typeof TASK_SORTS];
+export type TaskSort = (typeof TASK_SORTS)[keyof typeof TASK_SORTS];
 
 export type TaskFiltersState = {
   query: string;
   priorities: TaskPriority[];
   assigneeIds: string[];
   unassigned: boolean;
-  sort: TaskSort;
 };
 
 export const DEFAULT_TASK_FILTERS: TaskFiltersState = {
@@ -34,8 +33,9 @@ export const DEFAULT_TASK_FILTERS: TaskFiltersState = {
   priorities: [],
   assigneeIds: [],
   unassigned: false,
-  sort: TASK_SORTS.DEFAULT,
 };
+
+export const DEFAULT_TASK_SORT: TaskSort = TASK_SORTS.DEFAULT;
 
 const PRIORITY_RANK = {
   [TASK_PRIORITIES.URGENT]: 0,
@@ -86,9 +86,17 @@ type Props = {
   members: WorkspaceMember[];
   filters: TaskFiltersState;
   onChange: (filters: TaskFiltersState) => void;
+  sort: TaskSort;
+  onSortChange: (sort: TaskSort) => void;
 };
 
-export function TaskFilters({ members, filters, onChange }: Props) {
+export function TaskFilters({
+  members,
+  filters,
+  onChange,
+  sort,
+  onSortChange,
+}: Props) {
   const t = useTranslations("tasks");
   const tTeam = useTranslations("team");
   const [priorityOpen, setPriorityOpen] = useState(false);
@@ -231,10 +239,10 @@ export function TaskFilters({ members, filters, onChange }: Props) {
 
       <div className="flex items-center justify-end gap-2">
         <SortSelect
-          value={filters.sort}
-          onChange={sort => update({ sort })}
+          value={sort}
+          onChange={onSortChange}
           options={Object.values(TASK_SORTS)}
-          getLabel={sort => t(`sort.${sort}`)}
+          getLabel={s => t(`sort.${s}`)}
         />
       </div>
     </div>

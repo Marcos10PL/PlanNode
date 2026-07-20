@@ -398,6 +398,7 @@
     "show_less": "Pokaż mniej",
     "created_at": "Utworzono {date}",
     "sort": {
+      "custom": "Domyślne",
       "newest": "Najnowsze",
       "date": "Najstarsze",
       "name": "Nazwa",

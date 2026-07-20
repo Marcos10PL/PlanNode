@@ -16,9 +16,10 @@ import { ProjectModal } from "./project-modal";
 type Props = {
   project: ProjectWithProgress;
   canManage: boolean;
+  dragHandle?: React.ReactNode;
 };
 
-export function ProjectCard({ project, canManage }: Props) {
+export function ProjectCard({ project, canManage, dragHandle }: Props) {
   const t = useTranslations("projects");
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -37,6 +38,7 @@ export function ProjectCard({ project, canManage }: Props) {
       <EntityCard
         href={generateProjectRoute(project.id)}
         title={project.name}
+        dragHandle={dragHandle}
         icon={
           <ProjectIcon
             className={`h-4 w-4 shrink-0 ${getProjectColorTextClass(project.color)}`}
@@ -55,7 +57,7 @@ export function ProjectCard({ project, canManage }: Props) {
           canManage ? (
             <ManageMenu
               disabled={isPending}
-              triggerClassName="h-7 w-7"
+              triggerClassName="size-7"
               items={[
                 {
                   label: t("edit.trigger"),

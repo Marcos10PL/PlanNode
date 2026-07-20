@@ -11,6 +11,7 @@ CREATE TABLE public.projects (
   is_private boolean NOT NULL DEFAULT false,
   icon text NOT NULL DEFAULT 'folder-kanban',
   color text NOT NULL DEFAULT 'neutral',
+  position integer NOT NULL DEFAULT 0,
   created_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
@@ -252,6 +253,7 @@ CREATE OR REPLACE TRIGGER on_workspace_member_removed_clear_assignee
 
 -- Indexes
 CREATE INDEX idx_projects_workspace_id ON public.projects(workspace_id);
+CREATE INDEX idx_projects_workspace_position ON public.projects(workspace_id, position);
 CREATE INDEX idx_project_members_id ON public.project_members(id);
 CREATE INDEX idx_task_lists_project_id ON public.task_lists(project_id, position);
 CREATE INDEX idx_tasks_project_id ON public.tasks(project_id);
