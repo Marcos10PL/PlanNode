@@ -373,6 +373,10 @@
     "projects": "Projects",
     "all_projects": "Active",
     "favorites": "Favorites",
+    "completed": "Completed",
+    "empty_favorites": "No favorite projects",
+    "empty_active": "No active projects",
+    "empty_completed": "No completed projects",
     "no_workspaces": "Create a workspace to start adding projects and tasks."
   },
   "dashboard": {
@@ -385,10 +389,13 @@
   "projects": {
     "title": "Projects (active)",
     "title_favorites": "Projects (favorites)",
+    "title_completed": "Projects (completed)",
     "empty": "No projects yet",
     "private_badge": "Private",
     "favorite": "Add to favorites",
     "unfavorite": "Remove from favorites",
+    "mark_completed": "Mark as completed",
+    "mark_active": "Mark as active",
     "appearance": {
       "icon_label": "Icon",
       "color_label": "Color",
@@ -410,7 +417,7 @@
       "progress": "Progress"
     },
     "create": {
-      "trigger": "Create project",
+      "trigger": "Create new",
       "title": "Create project",
       "description": "Fill in the details for your new project.",
       "name_label": "Name",

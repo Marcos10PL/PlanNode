@@ -373,6 +373,10 @@
     "projects": "Projekty",
     "all_projects": "Aktywne",
     "favorites": "Ulubione",
+    "completed": "Zakończone",
+    "empty_favorites": "Brak ulubionych projektów",
+    "empty_active": "Brak aktywnych projektów",
+    "empty_completed": "Brak zakończonych projektów",
     "no_workspaces": "Utwórz przestrzeń roboczą, aby móc tworzyć projekty i dodawać zadania."
   },
   "dashboard": {
@@ -385,10 +389,13 @@
   "projects": {
     "title": "Projekty (aktywne)",
     "title_favorites": "Projekty (ulubione)",
+    "title_completed": "Projekty (zakończone)",
     "empty": "Brak projektów",
     "private_badge": "Prywatny",
     "favorite": "Dodaj do ulubionych",
     "unfavorite": "Usuń z ulubionych",
+    "mark_completed": "Oznacz jako zakończony",
+    "mark_active": "Oznacz jako aktywny",
     "appearance": {
       "icon_label": "Ikona",
       "color_label": "Kolor",
@@ -410,7 +417,7 @@
       "progress": "Postęp"
     },
     "create": {
-      "trigger": "Utwórz projekt",
+      "trigger": "Utwórz nowy",
       "title": "Utwórz projekt",
       "description": "Uzupełnij dane nowego projektu.",
       "name_label": "Nazwa",

@@ -76,6 +76,7 @@ export type Project = ToCamelCase<
     | "name"
     | "description"
     | "is_private"
+    | "is_completed"
     | "icon"
     | "color"
     | "created_by"

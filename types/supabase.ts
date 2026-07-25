@@ -209,6 +209,7 @@ export type Database = {
           description: string | null
           icon: string
           id: string
+          is_completed: boolean
           is_private: boolean
           name: string
           position: number
@@ -222,6 +223,7 @@ export type Database = {
           description?: string | null
           icon?: string
           id?: string
+          is_completed?: boolean
           is_private?: boolean
           name: string
           position?: number
@@ -235,6 +237,7 @@ export type Database = {
           description?: string | null
           icon?: string
           id?: string
+          is_completed?: boolean
           is_private?: boolean
           name?: string
           position?: number

@@ -8,7 +8,7 @@ const projectRowQuery = (supabase: Client) =>
   supabase
     .from("projects")
     .select(
-      "id, workspace_id, name, description, is_private, icon, color, created_by, created_at, task_lists(id, name, position, tasks(status)), project_favorites(position)",
+      "id, workspace_id, name, description, is_private, is_completed, icon, color, created_by, created_at, task_lists(id, name, position, tasks(status)), project_favorites(position)",
     );
 
 const mapProjectWithProgress = (
@@ -23,6 +23,7 @@ const mapProjectWithProgress = (
     name: row.name,
     description: row.description,
     isPrivate: row.is_private,
+    isCompleted: row.is_completed,
     icon: row.icon,
     color: row.color,
     createdBy: row.created_by,
@@ -51,9 +52,43 @@ export const getProjects = cache(async (workspaceId: string) => {
   const { data } = await supabase
     .from("projects")
     .select(
-      "id, workspace_id, name, description, is_private, icon, color, position, created_by, created_at, task_lists(id, name, position, tasks(status)), project_favorites(position)",
+      "id, workspace_id, name, description, is_private, is_completed, icon, color, position, created_by, created_at, task_lists(id, name, position, tasks(status)), project_favorites(position)",
     )
     .eq("workspace_id", workspaceId)
+    .eq("project_favorites.user_id", user.id)
+    .order("position", { ascending: true })
+    .order("position", { referencedTable: "task_lists", ascending: true });
+
+  return data?.map(mapProjectWithProgress) ?? [];
+});
+
+export const getActiveProjects = cache(async (workspaceId: string) => {
+  const { supabase, user } = await requireUserContext();
+
+  const { data } = await supabase
+    .from("projects")
+    .select(
+      "id, workspace_id, name, description, is_private, is_completed, icon, color, created_by, created_at, task_lists(id, name, position, tasks(status)), project_favorites(position)",
+    )
+    .eq("workspace_id", workspaceId)
+    .eq("is_completed", false)
+    .eq("project_favorites.user_id", user.id)
+    .order("position", { ascending: true })
+    .order("position", { referencedTable: "task_lists", ascending: true });
+
+  return data?.map(mapProjectWithProgress) ?? [];
+});
+
+export const getCompletedProjects = cache(async (workspaceId: string) => {
+  const { supabase, user } = await requireUserContext();
+
+  const { data } = await supabase
+    .from("projects")
+    .select(
+      "id, workspace_id, name, description, is_private, is_completed, icon, color, created_by, created_at, task_lists(id, name, position, tasks(status)), project_favorites(position)",
+    )
+    .eq("workspace_id", workspaceId)
+    .eq("is_completed", true)
     .eq("project_favorites.user_id", user.id)
     .order("position", { ascending: true })
     .order("position", { referencedTable: "task_lists", ascending: true });
@@ -67,7 +102,7 @@ export const getFavoriteProjects = cache(async (workspaceId: string) => {
   const { data } = await supabase
     .from("projects")
     .select(
-      "id, workspace_id, name, description, is_private, icon, color, created_by, created_at, task_lists(id, name, position, tasks(status)), project_favorites!inner(position)",
+      "id, workspace_id, name, description, is_private, is_completed, icon, color, created_by, created_at, task_lists(id, name, position, tasks(status)), project_favorites!inner(position)",
     )
     .eq("workspace_id", workspaceId)
     .eq("project_favorites.user_id", user.id)
@@ -86,7 +121,7 @@ export const getProject = cache(async (projectId: string) => {
   const { data } = await supabase
     .from("projects")
     .select(
-      "id, workspace_id, name, description, is_private, icon, color, created_by, created_at, project_favorites(position)",
+      "id, workspace_id, name, description, is_private, is_completed, icon, color, created_by, created_at, project_favorites(position)",
     )
     .eq("id", projectId)
     .eq("project_favorites.user_id", user.id)
@@ -102,6 +137,7 @@ export const getProject = cache(async (projectId: string) => {
     name: p.name,
     description: p.description,
     isPrivate: p.is_private,
+    isCompleted: p.is_completed,
     icon: p.icon,
     color: p.color,
     createdBy: p.created_by,

@@ -18,6 +18,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useToggleProjectCompleted } from "@/hooks/use-toggle-project-completed";
 import { useToggleProjectFavorite } from "@/hooks/use-toggle-project-favorite";
 import { usePathname } from "@/i18n/navigation";
 import { ProjectWithProgress } from "@/types/dto";
@@ -76,10 +77,16 @@ export function SidebarProjectItem({
     project.id,
     project.isFavorite,
   );
+  const { isCompleted, toggle: toggleCompleted } = useToggleProjectCompleted(
+    project.id,
+    project.isCompleted,
+  );
   const items = getProjectManageMenuItems({
     canManage,
     isFavorite,
     onToggleFavorite: toggleFavorite,
+    isCompleted,
+    onToggleCompleted: toggleCompleted,
     onEdit: () => onEditProject(project),
     onDelete: () => onDeleteProject(project),
     t: tProjects,

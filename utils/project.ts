@@ -6,6 +6,7 @@ import {
   Book,
   Briefcase,
   Calendar,
+  CheckCircle2,
   Code,
   Flag,
   FolderKanban,
@@ -131,6 +132,8 @@ export const getProjectManageMenuItems = ({
   canManage,
   isFavorite,
   onToggleFavorite,
+  isCompleted,
+  onToggleCompleted,
   onEdit,
   onDelete,
   t,
@@ -138,6 +141,8 @@ export const getProjectManageMenuItems = ({
   canManage: boolean;
   isFavorite: boolean;
   onToggleFavorite: () => void;
+  isCompleted: boolean;
+  onToggleCompleted: () => void;
   onEdit: () => void;
   onDelete: () => void;
   t: Translations;
@@ -153,6 +158,11 @@ export const getProjectManageMenuItems = ({
           label: t("edit.trigger"),
           icon: Pencil,
           onClick: onEdit,
+        },
+        {
+          label: isCompleted ? t("mark_active") : t("mark_completed"),
+          icon: CheckCircle2,
+          onClick: onToggleCompleted,
         },
         {
           label: t("delete.trigger"),

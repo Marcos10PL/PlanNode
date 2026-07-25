@@ -1,17 +1,17 @@
-import { reorderFavoriteProjectsAction } from "@/actions/project/reorder-favorite-projects";
+import { reorderProjectsAction } from "@/actions/project/reorder-projects";
 import { ProjectsView } from "@/components/projects/projects-view";
 import { NoWorkspaceBanner } from "@/components/workspaces/no-workspace-banner";
 import { COOKIES, PROJECT_SORTS } from "@/const";
-import { getFavoriteProjects, getWorkspaceContext } from "@/lib/data";
+import { getCompletedProjects, getWorkspaceContext } from "@/lib/data";
 import { parseCookieValue } from "@/utils/helpers";
 import { getTranslations } from "next-intl/server";
 import { cookies } from "next/headers";
 
-export default async function FavoriteProjectsPage() {
+export default async function CompletedProjectsPage() {
   const cookieStore = await cookies();
   const activeWorkspaceId = cookieStore.get(COOKIES.ACTIVE_WORKSPACE_ID)?.value;
   const defaultSort = parseCookieValue(
-    cookieStore.get(COOKIES.PROJECT_SORT_FAVORITES)?.value,
+    cookieStore.get(COOKIES.PROJECT_SORT_COMPLETED)?.value,
     PROJECT_SORTS.CUSTOM,
   );
 
@@ -24,7 +24,7 @@ export default async function FavoriteProjectsPage() {
   }
 
   const [projects, { canEdit }, t] = await Promise.all([
-    getFavoriteProjects(activeWorkspaceId),
+    getCompletedProjects(activeWorkspaceId),
     getWorkspaceContext(activeWorkspaceId),
     getTranslations("projects"),
   ]);
@@ -33,11 +33,11 @@ export default async function FavoriteProjectsPage() {
     <ProjectsView
       projects={projects}
       canManage={canEdit}
-      canReorder
+      canReorder={canEdit}
       defaultSort={defaultSort}
-      sortCookieKey={COOKIES.PROJECT_SORT_FAVORITES}
-      onReorder={reorderFavoriteProjectsAction}
-      title={t("title_favorites")}
+      sortCookieKey={COOKIES.PROJECT_SORT_COMPLETED}
+      onReorder={reorderProjectsAction.bind(null, activeWorkspaceId)}
+      title={t("title_completed")}
     />
   );
 }

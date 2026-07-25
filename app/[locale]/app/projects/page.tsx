@@ -2,7 +2,7 @@ import { reorderProjectsAction } from "@/actions/project/reorder-projects";
 import { ProjectsView } from "@/components/projects/projects-view";
 import { NoWorkspaceBanner } from "@/components/workspaces/no-workspace-banner";
 import { COOKIES, PROJECT_SORTS } from "@/const";
-import { getProjects, getWorkspaceContext } from "@/lib/data";
+import { getActiveProjects, getWorkspaceContext } from "@/lib/data";
 import { parseCookieValue } from "@/utils/helpers";
 import { getTranslations } from "next-intl/server";
 import { cookies } from "next/headers";
@@ -24,7 +24,7 @@ export default async function ProjectsPage() {
   }
 
   const [projects, { canEdit }, t] = await Promise.all([
-    getProjects(activeWorkspaceId),
+    getActiveProjects(activeWorkspaceId),
     getWorkspaceContext(activeWorkspaceId),
     getTranslations("projects"),
   ]);
@@ -34,7 +34,6 @@ export default async function ProjectsPage() {
       projects={projects}
       canManage={canEdit}
       canReorder={canEdit}
-      workspaceId={activeWorkspaceId}
       defaultSort={defaultSort}
       sortCookieKey={COOKIES.PROJECT_SORT}
       onReorder={reorderProjectsAction.bind(null, activeWorkspaceId)}

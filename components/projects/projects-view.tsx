@@ -8,7 +8,6 @@ import { ReorderAction } from "@/types";
 import { ProjectWithProgress } from "@/types/dto";
 import { getProjectProgress } from "@/utils";
 import { useTranslations } from "next-intl";
-import { AddProjectButton } from "./add-project-button";
 import { ProjectList } from "./project-list";
 
 type ProjectSort = (typeof PROJECT_SORTS)[keyof typeof PROJECT_SORTS];
@@ -40,7 +39,6 @@ type Props = {
   projects: ProjectWithProgress[];
   canManage: boolean;
   canReorder: boolean;
-  workspaceId: string;
   defaultSort: ProjectSort;
   sortCookieKey: string;
   onReorder: ReorderAction;
@@ -51,7 +49,6 @@ export function ProjectsView({
   projects,
   canManage,
   canReorder,
-  workspaceId,
   defaultSort,
   sortCookieKey,
   onReorder,
@@ -70,11 +67,10 @@ export function ProjectsView({
     <>
       <div className="flex flex-col md:flex-row md:items-center gap-2 mt-4 mb-6 justify-between">
         <div className="flex items-center gap-2">
-          <SubHeader
-            title={`${title} (${projects.length})`}
-            className="my-0"
-          />
-          {canManage && <AddProjectButton workspaceId={workspaceId} />}
+          <SubHeader title={title} className="my-1" />
+          <span className="text-sm text-muted-foreground">
+            {projects.length}
+          </span>
         </div>
         {projects.length > 1 && (
           <SortSelect

@@ -3,12 +3,11 @@
 import { reorderFavoriteProjectsAction } from "@/actions/project/reorder-favorite-projects";
 import { reorderProjectsAction } from "@/actions/project/reorder-projects";
 import { reorderTaskListsAction } from "@/actions/task/reorder-task-lists";
-import { AddProjectButton } from "@/components/projects/add-project-button";
 import { ProjectModal } from "@/components/projects/project-modal";
 import { TaskListModal } from "@/components/tasks/create-task-list-modal";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import {
-  SidebarGroupAction,
+  SidebarGroup,
   SidebarMenuButton,
   useSidebar,
 } from "@/components/ui/sidebar";
@@ -18,13 +17,12 @@ import { useDeleteProject } from "@/hooks/use-delete-project";
 import { useDeleteTaskList } from "@/hooks/use-delete-task-list";
 import { usePathname } from "@/i18n/navigation";
 import { ProjectWithProgress } from "@/types/dto";
-import { cn, isActivePath, isActiveSubPath } from "@/utils";
+import { isActivePath, isActiveSubPath } from "@/utils";
 import { generateProjectRoute } from "@/utils/helpers";
 import { move } from "@dnd-kit/helpers";
 import { type DragEndEvent } from "@dnd-kit/react";
-import { FolderOpenDot, Plus, Star } from "lucide-react";
+import { CheckCircle2, FolderOpenDot, Plus, Star } from "lucide-react";
 import { useTranslations } from "next-intl";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -35,8 +33,9 @@ import {
 } from "./project-sidebar-context";
 import { SidebarProjectSection } from "./sidebar-project-section";
 
-const allProjectsKey = (projectId: string) => `all:${projectId}`;
 const favoritesKey = (projectId: string) => `fav:${projectId}`;
+const activeKey = (projectId: string) => `active:${projectId}`;
+const completedKey = (projectId: string) => `done:${projectId}`;
 
 type Props = {
   projects: ProjectWithProgress[];
@@ -66,6 +65,7 @@ export function SidebarProjects({
   );
   const [deleteProject, setDeleteProject] =
     useState<ProjectWithProgress | null>(null);
+  const [addProjectOpen, setAddProjectOpen] = useState(false);
 
   const { remove: removeList, isPending: listPending } = useDeleteTaskList();
   const { remove: removeProject, isPending: projectPending } =
@@ -145,24 +145,43 @@ export function SidebarProjects({
     }, 0);
   };
 
-  const commitProjectOrder = (
-    previousOrder: ProjectWithProgress[],
-    newIds: string[],
+  const reorderPositionSubset = (
+    event: DragEndEvent,
+    predicate: (project: ProjectWithProgress) => boolean,
   ) => {
-    if (!workspaceId) return;
+    const draggedId = event.operation.source?.id;
+    if (event.canceled || !draggedId) return null;
 
-    const oldPosition = new Map(previousOrder.map((p, index) => [p.id, index]));
-    const changes = newIds
+    const previousOrder = localProjects;
+    const subsetIds = previousOrder.filter(predicate).map(p => p.id);
+    const newSubsetIds = move(subsetIds, event);
+
+    const oldPosition = new Map(subsetIds.map((id, index) => [id, index]));
+    const changes = newSubsetIds
       .map((id, position) => ({ id, position }))
       .filter(({ id, position }) => oldPosition.get(id) !== position);
 
-    if (changes.length === 0) return;
+    if (changes.length === 0) return null;
+
+    const byId = new Map(previousOrder.map(project => [project.id, project]));
+    const reorderedSubset = newSubsetIds.map(id => byId.get(id)!);
+    let index = 0;
+    const nextOrder = previousOrder.map(project =>
+      predicate(project) ? reorderedSubset[index++] : project,
+    );
+
+    return { previousOrder, nextOrder, changes };
+  };
+
+  const commitPositionReorder = (
+    previousOrder: ProjectWithProgress[],
+    nextOrder: ProjectWithProgress[],
+    changes: { id: string; position: number }[],
+  ) => {
+    if (!workspaceId) return;
 
     setTimeout(async () => {
-      setLocalProjects(prev => {
-        const byId = new Map(prev.map(project => [project.id, project]));
-        return newIds.map(id => byId.get(id)!);
-      });
+      setLocalProjects(nextOrder);
 
       try {
         const result = await reorderProjectsAction(workspaceId, changes);
@@ -183,20 +202,17 @@ export function SidebarProjects({
     }, 0);
   };
 
-  const handleProjectDragEnd = (event: DragEndEvent) => {
-    if (event.canceled) return;
-
-    const draggedId = event.operation.source?.id;
-    if (!draggedId) return;
-
-    const previousOrder = localProjects;
-    const newIds = move(
-      previousOrder.map(project => project.id),
-      event,
-    );
-
-    commitProjectOrder(previousOrder, newIds);
-  };
+  const handlePositionDragEnd =
+    (predicate: (project: ProjectWithProgress) => boolean) =>
+    (event: DragEndEvent) => {
+      const result = reorderPositionSubset(event, predicate);
+      if (!result) return;
+      commitPositionReorder(
+        result.previousOrder,
+        result.nextOrder,
+        result.changes,
+      );
+    };
 
   const handleFavoriteDragEnd = (event: DragEndEvent) => {
     if (event.canceled) return;
@@ -280,6 +296,11 @@ export function SidebarProjects({
     .filter(project => project.isFavorite)
     .sort((a, b) => (a.favoritePosition ?? 0) - (b.favoritePosition ?? 0));
 
+  const activeProjects = localProjects.filter(project => !project.isCompleted);
+  const completedProjects = localProjects.filter(
+    project => project.isCompleted,
+  );
+
   return (
     <ProjectSidebarActionsProvider
       value={{
@@ -296,77 +317,60 @@ export function SidebarProjects({
         onDeleteList: setDeleteTarget,
       }}
     >
-      {favoriteProjects.length > 0 && (
-        <SidebarProjectSection
-          header={
-            <>
-              <SidebarMenuButton asChild tooltip={t("sidebar.favorites")}>
-                <Link
-                  href={LINKS.PROJECTS_FAVORITES}
-                  onClick={() => setOpenMobile(false)}
-                  className={cn("pr-16", isActive(LINKS.PROJECTS_FAVORITES))}
-                >
-                  <Star className="mr-1" />
-                  {t("sidebar.favorites")}
-                </Link>
+      {workspaces.length === 0 ? (
+        <div className="text-sm px-2 italic text-muted-foreground group-data-[collapsible=icon]:hidden">
+          {t("sidebar.no_workspaces")}
+        </div>
+      ) : (
+        <>
+          {canManage && workspaceId && (
+            <SidebarGroup className="-mt-4">
+              <SidebarMenuButton
+                className="cursor-pointer text-nowrap"
+                variant="outline"
+                tooltip={t("projects.create.trigger")}
+                onClick={() => setAddProjectOpen(true)}
+              >
+                <Plus className="mr-1" />
+                {t("projects.create.trigger")}
               </SidebarMenuButton>
+            </SidebarGroup>
+          )}
 
-              {canManage && workspaceId && (
-                <AddProjectButton
-                  workspaceId={workspaceId}
-                  trigger={
-                    <SidebarGroupAction className="right-10 top-2.5 aspect-auto h-7 w-7 cursor-pointer hover:bg-foreground/20">
-                      <Plus />
-                    </SidebarGroupAction>
-                  }
-                />
-              )}
-            </>
-          }
-          projects={favoriteProjects}
-          keyFor={favoritesKey}
-          onDragEnd={handleFavoriteDragEnd}
-          sectionKey="favorites"
-        />
+          <SidebarProjectSection
+            href={LINKS.PROJECTS_FAVORITES}
+            label={t("sidebar.favorites")}
+            icon={Star}
+            projects={favoriteProjects}
+            keyFor={favoritesKey}
+            onDragEnd={handleFavoriteDragEnd}
+            sectionKey="favorites"
+            emptyMessage={t("sidebar.empty_favorites")}
+          />
+
+          <SidebarProjectSection
+            href={LINKS.PROJECTS}
+            label={t("sidebar.all_projects")}
+            icon={FolderOpenDot}
+            projects={activeProjects}
+            keyFor={activeKey}
+            onDragEnd={handlePositionDragEnd(p => !p.isCompleted)}
+            sectionKey="active"
+            emptyMessage={t("sidebar.empty_active")}
+          />
+
+          <SidebarProjectSection
+            href={LINKS.PROJECTS_COMPLETED}
+            label={t("sidebar.completed")}
+            icon={CheckCircle2}
+            projects={completedProjects}
+            keyFor={completedKey}
+            onDragEnd={handlePositionDragEnd(p => p.isCompleted)}
+            sectionKey="completed"
+            emptyMessage={t("sidebar.empty_completed")}
+          />
+        </>
       )}
-
-      <SidebarProjectSection
-        header={
-          <>
-            {workspaces.length > 0 ? (
-              <SidebarMenuButton asChild tooltip={t("sidebar.all_projects")}>
-                <Link
-                  href={LINKS.PROJECTS}
-                  onClick={() => setOpenMobile(false)}
-                  className={cn("pr-16", isActive(LINKS.PROJECTS))}
-                >
-                  <FolderOpenDot className="mr-1" />
-                  {t("sidebar.all_projects")}
-                </Link>
-              </SidebarMenuButton>
-            ) : (
-              <div className="text-sm px-2 -mt-1.5 italic text-muted-foreground group-data-[collapsible=icon]:hidden">
-                {t("sidebar.no_workspaces")}
-              </div>
-            )}
-
-            {canManage && workspaceId && (
-              <AddProjectButton
-                workspaceId={workspaceId}
-                trigger={
-                  <SidebarGroupAction className="right-10 top-2.5 aspect-auto h-7 w-7 cursor-pointer hover:bg-foreground/20">
-                    <Plus />
-                  </SidebarGroupAction>
-                }
-              />
-            )}
-          </>
-        }
-        projects={localProjects}
-        keyFor={allProjectsKey}
-        onDragEnd={handleProjectDragEnd}
-        sectionKey="all"
-      />
 
       <TaskListModal
         projectId={renameTarget?.projectId ?? ""}
@@ -387,6 +391,14 @@ export function SidebarProjects({
           project={editProject}
           open={!!editProject}
           onOpenChange={o => !o && setEditProject(null)}
+        />
+      )}
+
+      {workspaceId && (
+        <ProjectModal
+          workspaceId={workspaceId}
+          open={addProjectOpen}
+          onOpenChange={setAddProjectOpen}
         />
       )}
 

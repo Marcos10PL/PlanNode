@@ -4,6 +4,7 @@ import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { ManageMenu } from "@/components/ui/manage-menu";
 import { LINKS } from "@/const";
 import { useDeleteProject } from "@/hooks/use-delete-project";
+import { useToggleProjectCompleted } from "@/hooks/use-toggle-project-completed";
 import { useToggleProjectFavorite } from "@/hooks/use-toggle-project-favorite";
 import { Project } from "@/types/dto";
 import { getProjectManageMenuItems } from "@/utils";
@@ -30,11 +31,17 @@ export function ProjectActions({ project, canManage }: Props) {
     project.id,
     project.isFavorite,
   );
+  const { isCompleted, toggle: toggleCompleted } = useToggleProjectCompleted(
+    project.id,
+    project.isCompleted,
+  );
 
   const items = getProjectManageMenuItems({
     canManage,
     isFavorite,
     onToggleFavorite: toggleFavorite,
+    isCompleted,
+    onToggleCompleted: toggleCompleted,
     onEdit: () => setEditOpen(true),
     onDelete: () => setDeleteOpen(true),
     t: tProjects,

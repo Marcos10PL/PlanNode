@@ -20,6 +20,7 @@ export const LINKS = {
   DASHBOARD: "/app/dashboard",
   PROJECTS: "/app/projects",
   PROJECTS_FAVORITES: "/app/projects/favorites",
+  PROJECTS_COMPLETED: "/app/projects/completed",
   PROFILE_SETTINGS: "/app/settings/profile",
   PROFILE_WORKSPACES: "/app/settings/workspaces",
   TEAM: "/app/settings/team",
@@ -69,6 +70,7 @@ export const COOKIES = {
   SIDEBAR_STATE: "sidebar_state",
   PROJECT_SORT: "project_sort",
   PROJECT_SORT_FAVORITES: "project_sort_favorites",
+  PROJECT_SORT_COMPLETED: "project_sort_completed",
   SIDEBAR_EXPANDED_PROJECTS: "sidebar_expanded_projects",
 } as const;
 

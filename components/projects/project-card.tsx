@@ -5,6 +5,7 @@ import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { EntityCard } from "@/components/ui/entity-card";
 import { ManageMenu } from "@/components/ui/manage-menu";
 import { useDeleteProject } from "@/hooks/use-delete-project";
+import { useToggleProjectCompleted } from "@/hooks/use-toggle-project-completed";
 import { useToggleProjectFavorite } from "@/hooks/use-toggle-project-favorite";
 import { ProjectWithProgress } from "@/types/dto";
 import {
@@ -30,16 +31,22 @@ export function ProjectCard({ project, canManage, dragHandle }: Props) {
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   const { remove, isPending } = useDeleteProject();
-  
+
   const { isFavorite, toggle: toggleFavorite } = useToggleProjectFavorite(
     project.id,
     project.isFavorite,
+  );
+  const { isCompleted, toggle: toggleCompleted } = useToggleProjectCompleted(
+    project.id,
+    project.isCompleted,
   );
 
   const items = getProjectManageMenuItems({
     canManage,
     isFavorite,
     onToggleFavorite: toggleFavorite,
+    isCompleted,
+    onToggleCompleted: toggleCompleted,
     onEdit: () => setEditOpen(true),
     onDelete: () => setDeleteOpen(true),
     t,
