@@ -5,10 +5,15 @@ import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { EntityCard } from "@/components/ui/entity-card";
 import { ManageMenu } from "@/components/ui/manage-menu";
 import { useDeleteProject } from "@/hooks/use-delete-project";
+import { useToggleProjectFavorite } from "@/hooks/use-toggle-project-favorite";
 import { ProjectWithProgress } from "@/types/dto";
-import { getProjectColorTextClass, getProjectIcon } from "@/utils";
+import {
+  getProjectColorTextClass,
+  getProjectIcon,
+  getProjectManageMenuItems,
+} from "@/utils";
 import { generateProjectRoute } from "@/utils/helpers";
-import { Lock, Pencil, Trash2 } from "lucide-react";
+import { Lock } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { ProjectModal } from "./project-modal";
@@ -25,6 +30,20 @@ export function ProjectCard({ project, canManage, dragHandle }: Props) {
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   const { remove, isPending } = useDeleteProject();
+  
+  const { isFavorite, toggle: toggleFavorite } = useToggleProjectFavorite(
+    project.id,
+    project.isFavorite,
+  );
+
+  const items = getProjectManageMenuItems({
+    canManage,
+    isFavorite,
+    onToggleFavorite: toggleFavorite,
+    onEdit: () => setEditOpen(true),
+    onDelete: () => setDeleteOpen(true),
+    t,
+  });
 
   const ProjectIcon = getProjectIcon(project.icon);
 
@@ -54,25 +73,11 @@ export function ProjectCard({ project, canManage, dragHandle }: Props) {
         }
         description={project.description ?? undefined}
         actions={
-          canManage ? (
-            <ManageMenu
-              disabled={isPending}
-              triggerClassName="size-7"
-              items={[
-                {
-                  label: t("edit.trigger"),
-                  icon: Pencil,
-                  onClick: () => setEditOpen(true),
-                },
-                {
-                  label: t("delete.trigger"),
-                  icon: Trash2,
-                  onClick: () => setDeleteOpen(true),
-                  destructive: true,
-                },
-              ]}
-            />
-          ) : undefined
+          <ManageMenu
+            disabled={isPending}
+            triggerClassName="size-7"
+            items={items}
+          />
         }
         progress={{
           total: project.totalTasks,

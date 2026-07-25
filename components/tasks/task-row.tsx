@@ -1,7 +1,6 @@
 "use client";
 
 import { deleteTaskAction } from "@/actions/task/delete-task";
-import { updateTaskAction } from "@/actions/task/update-task";
 import { Button } from "@/components/ui/button";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { InfoPopover } from "@/components/ui/info-popover";
@@ -11,7 +10,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { ERRORS } from "@/const";
-import { Task, WorkspaceMember } from "@/types/dto";
+import { UpdateTaskSchema } from "@/schema";
+import { Task, TaskAssignee, WorkspaceMember } from "@/types/dto";
 import { TaskPriority, TaskStatus } from "@/types/entities";
 import { cn, getPriorityLabel, isTaskOverdue } from "@/utils";
 import { Pencil, Trash2 } from "lucide-react";
@@ -29,9 +29,21 @@ type Props = {
   members: WorkspaceMember[];
   canEdit: boolean;
   dragHandle?: React.ReactNode;
+  onUpdateTask: (
+    taskId: string,
+    patch: Partial<Task>,
+    serverPatch: UpdateTaskSchema,
+    fallbackErrorKey: string,
+  ) => Promise<{ error?: string } | undefined>;
 };
 
-export function TaskRow({ task, members, canEdit, dragHandle }: Props) {
+export function TaskRow({
+  task,
+  members,
+  canEdit,
+  dragHandle,
+  onUpdateTask,
+}: Props) {
   const t = useTranslations();
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -39,38 +51,42 @@ export function TaskRow({ task, members, canEdit, dragHandle }: Props) {
 
   const isOverdue = isTaskOverdue(task);
 
-  const handleStatusChange = async (status: TaskStatus) => {
-    setIsPending(true);
-    try {
-      const result = await updateTaskAction(task.id, { status });
-      if (result?.error)
-        toast.error(
-          result.error === ERRORS.INSUFFICIENT_ROLE
-            ? t("common.insufficient_role")
-            : t("tasks.status_change_error"),
-        );
-    } catch {
-      toast.error(t("common.unexpected_error"));
-    } finally {
-      setIsPending(false);
-    }
+  const handleStatusChange = (status: TaskStatus) => {
+    onUpdateTask(task.id, { status }, { status }, "tasks.status_change_error");
   };
 
-  const handlePriorityChange = async (priority: TaskPriority) => {
-    setIsPending(true);
-    try {
-      const result = await updateTaskAction(task.id, { priority });
-      if (result?.error)
-        toast.error(
-          result.error === ERRORS.INSUFFICIENT_ROLE
-            ? t("common.insufficient_role")
-            : t("tasks.priority_change_error"),
-        );
-    } catch {
-      toast.error(t("common.unexpected_error"));
-    } finally {
-      setIsPending(false);
-    }
+  const handlePriorityChange = (priority: TaskPriority) => {
+    onUpdateTask(
+      task.id,
+      { priority },
+      { priority },
+      "tasks.priority_change_error",
+    );
+  };
+
+  const handleAssigneeChange = (assigneeId: string | null) => {
+    const member = assigneeId
+      ? members.find(m => m.id === assigneeId)
+      : undefined;
+    const assignee: TaskAssignee | null = member
+      ? { id: member.id, fullName: member.fullName, email: member.email }
+      : null;
+
+    onUpdateTask(
+      task.id,
+      { assigneeId, assignee },
+      { assigneeId },
+      "tasks.assignee_change_error",
+    );
+  };
+
+  const handleDueDateChange = (dueDate: string | null) => {
+    onUpdateTask(
+      task.id,
+      { dueDate },
+      { dueDate },
+      "tasks.due_date_change_error",
+    );
   };
 
   const handleDelete = async () => {
@@ -127,10 +143,10 @@ export function TaskRow({ task, members, canEdit, dragHandle }: Props) {
 
         <div onClick={stopPropagation} className="hidden lg:block shrink-0">
           <TaskAssigneePopover
-            taskId={task.id}
             assignee={task.assignee}
             members={members}
             canEdit={canEdit}
+            onChange={handleAssigneeChange}
           />
         </div>
 
@@ -138,7 +154,7 @@ export function TaskRow({ task, members, canEdit, dragHandle }: Props) {
           <TaskPrioritySelect
             value={task.priority}
             onValueChange={handlePriorityChange}
-            disabled={isPending || !canEdit}
+            disabled={!canEdit}
             iconOnly
             size="sm"
             ariaLabel={getPriorityLabel(task.priority, t)}
@@ -149,7 +165,7 @@ export function TaskRow({ task, members, canEdit, dragHandle }: Props) {
           <TaskStatusSelect
             value={task.status}
             onValueChange={handleStatusChange}
-            disabled={isPending || !canEdit}
+            disabled={!canEdit}
             size="sm"
             className="w-40"
           />
@@ -157,10 +173,10 @@ export function TaskRow({ task, members, canEdit, dragHandle }: Props) {
 
         <div onClick={stopPropagation} className="hidden lg:block shrink-0">
           <TaskDueDatePopover
-            taskId={task.id}
             dueDate={task.dueDate}
             isOverdue={isOverdue}
             canEdit={canEdit}
+            onChange={handleDueDateChange}
           />
         </div>
 

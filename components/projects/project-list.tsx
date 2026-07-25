@@ -1,27 +1,31 @@
 "use client";
 
-import { reorderProjectsAction } from "@/actions/project/reorder-projects";
+import { ERRORS } from "@/const";
+import { ReorderAction } from "@/types";
 import { ProjectWithProgress } from "@/types/dto";
 import { move } from "@dnd-kit/helpers";
 import { DragDropProvider, type DragEndEvent } from "@dnd-kit/react";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { SortableProjectCard } from "./sortable-project-card";
 
 type Props = {
   projects: ProjectWithProgress[];
   canManage: boolean;
-  workspaceId: string;
+  onReorder: ReorderAction;
   dragEnabled: boolean;
 };
 
 export function ProjectList({
   projects,
   canManage,
-  workspaceId,
+  onReorder,
   dragEnabled,
 }: Props) {
-  const t = useTranslations("projects");
+  const t = useTranslations();
+  const router = useRouter();
   const [localProjects, setLocalProjects] = useState(projects);
 
   useEffect(() => {
@@ -31,10 +35,11 @@ export function ProjectList({
   const handleDragEnd = (event: DragEndEvent) => {
     if (event.canceled) return;
 
-    const draggedId = event.operation.source?.id as string | undefined;
+    const draggedId = event.operation.source?.id;
     if (!draggedId) return;
 
-    const ids = localProjects.map(project => project.id);
+    const previousOrder = localProjects;
+    const ids = previousOrder.map(project => project.id);
     const movedIds = move(ids, event);
 
     const oldPosition = new Map(ids.map((id, index) => [id, index]));
@@ -44,17 +49,35 @@ export function ProjectList({
 
     if (changes.length === 0) return;
 
-    setTimeout(() => {
+    setTimeout(async () => {
       setLocalProjects(prev => {
         const byId = new Map(prev.map(project => [project.id, project]));
         return movedIds.map(id => byId.get(id)!);
       });
-      reorderProjectsAction(workspaceId, changes);
+
+      try {
+        const result = await onReorder(changes);
+        if (result?.error) {
+          setLocalProjects(previousOrder);
+          toast.error(
+            result.error === ERRORS.INSUFFICIENT_ROLE
+              ? t("common.insufficient_role")
+              : t("common.unexpected_error"),
+          );
+          router.refresh();
+        }
+      } catch {
+        setLocalProjects(previousOrder);
+        toast.error(t("common.unexpected_error"));
+        router.refresh();
+      }
     }, 0);
   };
 
   if (localProjects.length === 0) {
-    return <p className="text-sm text-muted-foreground">{t("empty")}</p>;
+    return (
+      <p className="text-sm text-muted-foreground">{t("projects.empty")}</p>
+    );
   }
 
   return (

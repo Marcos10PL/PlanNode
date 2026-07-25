@@ -19,6 +19,7 @@ export const LINKS = {
   APP: "/app",
   DASHBOARD: "/app/dashboard",
   PROJECTS: "/app/projects",
+  PROJECTS_FAVORITES: "/app/projects/favorites",
   PROFILE_SETTINGS: "/app/settings/profile",
   PROFILE_WORKSPACES: "/app/settings/workspaces",
   TEAM: "/app/settings/team",
@@ -67,6 +68,7 @@ export const COOKIES = {
   ACTIVE_WORKSPACE_ID: "active_workspace_id",
   SIDEBAR_STATE: "sidebar_state",
   PROJECT_SORT: "project_sort",
+  PROJECT_SORT_FAVORITES: "project_sort_favorites",
   SIDEBAR_EXPANDED_PROJECTS: "sidebar_expanded_projects",
 } as const;
 

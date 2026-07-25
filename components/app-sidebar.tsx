@@ -9,11 +9,13 @@ import {
   SidebarMenuButton,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { SectionSeparator } from "@/components/ui/section-separator";
 import { LINKS } from "@/const";
 import { usePathname } from "@/i18n/navigation";
 import { ProjectWithProgress } from "@/types/dto";
 import { cn, isActivePath } from "@/utils";
 import { LayoutDashboard } from "lucide-react";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import LanguageSwitcher from "./language-switcher";
 import { SidebarProjects } from "./nav/sidebar-projects";
@@ -33,6 +35,7 @@ export function AppSidebar({
   canManageProjects,
   defaultExpandedProjectIds,
 }: Props) {
+  const t = useTranslations();
   const pathname = usePathname();
   const { setOpenMobile } = useSidebar();
 
@@ -58,6 +61,8 @@ export function AppSidebar({
             </Link>
           </SidebarMenuButton>
         </SidebarGroup>
+
+        <SectionSeparator title={t("sidebar.projects")} />
 
         <SidebarProjects
           projects={projects}

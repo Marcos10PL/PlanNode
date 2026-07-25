@@ -1,17 +1,20 @@
 "use client";
 
 import { reorderTasksAction } from "@/actions/task/reorder-tasks";
+import { updateTaskAction } from "@/actions/task/update-task";
 import { Button } from "@/components/ui/button";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { ManageMenu } from "@/components/ui/manage-menu";
 import { TaskProgress } from "@/components/ui/task-progress";
-import { TASK_SORTS, TASK_STATUSES } from "@/const";
+import { ERRORS, TASK_SORTS, TASK_STATUSES } from "@/const";
 import { useCookieState } from "@/hooks/use-cookie-state";
 import { useDeleteTaskList } from "@/hooks/use-delete-task-list";
+import { UpdateTaskSchema } from "@/schema";
 import { Task, TaskListWithTasks, WorkspaceMember } from "@/types/dto";
 import { TaskStatus } from "@/types/entities";
 import {
   cn,
+  getListManageMenuItems,
   getStatusBorderClass,
   getStatusDotClass,
   getStatusLabel,
@@ -20,16 +23,18 @@ import {
   getTaskListCollapsedCookie,
   getTaskListSortCookie,
 } from "@/utils/helpers";
+import { move } from "@dnd-kit/helpers";
 import {
   DragDropProvider,
   type DragEndEvent,
   type DragOverEvent,
 } from "@dnd-kit/react";
 import { isSortable } from "@dnd-kit/react/sortable";
-import { move } from "@dnd-kit/helpers";
-import { ChevronDown, Pencil, Plus, Trash2 } from "lucide-react";
+import { ChevronDown, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 import { TaskListModal } from "./create-task-list-modal";
 import { SortableTaskRow } from "./sortable-task-row";
 import {
@@ -75,6 +80,7 @@ export function TaskListSection({
 }: Props) {
   const t = useTranslations("tasks");
   const tRoot = useTranslations();
+  const router = useRouter();
   const [renameOpen, setRenameOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [createTaskOpen, setCreateTaskOpen] = useState(false);
@@ -102,7 +108,8 @@ export function TaskListSection({
     filters.assigneeIds.length > 0 ||
     filters.unassigned;
 
-  const dragEnabled = canEdit && sort === TASK_SORTS.DEFAULT && !hasActiveFilters;
+  const dragEnabled =
+    canEdit && sort === TASK_SORTS.DEFAULT && !hasActiveFilters;
 
   const handleDragOver = (event: DragOverEvent) => {
     const { source, target } = event.operation;
@@ -145,13 +152,67 @@ export function TaskListSection({
 
     if (changes.length === 0) return;
 
-    setTimeout(() => {
+    setTimeout(async () => {
       setTasks(newTasksOrder);
-      reorderTasksAction(list.id, changes);
+
+      try {
+        const result = await reorderTasksAction(list.id, changes);
+        if (result?.error) {
+          setTasks(tasks);
+          toast.error(
+            result.error === ERRORS.INSUFFICIENT_ROLE
+              ? tRoot("common.insufficient_role")
+              : tRoot("common.unexpected_error"),
+          );
+          router.refresh();
+        }
+      } catch {
+        setTasks(tasks);
+        toast.error(tRoot("common.unexpected_error"));
+        router.refresh();
+      }
     }, 0);
   };
 
+  const updateTaskField = async (
+    taskId: string,
+    patch: Partial<Task>,
+    serverPatch: UpdateTaskSchema,
+    fallbackErrorKey: string,
+  ) => {
+    const previous = tasks;
+    setTasks(prev =>
+      prev.map(task => (task.id === taskId ? { ...task, ...patch } : task)),
+    );
+
+    try {
+      const result = await updateTaskAction(taskId, serverPatch);
+      if (result?.error) {
+        setTasks(previous);
+        toast.error(
+          result.error === ERRORS.INSUFFICIENT_ROLE
+            ? tRoot("common.insufficient_role")
+            : result.error === ERRORS.INVALID_ASSIGNEE
+              ? tRoot("tasks.invalid_assignee")
+              : tRoot(fallbackErrorKey),
+        );
+        router.refresh();
+      }
+      return result;
+    } catch {
+      setTasks(previous);
+      toast.error(tRoot("common.unexpected_error"));
+      router.refresh();
+    }
+  };
+
   const { remove, isPending } = useDeleteTaskList();
+  const listManageMenuItems = getListManageMenuItems({
+    canManage: canEdit,
+    onRename: () => setRenameOpen(true),
+    onDelete: () => setDeleteOpen(true),
+    t,
+  });
 
   const toggleGroup = (status: TaskStatus) => {
     const next = new Set(collapsedList);
@@ -192,19 +253,7 @@ export function TaskListSection({
               <ManageMenu
                 disabled={isPending}
                 align="start"
-                items={[
-                  {
-                    label: t("list_rename.trigger"),
-                    icon: Pencil,
-                    onClick: () => setRenameOpen(true),
-                  },
-                  {
-                    label: t("list_delete.trigger"),
-                    icon: Trash2,
-                    onClick: () => setDeleteOpen(true),
-                    destructive: true,
-                  },
-                ]}
+                items={listManageMenuItems}
               />
             </div>
           )}
@@ -250,7 +299,10 @@ export function TaskListSection({
             {t("filters.no_results")}
           </p>
         ) : (
-          <DragDropProvider onDragOver={handleDragOver} onDragEnd={handleDragEnd}>
+          <DragDropProvider
+            onDragOver={handleDragOver}
+            onDragEnd={handleDragEnd}
+          >
             <div className="flex flex-col gap-4">
               {STATUS_GROUP_ORDER.map(status => {
                 const tasks = visibleTasks.filter(
@@ -300,6 +352,7 @@ export function TaskListSection({
                             members={members}
                             canEdit={canEdit}
                             dragEnabled={dragEnabled}
+                            onUpdateTask={updateTaskField}
                           />
                         ))}
                         {canEdit && (

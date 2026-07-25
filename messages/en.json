@@ -371,6 +371,8 @@
   },
   "sidebar": {
     "projects": "Projects",
+    "all_projects": "Active",
+    "favorites": "Favorites",
     "no_workspaces": "Create a workspace to start adding projects and tasks."
   },
   "dashboard": {
@@ -381,9 +383,12 @@
     "projects_progress": "Projects progress"
   },
   "projects": {
-    "title": "Projects in the active workspace",
+    "title": "Projects (active)",
+    "title_favorites": "Projects (favorites)",
     "empty": "No projects yet",
     "private_badge": "Private",
+    "favorite": "Add to favorites",
+    "unfavorite": "Remove from favorites",
     "appearance": {
       "icon_label": "Icon",
       "color_label": "Color",

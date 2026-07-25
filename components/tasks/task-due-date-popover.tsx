@@ -1,31 +1,26 @@
 "use client";
 
-import { updateTaskAction } from "@/actions/task/update-task";
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/ui/date-picker";
-import { ERRORS } from "@/const";
 import { cn, formatDate } from "@/utils";
 import { CalendarIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useState } from "react";
-import { toast } from "sonner";
 
 type Props = {
-  taskId: string;
   dueDate: string | null;
   isOverdue: boolean;
   canEdit: boolean;
+  onChange: (value: string | null) => void;
 };
 
 export function TaskDueDatePopover({
-  taskId,
   dueDate,
   isOverdue,
   canEdit,
+  onChange,
 }: Props) {
   const t = useTranslations();
   const locale = useLocale();
-  const [isPending, setIsPending] = useState(false);
 
   if (!canEdit) {
     return dueDate ? (
@@ -40,30 +35,15 @@ export function TaskDueDatePopover({
     ) : null;
   }
 
-  const handleChange = async (value: string | null) => {
+  const handleChange = (value: string | null) => {
     if (value === dueDate) return;
-
-    setIsPending(true);
-    try {
-      const result = await updateTaskAction(taskId, { dueDate: value });
-      if (result?.error)
-        toast.error(
-          result.error === ERRORS.INSUFFICIENT_ROLE
-            ? t("common.insufficient_role")
-            : t("tasks.due_date_change_error"),
-        );
-    } catch {
-      toast.error(t("common.unexpected_error"));
-    } finally {
-      setIsPending(false);
-    }
+    onChange(value);
   };
 
   return (
     <DatePicker
       value={dueDate}
       onChange={handleChange}
-      disabled={isPending}
       align="end"
       tooltip={t("tasks.set_due_date")}
       trigger={
@@ -76,7 +56,6 @@ export function TaskDueDatePopover({
               ? "text-destructive font-medium"
               : "text-muted-foreground",
           )}
-          disabled={isPending}
         >
           <CalendarIcon className="size-4" />
           <span

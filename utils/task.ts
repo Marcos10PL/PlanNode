@@ -1,7 +1,9 @@
-﻿import { TASK_PRIORITIES, TASK_STATUSES } from "@/const";
+﻿import type { ManageMenuItem } from "@/components/ui/manage-menu";
+import { TASK_PRIORITIES, TASK_STATUSES } from "@/const";
 import { Translations } from "@/types";
 import { Task } from "@/types/dto";
 import { TaskPriority, TaskStatus } from "@/types/entities";
+import { Pencil, Trash2 } from "lucide-react";
 
 type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
 
@@ -96,6 +98,34 @@ export const isTaskOverdue = (task: Pick<Task, "dueDate" | "status">) => {
 
   const [year, month, day] = task.dueDate.split("-").map(Number);
   return new Date(year, month - 1, day, 23, 59, 59, 999) < new Date();
+};
+
+export const getListManageMenuItems = ({
+  canManage,
+  onRename,
+  onDelete,
+  t,
+}: {
+  canManage: boolean;
+  onRename: () => void;
+  onDelete: () => void;
+  t: Translations;
+}): ManageMenuItem[] => {
+  if (!canManage) return [];
+
+  return [
+    {
+      label: t("list_rename.trigger"),
+      icon: Pencil,
+      onClick: onRename,
+    },
+    {
+      label: t("list_delete.trigger"),
+      icon: Trash2,
+      onClick: onDelete,
+      destructive: true,
+    },
+  ];
 };
 
 export const getProjectProgress = (

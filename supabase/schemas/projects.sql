@@ -26,6 +26,14 @@ CREATE TABLE public.project_members (
   PRIMARY KEY (project_id, id)
 );
 
+CREATE TABLE public.project_favorites (
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  project_id uuid NOT NULL REFERENCES public.projects(id) ON DELETE CASCADE,
+  position integer NOT NULL DEFAULT 0,
+
+  PRIMARY KEY (user_id, project_id)
+);
+
 CREATE TABLE public.task_lists (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   project_id uuid NOT NULL REFERENCES public.projects(id) ON DELETE CASCADE,
@@ -57,6 +65,7 @@ CREATE TABLE public.tasks (
 
 -- RLS
 ALTER TABLE public.projects ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.project_favorites ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.project_members ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.task_lists ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.tasks ENABLE ROW LEVEL SECURITY;
@@ -128,6 +137,27 @@ USING (public.can_edit_project(id, (SELECT auth.uid())));
 CREATE POLICY "Non-guest members can delete accessible projects"
 ON public.projects FOR DELETE
 USING (public.can_edit_project(id, (SELECT auth.uid())));
+
+-- Policies: project_favorites
+CREATE POLICY "Users can see their own favorites"
+ON public.project_favorites FOR SELECT
+USING (user_id = (SELECT auth.uid()));
+
+CREATE POLICY "Users can favorite accessible projects"
+ON public.project_favorites FOR INSERT
+WITH CHECK (
+  user_id = (SELECT auth.uid())
+  AND public.can_access_project(project_id, (SELECT auth.uid()))
+);
+
+CREATE POLICY "Users can reorder their own favorites"
+ON public.project_favorites FOR UPDATE
+USING (user_id = (SELECT auth.uid()))
+WITH CHECK (user_id = (SELECT auth.uid()));
+
+CREATE POLICY "Users can remove their own favorites"
+ON public.project_favorites FOR DELETE
+USING (user_id = (SELECT auth.uid()));
 
 -- Policies: project_members
 CREATE POLICY "Users with project access can see project members"
@@ -255,6 +285,7 @@ CREATE OR REPLACE TRIGGER on_workspace_member_removed_clear_assignee
 CREATE INDEX idx_projects_workspace_id ON public.projects(workspace_id);
 CREATE INDEX idx_projects_workspace_position ON public.projects(workspace_id, position);
 CREATE INDEX idx_project_members_id ON public.project_members(id);
+CREATE INDEX idx_project_favorites_user_position ON public.project_favorites(user_id, position);
 CREATE INDEX idx_task_lists_project_id ON public.task_lists(project_id, position);
 CREATE INDEX idx_tasks_project_id ON public.tasks(project_id);
 CREATE INDEX idx_tasks_list_id ON public.tasks(list_id, position);
@@ -263,6 +294,7 @@ CREATE INDEX idx_tasks_project_status ON public.tasks(project_id, status);
 
 -- Permissions
 REVOKE ALL ON public.projects FROM anon;
+REVOKE ALL ON public.project_favorites FROM anon;
 REVOKE ALL ON public.project_members FROM anon;
 REVOKE ALL ON public.task_lists FROM anon;
 REVOKE ALL ON public.tasks FROM anon;
@@ -272,10 +304,12 @@ REVOKE EXECUTE ON FUNCTION public.is_project_manager(uuid, uuid) FROM anon;
 REVOKE EXECUTE ON FUNCTION public.add_default_task_list() FROM anon;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.projects TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.project_favorites TO authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.project_members TO authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.task_lists TO authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.tasks TO authenticated;
 GRANT ALL ON public.projects TO service_role;
+GRANT ALL ON public.project_favorites TO service_role;
 GRANT ALL ON public.project_members TO service_role;
 GRANT ALL ON public.task_lists TO service_role;
 GRANT ALL ON public.tasks TO service_role;

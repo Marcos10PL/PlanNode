@@ -4,8 +4,9 @@ import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { ManageMenu } from "@/components/ui/manage-menu";
 import { LINKS } from "@/const";
 import { useDeleteProject } from "@/hooks/use-delete-project";
+import { useToggleProjectFavorite } from "@/hooks/use-toggle-project-favorite";
 import { Project } from "@/types/dto";
-import { Pencil, Trash2 } from "lucide-react";
+import { getProjectManageMenuItems } from "@/utils";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -18,11 +19,26 @@ type Props = {
 
 export function ProjectActions({ project, canManage }: Props) {
   const t = useTranslations();
+  const tProjects = useTranslations("projects");
   const router = useRouter();
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   const { remove, isPending } = useDeleteProject();
+
+  const { isFavorite, toggle: toggleFavorite } = useToggleProjectFavorite(
+    project.id,
+    project.isFavorite,
+  );
+
+  const items = getProjectManageMenuItems({
+    canManage,
+    isFavorite,
+    onToggleFavorite: toggleFavorite,
+    onEdit: () => setEditOpen(true),
+    onDelete: () => setDeleteOpen(true),
+    t: tProjects,
+  });
 
   const handleDelete = async () => {
     const deleted = await remove(project.id);
@@ -30,27 +46,9 @@ export function ProjectActions({ project, canManage }: Props) {
     setDeleteOpen(false);
   };
 
-  if (!canManage) return null;
-
   return (
     <>
-      <ManageMenu
-        disabled={isPending}
-        align="start"
-        items={[
-          {
-            label: t("projects.edit.trigger"),
-            icon: Pencil,
-            onClick: () => setEditOpen(true),
-          },
-          {
-            label: t("projects.delete.trigger"),
-            icon: Trash2,
-            onClick: () => setDeleteOpen(true),
-            destructive: true,
-          },
-        ]}
-      />
+      <ManageMenu disabled={isPending} align="start" items={items} />
 
       <ProjectModal
         workspaceId={project.workspaceId}

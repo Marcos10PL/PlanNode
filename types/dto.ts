@@ -81,9 +81,12 @@ export type Project = ToCamelCase<
     | "created_by"
     | "created_at"
   >
->;
+> & {
+  isFavorite: boolean;
+};
 
 export type ProjectWithProgress = Project & {
+  favoritePosition: number | null;
   totalTasks: number;
   doneTasks: number;
   cancelledTasks: number;

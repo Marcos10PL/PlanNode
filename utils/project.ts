@@ -1,4 +1,6 @@
+import type { ManageMenuItem } from "@/components/ui/manage-menu";
 import { PROJECT_COLORS, PROJECT_ICONS } from "@/const";
+import { Translations } from "@/types";
 import {
   BarChart3,
   Book,
@@ -12,9 +14,12 @@ import {
   Lightbulb,
   LucideIcon,
   Palette,
+  Pencil,
   Rocket,
   Shield,
+  Star,
   Target,
+  Trash2,
   Wrench,
   Zap,
 } from "lucide-react";
@@ -121,3 +126,40 @@ export const getProjectColorBgClass = (color: string) =>
 
 export const getProjectColorBorderClass = (color: string) =>
   PROJECT_COLOR_BORDER_MAP[toProjectColor(color)];
+
+export const getProjectManageMenuItems = ({
+  canManage,
+  isFavorite,
+  onToggleFavorite,
+  onEdit,
+  onDelete,
+  t,
+}: {
+  canManage: boolean;
+  isFavorite: boolean;
+  onToggleFavorite: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
+  t: Translations;
+}): ManageMenuItem[] => [
+  {
+    label: isFavorite ? t("unfavorite") : t("favorite"),
+    icon: Star,
+    onClick: onToggleFavorite,
+  },
+  ...(canManage
+    ? [
+        {
+          label: t("edit.trigger"),
+          icon: Pencil,
+          onClick: onEdit,
+        },
+        {
+          label: t("delete.trigger"),
+          icon: Trash2,
+          onClick: onDelete,
+          destructive: true,
+        },
+      ]
+    : []),
+];

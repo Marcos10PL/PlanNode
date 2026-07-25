@@ -27,7 +27,7 @@ export async function createClient() {
   );
 }
 
-type Client = Awaited<ReturnType<typeof createClient>>;
+export type Client = Awaited<ReturnType<typeof createClient>>;
 
 export async function getUserContext() {
   const supabase = await createClient();

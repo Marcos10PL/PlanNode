@@ -1,10 +1,14 @@
 "use client";
 
 import { reorderTaskListsAction } from "@/actions/task/reorder-task-lists";
+import { ERRORS } from "@/const";
 import { ProjectListSummary } from "@/types/dto";
 import { move } from "@dnd-kit/helpers";
 import { DragDropProvider, type DragEndEvent } from "@dnd-kit/react";
+import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { SortableTaskListCard } from "./sortable-task-list-card";
 
 type Props = {
@@ -14,6 +18,8 @@ type Props = {
 };
 
 export function TaskListsGrid({ lists, projectId, canEdit }: Props) {
+  const t = useTranslations("common");
+  const router = useRouter();
   const [localLists, setLocalLists] = useState(lists);
 
   useEffect(() => {
@@ -26,7 +32,8 @@ export function TaskListsGrid({ lists, projectId, canEdit }: Props) {
     const draggedId = event.operation.source?.id as string | undefined;
     if (!draggedId) return;
 
-    const ids = localLists.map(list => list.id);
+    const previousOrder = localLists;
+    const ids = previousOrder.map(list => list.id);
     const movedIds = move(ids, event);
 
     const oldPosition = new Map(ids.map((id, index) => [id, index]));
@@ -36,12 +43,28 @@ export function TaskListsGrid({ lists, projectId, canEdit }: Props) {
 
     if (changes.length === 0) return;
 
-    setTimeout(() => {
+    setTimeout(async () => {
       setLocalLists(prev => {
         const byId = new Map(prev.map(list => [list.id, list]));
         return movedIds.map(id => byId.get(id)!);
       });
-      reorderTaskListsAction(projectId, changes);
+
+      try {
+        const result = await reorderTaskListsAction(projectId, changes);
+        if (result?.error) {
+          setLocalLists(previousOrder);
+          toast.error(
+            result.error === ERRORS.INSUFFICIENT_ROLE
+              ? t("insufficient_role")
+              : t("unexpected_error"),
+          );
+          router.refresh();
+        }
+      } catch {
+        setLocalLists(previousOrder);
+        toast.error(t("unexpected_error"));
+        router.refresh();
+      }
     }, 0);
   };
 

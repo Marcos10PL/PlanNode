@@ -1,31 +1,26 @@
 "use client";
 
-import { updateTaskAction } from "@/actions/task/update-task";
 import { Button } from "@/components/ui/button";
-import { ERRORS } from "@/const";
 import UserAvatar from "@/components/user-avatar";
 import { TaskAssignee, WorkspaceMember } from "@/types/dto";
 import { UserRoundPlus } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
-import { toast } from "sonner";
 import { AssigneePicker } from "./assignee-picker";
 
 type Props = {
-  taskId: string;
   assignee: TaskAssignee | null;
   members: WorkspaceMember[];
   canEdit: boolean;
+  onChange: (assigneeId: string | null) => void;
 };
 
 export function TaskAssigneePopover({
-  taskId,
   assignee,
   members,
   canEdit,
+  onChange,
 }: Props) {
   const t = useTranslations();
-  const [isPending, setIsPending] = useState(false);
 
   if (!canEdit) {
     return assignee ? (
@@ -33,26 +28,9 @@ export function TaskAssigneePopover({
     ) : null;
   }
 
-  const handleChange = async (assigneeId: string | null) => {
+  const handleChange = (assigneeId: string | null) => {
     if (assigneeId === (assignee?.id ?? null)) return;
-
-    setIsPending(true);
-    try {
-      const result = await updateTaskAction(taskId, { assigneeId });
-      if (result?.error) {
-        toast.error(
-          result.error === ERRORS.INSUFFICIENT_ROLE
-            ? t("common.insufficient_role")
-            : result.error === ERRORS.INVALID_ASSIGNEE
-              ? t("tasks.invalid_assignee")
-              : t("tasks.assignee_change_error"),
-        );
-      }
-    } catch {
-      toast.error(t("common.unexpected_error"));
-    } finally {
-      setIsPending(false);
-    }
+    onChange(assigneeId);
   };
 
   return (
@@ -60,14 +38,12 @@ export function TaskAssigneePopover({
       value={assignee?.id ?? null}
       onChange={handleChange}
       members={members}
-      disabled={isPending}
       tooltip={assignee ? assignee.fullName : t("tasks.assign")}
       trigger={
         <Button
           variant="ghost"
           size="icon"
           className="h-7 w-7 shrink-0 rounded-full"
-          disabled={isPending}
         >
           {assignee ? (
             <UserAvatar name={assignee.fullName} className="h-7 w-7" />

@@ -371,6 +371,8 @@
   },
   "sidebar": {
     "projects": "Projekty",
+    "all_projects": "Aktywne",
+    "favorites": "Ulubione",
     "no_workspaces": "Utwórz przestrzeń roboczą, aby móc tworzyć projekty i dodawać zadania."
   },
   "dashboard": {
@@ -381,9 +383,12 @@
     "projects_progress": "Postęp projektów"
   },
   "projects": {
-    "title": "Projekty w aktywnej przestrzeni",
+    "title": "Projekty (aktywne)",
+    "title_favorites": "Projekty (ulubione)",
     "empty": "Brak projektów",
     "private_badge": "Prywatny",
+    "favorite": "Dodaj do ulubionych",
+    "unfavorite": "Usuń z ulubionych",
     "appearance": {
       "icon_label": "Ikona",
       "color_label": "Kolor",

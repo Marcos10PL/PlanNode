@@ -1,6 +1,7 @@
 "use client";
 
 import { DragHandle } from "@/components/ui/drag-handle";
+import { UpdateTaskSchema } from "@/schema";
 import { Task, WorkspaceMember } from "@/types/dto";
 import { TaskStatus } from "@/types/entities";
 import { cn } from "@/utils";
@@ -13,6 +14,12 @@ type Props = {
   members: WorkspaceMember[];
   canEdit: boolean;
   dragEnabled: boolean;
+  onUpdateTask: (
+    taskId: string,
+    patch: Partial<Task>,
+    serverPatch: UpdateTaskSchema,
+    fallbackErrorKey: string,
+  ) => Promise<{ error?: string } | undefined>;
 };
 
 export function SortableTaskRow({
@@ -21,6 +28,7 @@ export function SortableTaskRow({
   members,
   canEdit,
   dragEnabled,
+  onUpdateTask,
 }: Props) {
   const { ref, handleRef, isDragging } = useSortable({
     id: task.id,
@@ -35,6 +43,7 @@ export function SortableTaskRow({
         task={task}
         members={members}
         canEdit={canEdit}
+        onUpdateTask={onUpdateTask}
         dragHandle={
           dragEnabled ? (
             <DragHandle

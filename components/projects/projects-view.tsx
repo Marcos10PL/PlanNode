@@ -2,8 +2,9 @@
 
 import { SubHeader } from "@/components/sub-header";
 import { SortSelect } from "@/components/ui/sort-select";
-import { COOKIES, PROJECT_SORTS } from "@/const";
+import { PROJECT_SORTS } from "@/const";
 import { useCookieState } from "@/hooks/use-cookie-state";
+import { ReorderAction } from "@/types";
 import { ProjectWithProgress } from "@/types/dto";
 import { getProjectProgress } from "@/utils";
 import { useTranslations } from "next-intl";
@@ -38,31 +39,39 @@ const SORTERS = {
 type Props = {
   projects: ProjectWithProgress[];
   canManage: boolean;
+  canReorder: boolean;
   workspaceId: string;
   defaultSort: ProjectSort;
+  sortCookieKey: string;
+  onReorder: ReorderAction;
+  title: string;
 };
 
 export function ProjectsView({
   projects,
   canManage,
+  canReorder,
   workspaceId,
   defaultSort,
+  sortCookieKey,
+  onReorder,
+  title,
 }: Props) {
   const t = useTranslations("projects");
   const [sort, setSort] = useCookieState<ProjectSort>(
-    COOKIES.PROJECT_SORT,
+    sortCookieKey,
     defaultSort,
   );
 
   const sorted = SORTERS[sort](projects);
-  const dragEnabled = canManage && sort === PROJECT_SORTS.CUSTOM;
+  const dragEnabled = canReorder && sort === PROJECT_SORTS.CUSTOM;
 
   return (
     <>
       <div className="flex flex-col md:flex-row md:items-center gap-2 mt-4 mb-6 justify-between">
         <div className="flex items-center gap-2">
           <SubHeader
-            title={`${t("title")} (${projects.length})`}
+            title={`${title} (${projects.length})`}
             className="my-0"
           />
           {canManage && <AddProjectButton workspaceId={workspaceId} />}
@@ -80,7 +89,7 @@ export function ProjectsView({
       <ProjectList
         projects={sorted}
         canManage={canManage}
-        workspaceId={workspaceId}
+        onReorder={onReorder}
         dragEnabled={dragEnabled}
       />
     </>

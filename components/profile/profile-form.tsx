@@ -41,33 +41,50 @@ export function ProfileForm() {
 
     if (data.full_name !== profile.fullName) {
       tasks.push(
-        updateProfileAction({ full_name: data.full_name }).then(result =>
-          result.error ? t("save_failed") : null,
-        ),
+        (async () => {
+          try {
+            const result = await updateProfileAction({
+              full_name: data.full_name,
+            });
+            return result.error ? t("save_failed") : null;
+          } catch {
+            return t("save_failed");
+          }
+        })(),
       );
     }
 
     if (data.email !== profile.email && !pendingEmail) {
       tasks.push(
-        updateEmailAction({ email: data.email }).then(result => {
-          if (result.error) return t("email_update_failed");
-          setPendingEmail(data.email);
-          return null;
-        }),
+        (async () => {
+          try {
+            const result = await updateEmailAction({ email: data.email });
+            if (result.error) return t("email_update_failed");
+            setPendingEmail(data.email);
+            return null;
+          } catch {
+            return t("email_update_failed");
+          }
+        })(),
       );
     }
 
     if (data.password) {
       tasks.push(
-        updatePasswordAction({
-          password: data.password,
-          confirmPassword: data.confirmPassword,
-        }).then(result => {
-          if (!result.error) return null;
-          if (result.error === ERRORS.SAME_PASSWORD)
-            return t("password_same_as_old");
-          return t("password_update_failed");
-        }),
+        (async () => {
+          try {
+            const result = await updatePasswordAction({
+              password: data.password,
+              confirmPassword: data.confirmPassword,
+            });
+            if (!result.error) return null;
+            if (result.error === ERRORS.SAME_PASSWORD)
+              return t("password_same_as_old");
+            return t("password_update_failed");
+          } catch {
+            return t("password_update_failed");
+          }
+        })(),
       );
     }
 

@@ -5,8 +5,8 @@ import { EntityCard } from "@/components/ui/entity-card";
 import { ManageMenu } from "@/components/ui/manage-menu";
 import { useDeleteTaskList } from "@/hooks/use-delete-task-list";
 import { ProjectListSummary } from "@/types/dto";
+import { getListManageMenuItems } from "@/utils";
 import { generateListRoute } from "@/utils/helpers";
-import { Pencil, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { TaskListModal } from "./create-task-list-modal";
@@ -18,17 +18,19 @@ type Props = {
   dragHandle?: React.ReactNode;
 };
 
-export function TaskListCard({
-  list,
-  projectId,
-  canEdit,
-  dragHandle,
-}: Props) {
+export function TaskListCard({ list, projectId, canEdit, dragHandle }: Props) {
   const t = useTranslations("tasks");
   const [renameOpen, setRenameOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   const { remove, isPending } = useDeleteTaskList();
+
+  const items = getListManageMenuItems({
+    canManage: canEdit,
+    onRename: () => setRenameOpen(true),
+    onDelete: () => setDeleteOpen(true),
+    t,
+  });
 
   const handleDelete = async () => {
     await remove(list.id);
@@ -42,25 +44,11 @@ export function TaskListCard({
         title={list.name}
         dragHandle={dragHandle}
         actions={
-          canEdit ? (
-            <ManageMenu
-              disabled={isPending}
-              triggerClassName="h-7 w-7"
-              items={[
-                {
-                  label: t("list_rename.trigger"),
-                  icon: Pencil,
-                  onClick: () => setRenameOpen(true),
-                },
-                {
-                  label: t("list_delete.trigger"),
-                  icon: Trash2,
-                  onClick: () => setDeleteOpen(true),
-                  destructive: true,
-                },
-              ]}
-            />
-          ) : undefined
+          <ManageMenu
+            disabled={isPending}
+            triggerClassName="h-7 w-7"
+            items={items}
+          />
         }
         progress={{
           total: list.taskCount,
