@@ -4,12 +4,13 @@ import type { QueryData } from "@supabase/supabase-js";
 import { cache } from "react";
 import { Client, requireUserContext } from "../supabase/server";
 
+const PROJECT_BASE_FIELDS =
+  "id, workspace_id, name, description, is_private, is_completed, icon, color, created_by, created_at, task_lists(id, name, position, tasks(status))";
+
 const projectRowQuery = (supabase: Client) =>
   supabase
     .from("projects")
-    .select(
-      "id, workspace_id, name, description, is_private, is_completed, icon, color, created_by, created_at, task_lists(id, name, position, tasks(status)), project_favorites(position)",
-    );
+    .select(`${PROJECT_BASE_FIELDS}, project_favorites(position)`);
 
 const mapProjectWithProgress = (
   row: QueryData<ReturnType<typeof projectRowQuery>>[number],
@@ -51,9 +52,7 @@ export const getProjects = cache(async (workspaceId: string) => {
 
   const { data } = await supabase
     .from("projects")
-    .select(
-      "id, workspace_id, name, description, is_private, is_completed, icon, color, position, created_by, created_at, task_lists(id, name, position, tasks(status)), project_favorites(position)",
-    )
+    .select(`${PROJECT_BASE_FIELDS}, project_favorites(position)`)
     .eq("workspace_id", workspaceId)
     .eq("project_favorites.user_id", user.id)
     .order("position", { ascending: true })
@@ -67,9 +66,7 @@ export const getActiveProjects = cache(async (workspaceId: string) => {
 
   const { data } = await supabase
     .from("projects")
-    .select(
-      "id, workspace_id, name, description, is_private, is_completed, icon, color, created_by, created_at, task_lists(id, name, position, tasks(status)), project_favorites(position)",
-    )
+    .select(`${PROJECT_BASE_FIELDS}, project_favorites(position)`)
     .eq("workspace_id", workspaceId)
     .eq("is_completed", false)
     .eq("project_favorites.user_id", user.id)
@@ -84,9 +81,7 @@ export const getCompletedProjects = cache(async (workspaceId: string) => {
 
   const { data } = await supabase
     .from("projects")
-    .select(
-      "id, workspace_id, name, description, is_private, is_completed, icon, color, created_by, created_at, task_lists(id, name, position, tasks(status)), project_favorites(position)",
-    )
+    .select(`${PROJECT_BASE_FIELDS}, project_favorites(position)`)
     .eq("workspace_id", workspaceId)
     .eq("is_completed", true)
     .eq("project_favorites.user_id", user.id)
@@ -101,9 +96,7 @@ export const getFavoriteProjects = cache(async (workspaceId: string) => {
 
   const { data } = await supabase
     .from("projects")
-    .select(
-      "id, workspace_id, name, description, is_private, is_completed, icon, color, created_by, created_at, task_lists(id, name, position, tasks(status)), project_favorites!inner(position)",
-    )
+    .select(`${PROJECT_BASE_FIELDS}, project_favorites!inner(position)`)
     .eq("workspace_id", workspaceId)
     .eq("project_favorites.user_id", user.id)
     .order("position", {

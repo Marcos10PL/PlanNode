@@ -1,26 +1,16 @@
 import { TASK_STATUSES } from "@/const";
 import { MyTask, Task, TaskListWithTasks } from "@/types/dto";
+import type { QueryData } from "@supabase/supabase-js";
 import { cache } from "react";
-import { requireUserContext } from "../supabase/server";
+import { Client, requireUserContext } from "../supabase/server";
 
 const TASK_SELECT =
   "id, project_id, list_id, parent_task_id, title, description, status, priority, assignee_id, due_date, position, created_by, assignee:profiles!tasks_assignee_id_fkey(id, full_name, email)";
 
-type TaskRow = {
-  id: string;
-  project_id: string;
-  list_id: string;
-  parent_task_id: string | null;
-  title: string;
-  description: string | null;
-  status: Task["status"];
-  priority: Task["priority"];
-  assignee_id: string | null;
-  due_date: string | null;
-  position: number;
-  created_by: string | null;
-  assignee: { id: string; full_name: string; email: string } | null;
-};
+const taskRowQuery = (supabase: Client) =>
+  supabase.from("tasks").select(TASK_SELECT);
+
+type TaskRow = QueryData<ReturnType<typeof taskRowQuery>>[number];
 
 const mapTask = (t: TaskRow) =>
   ({
@@ -74,11 +64,7 @@ export const getMyTasks = cache(async (workspaceId: string) => {
     .select(`${TASK_SELECT}, project:projects!inner(name, workspace_id)`)
     .eq("assignee_id", user.id)
     .eq("project.workspace_id", workspaceId)
-    .not(
-      "status",
-      "in",
-      `(${TASK_STATUSES.DONE},${TASK_STATUSES.CANCELLED})`,
-    )
+    .not("status", "in", `(${TASK_STATUSES.DONE},${TASK_STATUSES.CANCELLED})`)
     .order("due_date", { ascending: true, nullsFirst: false });
 
   return (
