@@ -6,7 +6,11 @@ import { createTaskSchema, CreateTaskSchema } from "@/schema";
 import { generateProjectRoute } from "@/utils/helpers";
 import { revalidatePath } from "next/cache";
 
-export async function createTaskAction(listId: string, data: CreateTaskSchema) {
+export async function createTaskAction(
+  listId: string,
+  data: CreateTaskSchema,
+  parentTaskId?: string,
+) {
   const parsed = createTaskSchema().safeParse(data);
   if (!parsed.success) return { error: ERRORS.INVALID_DATA };
 
@@ -25,13 +29,18 @@ export async function createTaskAction(listId: string, data: CreateTaskSchema) {
   if (!(await canEditProject(supabase, list.project_id, user.id)))
     return { error: ERRORS.INSUFFICIENT_ROLE };
 
-  const { data: lastTask } = await supabase
+  let lastTaskQuery = supabase
     .from("tasks")
     .select("position")
     .eq("list_id", listId)
     .order("position", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+    .limit(1);
+
+  lastTaskQuery = parentTaskId
+    ? lastTaskQuery.eq("parent_task_id", parentTaskId)
+    : lastTaskQuery.is("parent_task_id", null);
+
+  const { data: lastTask } = await lastTaskQuery.maybeSingle();
 
   const { title, description, status, priority, assigneeId, dueDate } =
     parsed.data;
@@ -50,6 +59,7 @@ export async function createTaskAction(listId: string, data: CreateTaskSchema) {
     .insert({
       project_id: list.project_id,
       list_id: listId,
+      parent_task_id: parentTaskId ?? null,
       title,
       description: description || null,
       status,

@@ -3,8 +3,8 @@
 import { DragHandle } from "@/components/ui/drag-handle";
 import { UpdateTaskSchema } from "@/schema";
 import { Task, WorkspaceMember } from "@/types/dto";
-import { TaskStatus } from "@/types/entities";
 import { cn } from "@/utils";
+import { type DragEndEvent } from "@dnd-kit/react";
 import { useSortable } from "@dnd-kit/react/sortable";
 import { TaskRow } from "./task-row";
 
@@ -20,6 +20,9 @@ type Props = {
     serverPatch: UpdateTaskSchema,
     fallbackErrorKey: string,
   ) => Promise<{ error?: string } | undefined>;
+  subtasks?: Task[];
+  onSubtaskDragEnd?: (event: DragEndEvent) => void;
+  onAddSubtask?: () => void;
 };
 
 export function SortableTaskRow({
@@ -29,11 +32,14 @@ export function SortableTaskRow({
   canEdit,
   dragEnabled,
   onUpdateTask,
+  subtasks,
+  onSubtaskDragEnd,
+  onAddSubtask,
 }: Props) {
   const { ref, handleRef, isDragging } = useSortable({
     id: task.id,
     index,
-    group: task.status satisfies TaskStatus,
+    group: task.parentTaskId ?? task.status,
     disabled: !dragEnabled,
   });
 
@@ -44,6 +50,9 @@ export function SortableTaskRow({
         members={members}
         canEdit={canEdit}
         onUpdateTask={onUpdateTask}
+        subtasks={subtasks}
+        onSubtaskDragEnd={onSubtaskDragEnd}
+        onAddSubtask={onAddSubtask}
         dragHandle={
           dragEnabled ? (
             <DragHandle

@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { TASK_STATUSES } from "@/const";
+import { TASK_STATUS_ORDER } from "@/const";
 import { TaskStatus } from "@/types/entities";
 import { cn, getStatusDotClass, getStatusLabel } from "@/utils";
 import { useTranslations } from "next-intl";
@@ -41,7 +41,7 @@ export function TaskStatusSelect({
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
-        {Object.values(TASK_STATUSES).map(status => (
+        {TASK_STATUS_ORDER.map(status => (
           <SelectItem key={status} value={status}>
             <span className="flex items-center gap-2">
               <span

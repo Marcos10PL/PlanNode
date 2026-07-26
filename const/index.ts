@@ -117,6 +117,16 @@ export const TASK_STATUSES = {
   CANCELLED: "cancelled",
 } as const satisfies Record<string, TaskStatus>;
 
+export const TASK_STATUS_ORDER: TaskStatus[] = [
+  TASK_STATUSES.TODO,
+  TASK_STATUSES.IN_PROGRESS,
+  TASK_STATUSES.IN_REVIEW,
+  TASK_STATUSES.IN_TESTS,
+  TASK_STATUSES.DONE,
+  TASK_STATUSES.ON_HOLD,
+  TASK_STATUSES.CANCELLED,
+];
+
 export const TASK_PRIORITIES = {
   LOW: "low",
   MEDIUM: "medium",

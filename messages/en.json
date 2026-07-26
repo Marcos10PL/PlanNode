@@ -474,6 +474,9 @@
   "tasks": {
     "empty": "No tasks in this list",
     "add_task": "Add task",
+    "add_subtask": "Add subtask",
+    "subtasks": "Subtasks",
+    "advance_status": "Switch status",
     "no_assignee": "No assignee",
     "assign": "Assign someone",
     "assignee_change_error": "Could not change assignee",

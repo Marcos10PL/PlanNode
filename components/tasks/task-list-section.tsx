@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { ManageMenu } from "@/components/ui/manage-menu";
 import { TaskProgress } from "@/components/ui/task-progress";
-import { ERRORS, TASK_SORTS, TASK_STATUSES } from "@/const";
+import { ERRORS, TASK_SORTS, TASK_STATUS_ORDER, TASK_STATUSES } from "@/const";
 import { useCookieState } from "@/hooks/use-cookie-state";
 import { useDeleteTaskList } from "@/hooks/use-delete-task-list";
 import { UpdateTaskSchema } from "@/schema";
@@ -30,11 +30,12 @@ import {
   type DragOverEvent,
 } from "@dnd-kit/react";
 import { isSortable } from "@dnd-kit/react/sortable";
-import { ChevronDown, Plus } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { AddRowButton } from "./add-row-button";
 import { TaskListModal } from "./create-task-list-modal";
 import { SortableTaskRow } from "./sortable-task-row";
 import {
@@ -46,19 +47,9 @@ import {
 } from "./task-filters";
 import { TaskModal } from "./task-modal";
 
-const STATUS_GROUP_ORDER: TaskStatus[] = [
-  TASK_STATUSES.TODO,
-  TASK_STATUSES.IN_PROGRESS,
-  TASK_STATUSES.IN_REVIEW,
-  TASK_STATUSES.IN_TESTS,
-  TASK_STATUSES.ON_HOLD,
-  TASK_STATUSES.DONE,
-  TASK_STATUSES.CANCELLED,
-];
-
 const toGroups = (tasks: Task[]): Record<TaskStatus, string[]> => {
   const groups = {} as Record<TaskStatus, string[]>;
-  for (const status of STATUS_GROUP_ORDER) groups[status] = [];
+  for (const status of TASK_STATUS_ORDER) groups[status] = [];
   for (const task of tasks) groups[task.status].push(task.id);
   return groups;
 };
@@ -85,6 +76,7 @@ export function TaskListSection({
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [createTaskOpen, setCreateTaskOpen] = useState(false);
   const [selectedTaskStatus, setSelectedTaskStatus] = useState<TaskStatus>();
+  const [createSubtaskParentId, setCreateSubtaskParentId] = useState<string>();
   const [filters, setFilters] = useState(DEFAULT_TASK_FILTERS);
   const [sort, setSort] = useCookieState(
     getTaskListSortCookie(list.id),
@@ -101,6 +93,25 @@ export function TaskListSection({
   useEffect(() => {
     setTasks(list.tasks);
   }, [list.tasks]);
+
+  const topLevelTasks = useMemo(
+    () => tasks.filter(task => !task.parentTaskId),
+    [tasks],
+  );
+
+  const subtasksByParent = useMemo(() => {
+    const map = new Map<string, Task[]>();
+    for (const task of tasks) {
+      if (!task.parentTaskId) continue;
+      const siblings = map.get(task.parentTaskId) ?? [];
+      siblings.push(task);
+      map.set(task.parentTaskId, siblings);
+    }
+    for (const siblings of map.values()) {
+      siblings.sort((a, b) => a.position - b.position);
+    }
+    return map;
+  }, [tasks]);
 
   const hasActiveFilters =
     filters.query.trim() !== "" ||
@@ -125,40 +136,49 @@ export function TaskListSection({
     const draggedId = event.operation.source?.id as string | undefined;
     if (!draggedId) return;
 
-    const draggedTask = tasks.find(task => task.id === draggedId);
+    const draggedTask = topLevelTasks.find(task => task.id === draggedId);
     if (!draggedTask) return;
 
-    const beforeGroups = toGroups(tasks);
+    const beforeGroups = toGroups(topLevelTasks);
     const updatedGroups = move(beforeGroups, event);
 
-    const newStatus = STATUS_GROUP_ORDER.find(status =>
+    const newStatus = TASK_STATUS_ORDER.find(status =>
       updatedGroups[status]?.includes(draggedId),
     );
     if (!newStatus || newStatus !== draggedTask.status) return;
 
-    const taskById = new Map(tasks.map(task => [task.id, task]));
-    const newTasksOrder = STATUS_GROUP_ORDER.flatMap(status =>
+    const taskById = new Map(topLevelTasks.map(task => [task.id, task]));
+    const newTopLevelOrder = TASK_STATUS_ORDER.flatMap(status =>
       (updatedGroups[status] ?? []).map(id => taskById.get(id)!),
     );
 
-    const beforeOrder = STATUS_GROUP_ORDER.flatMap(
+    const beforeOrder = TASK_STATUS_ORDER.flatMap(
       status => beforeGroups[status] ?? [],
     );
     const oldPosition = new Map(beforeOrder.map((id, index) => [id, index]));
 
-    const changes = newTasksOrder
+    const changes = newTopLevelOrder
       .map((task, position) => ({ id: task.id, position }))
       .filter(({ id, position }) => oldPosition.get(id) !== position);
 
     if (changes.length === 0) return;
 
+    const previousTasks = tasks;
+
     setTimeout(async () => {
-      setTasks(newTasksOrder);
+      const positionById = new Map(changes.map(c => [c.id, c.position]));
+      setTasks(prev =>
+        prev.map(task =>
+          positionById.has(task.id)
+            ? { ...task, position: positionById.get(task.id)! }
+            : task,
+        ),
+      );
 
       try {
         const result = await reorderTasksAction(list.id, changes);
         if (result?.error) {
-          setTasks(tasks);
+          setTasks(previousTasks);
           toast.error(
             result.error === ERRORS.INSUFFICIENT_ROLE
               ? tRoot("common.insufficient_role")
@@ -167,12 +187,57 @@ export function TaskListSection({
           router.refresh();
         }
       } catch {
-        setTasks(tasks);
+        setTasks(previousTasks);
         toast.error(tRoot("common.unexpected_error"));
         router.refresh();
       }
     }, 0);
   };
+
+  const handleSubtaskDragEnd =
+    (parentTaskId: string) => (event: DragEndEvent) => {
+      if (event.canceled) return;
+
+      const draggedId = event.operation.source?.id;
+      if (!draggedId) return;
+
+      const siblings = subtasksByParent.get(parentTaskId) ?? [];
+      const ids = siblings.map(task => task.id);
+      const movedIds = move(ids, event);
+
+      const oldPosition = new Map(ids.map((id, index) => [id, index]));
+      const changes = movedIds
+        .map((id, position) => ({ id, position }))
+        .filter(({ id, position }) => oldPosition.get(id) !== position);
+
+      if (changes.length === 0) return;
+
+      const previousTasks = tasks;
+
+      setTimeout(async () => {
+        const positionById = new Map(changes.map(c => [c.id, c.position]));
+        setTasks(prev =>
+          prev.map(task =>
+            positionById.has(task.id)
+              ? { ...task, position: positionById.get(task.id)! }
+              : task,
+          ),
+        );
+
+        try {
+          const result = await reorderTasksAction(list.id, changes);
+          if (result?.error) {
+            setTasks(previousTasks);
+            toast.error(tRoot("common.unexpected_error"));
+            router.refresh();
+          }
+        } catch {
+          setTasks(previousTasks);
+          toast.error(tRoot("common.unexpected_error"));
+          router.refresh();
+        }
+      }, 0);
+    };
 
   const updateTaskField = async (
     taskId: string,
@@ -225,14 +290,14 @@ export function TaskListSection({
   };
 
   const visibleTasks = useMemo(
-    () => sortTasks(filterTasks(tasks, filters), sort),
-    [tasks, filters, sort],
+    () => sortTasks(filterTasks(topLevelTasks, filters), sort),
+    [topLevelTasks, filters, sort],
   );
 
-  const doneTasks = tasks.filter(
+  const doneTasks = topLevelTasks.filter(
     task => task.status === TASK_STATUSES.DONE,
   ).length;
-  const cancelledTasks = tasks.filter(
+  const cancelledTasks = topLevelTasks.filter(
     task => task.status === TASK_STATUSES.CANCELLED,
   ).length;
 
@@ -241,12 +306,24 @@ export function TaskListSection({
     setDeleteOpen(false);
   };
 
+  const openCreateTask = (status?: TaskStatus) => {
+    setSelectedTaskStatus(status);
+    setCreateSubtaskParentId(undefined);
+    setCreateTaskOpen(true);
+  };
+
+  const openCreateSubtask = (parentTaskId: string) => {
+    setCreateSubtaskParentId(parentTaskId);
+    setSelectedTaskStatus(undefined);
+    setCreateTaskOpen(true);
+  };
+
   return (
     <>
       <div className="flex flex-col mt-4">
         <div className="flex flex-col-reverse md:flex-row md:items-center gap-1">
           <h2 className="text-sm font-semibold min-w-0 break-all">
-            {list.name} ({tasks.length})
+            {list.name} ({topLevelTasks.length})
           </h2>
           {canEdit && (
             <div className="self-end">
@@ -261,14 +338,14 @@ export function TaskListSection({
 
         <section className="my-4">
           <TaskProgress
-            total={tasks.length}
+            total={topLevelTasks.length}
             done={doneTasks}
             cancelled={cancelledTasks}
             showLabel
           />
         </section>
 
-        {tasks.length > 0 && (
+        {topLevelTasks.length > 0 && (
           <div className="my-4">
             <TaskFilters
               members={members}
@@ -280,18 +357,14 @@ export function TaskListSection({
           </div>
         )}
 
-        {tasks.length === 0 ? (
+        {topLevelTasks.length === 0 ? (
           <>
             <p className="text-sm text-muted-foreground py-2">{t("empty")}</p>
             {canEdit && (
-              <Button
-                variant="ghost"
-                className="w-full justify-start text-muted-foreground rounded-none hover:bg-accent/50 h-11 pl-2"
-                onClick={() => setCreateTaskOpen(true)}
-              >
-                <Plus className="h-4 w-4" />
-                {t("add_task")}
-              </Button>
+              <AddRowButton
+                label={t("add_task")}
+                onClick={() => openCreateTask()}
+              />
             )}
           </>
         ) : visibleTasks.length === 0 ? (
@@ -304,7 +377,7 @@ export function TaskListSection({
             onDragEnd={handleDragEnd}
           >
             <div className="flex flex-col gap-4">
-              {STATUS_GROUP_ORDER.map(status => {
+              {TASK_STATUS_ORDER.map(status => {
                 const tasks = visibleTasks.filter(
                   task => task.status === status,
                 );
@@ -353,20 +426,16 @@ export function TaskListSection({
                             canEdit={canEdit}
                             dragEnabled={dragEnabled}
                             onUpdateTask={updateTaskField}
+                            subtasks={subtasksByParent.get(task.id) ?? []}
+                            onSubtaskDragEnd={handleSubtaskDragEnd(task.id)}
+                            onAddSubtask={() => openCreateSubtask(task.id)}
                           />
                         ))}
                         {canEdit && (
-                          <Button
-                            variant="ghost"
-                            className="w-full justify-start text-muted-foreground rounded-none hover:bg-accent/50 h-11 pl-2"
-                            onClick={() => {
-                              setCreateTaskOpen(true);
-                              setSelectedTaskStatus(status);
-                            }}
-                          >
-                            <Plus className="h-4 w-4" />
-                            {t("add_task")}
-                          </Button>
+                          <AddRowButton
+                            label={t("add_task")}
+                            onClick={() => openCreateTask(status)}
+                          />
                         )}
                       </div>
                     )}
@@ -391,6 +460,7 @@ export function TaskListSection({
         open={createTaskOpen}
         onOpenChange={setCreateTaskOpen}
         selectedStatus={selectedTaskStatus}
+        parentTaskId={createSubtaskParentId}
       />
 
       <ConfirmModal

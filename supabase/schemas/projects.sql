@@ -50,6 +50,7 @@ CREATE TABLE public.tasks (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   project_id uuid NOT NULL REFERENCES public.projects(id) ON DELETE CASCADE,
   list_id uuid NOT NULL,
+  parent_task_id uuid REFERENCES public.tasks(id) ON DELETE CASCADE,
   title text NOT NULL,
   description text,
   status public.task_status NOT NULL DEFAULT 'todo',
@@ -215,6 +216,33 @@ CREATE POLICY "Non-guest members can delete tasks"
 ON public.tasks FOR DELETE
 USING (public.can_edit_project(project_id, (SELECT auth.uid())));
 
+-- Trigger: subtasks are limited to one level of nesting and must stay
+-- within the same list/project as their parent
+CREATE OR REPLACE FUNCTION public.validate_subtask_parent()
+RETURNS TRIGGER AS $$
+DECLARE
+  parent_task public.tasks%ROWTYPE;
+BEGIN
+  IF NEW.parent_task_id IS NOT NULL THEN
+    SELECT * INTO parent_task FROM public.tasks WHERE id = NEW.parent_task_id;
+
+    IF parent_task.parent_task_id IS NOT NULL THEN
+      RAISE EXCEPTION 'Subtasks cannot have their own subtasks';
+    END IF;
+
+    IF parent_task.list_id != NEW.list_id OR parent_task.project_id != NEW.project_id THEN
+      RAISE EXCEPTION 'Subtask must belong to the same list and project as its parent';
+    END IF;
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
+
+CREATE OR REPLACE TRIGGER validate_subtask_parent_trigger
+  BEFORE INSERT OR UPDATE ON public.tasks
+  FOR EACH ROW EXECUTE PROCEDURE public.validate_subtask_parent();
+
 -- Trigger: add default task list and creator membership when project is created
 CREATE OR REPLACE FUNCTION public.add_default_task_list()
 RETURNS TRIGGER AS $$
@@ -290,6 +318,7 @@ CREATE INDEX idx_project_members_id ON public.project_members(id);
 CREATE INDEX idx_project_favorites_user_position ON public.project_favorites(user_id, position);
 CREATE INDEX idx_task_lists_project_id ON public.task_lists(project_id, position);
 CREATE INDEX idx_tasks_project_id ON public.tasks(project_id);
+CREATE INDEX idx_tasks_parent_task_id ON public.tasks(parent_task_id);
 CREATE INDEX idx_tasks_list_id ON public.tasks(list_id, position);
 CREATE INDEX idx_tasks_assignee_due ON public.tasks(assignee_id, due_date);
 CREATE INDEX idx_tasks_project_status ON public.tasks(project_id, status);

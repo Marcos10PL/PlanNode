@@ -39,6 +39,7 @@ type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   selectedStatus?: TaskStatus;
+  parentTaskId?: string;
 };
 
 export function TaskModal({
@@ -48,6 +49,7 @@ export function TaskModal({
   open,
   onOpenChange,
   selectedStatus,
+  parentTaskId,
 }: Props) {
   const t = useTranslations(task ? "tasks.edit" : "tasks.create");
   const tErrors = useTranslations("fields.errors");
@@ -76,7 +78,7 @@ export function TaskModal({
     try {
       const result = task
         ? await updateTaskAction(task.id, data)
-        : await createTaskAction(listId, data);
+        : await createTaskAction(listId, data, parentTaskId);
 
       if (result.error) {
         toast.error(

@@ -4,12 +4,13 @@ import { cache } from "react";
 import { requireUserContext } from "../supabase/server";
 
 const TASK_SELECT =
-  "id, project_id, list_id, title, description, status, priority, assignee_id, due_date, position, created_by, assignee:profiles!tasks_assignee_id_fkey(id, full_name, email)";
+  "id, project_id, list_id, parent_task_id, title, description, status, priority, assignee_id, due_date, position, created_by, assignee:profiles!tasks_assignee_id_fkey(id, full_name, email)";
 
 type TaskRow = {
   id: string;
   project_id: string;
   list_id: string;
+  parent_task_id: string | null;
   title: string;
   description: string | null;
   status: Task["status"];
@@ -26,6 +27,7 @@ const mapTask = (t: TaskRow) =>
     id: t.id,
     projectId: t.project_id,
     listId: t.list_id,
+    parentTaskId: t.parent_task_id,
     title: t.title,
     description: t.description,
     status: t.status,

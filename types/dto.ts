@@ -106,6 +106,7 @@ export type Task = ToCamelCase<
     | "id"
     | "project_id"
     | "list_id"
+    | "parent_task_id"
     | "title"
     | "description"
     | "status"

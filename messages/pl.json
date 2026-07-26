@@ -474,6 +474,9 @@
   "tasks": {
     "empty": "Brak zadań na tej liście",
     "add_task": "Dodaj zadanie",
+    "add_subtask": "Dodaj podzadanie",
+    "subtasks": "Podzadania",
+    "advance_status": "Przełącz status",
     "no_assignee": "Brak przypisania",
     "assign": "Przypisz osobę",
     "assignee_change_error": "Nie udało się zmienić przypisania",
