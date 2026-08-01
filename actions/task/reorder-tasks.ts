@@ -31,17 +31,12 @@ export async function reorderTasksAction(
   if (!(await canEditProject(supabase, list.project_id, user.id)))
     return { error: ERRORS.INSUFFICIENT_ROLE };
 
-  const results = await Promise.all(
-    changes.map(({ id, position, status }) =>
-      supabase
-        .from("tasks")
-        .update({ position, ...(status ? { status } : {}) })
-        .eq("id", id)
-        .eq("list_id", listId),
-    ),
-  );
+  const { error: reorderError } = await supabase.rpc("reorder_tasks", {
+    p_list_id: listId,
+    p_changes: changes,
+  });
 
-  if (results.some(r => r.error)) return { error: ERRORS.SERVER_ERROR };
+  if (reorderError) return { error: ERRORS.SERVER_ERROR };
 
   revalidatePath(generateProjectRoute(list.project_id));
   return { success: true };

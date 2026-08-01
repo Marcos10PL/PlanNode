@@ -536,6 +536,10 @@ export type Database = {
         Args: { p_user_id: string; p_workspace_id: string }
         Returns: boolean
       }
+      reorder_tasks: {
+        Args: { p_changes: Json; p_list_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       invitation_status: "pending" | "accepted" | "declined"

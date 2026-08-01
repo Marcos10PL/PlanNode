@@ -1,4 +1,3 @@
-import { ProjectList } from "@/components/projects/project-list";
 import { SubHeader } from "@/components/sub-header";
 import { Badge } from "@/components/ui/badge";
 import { NoWorkspaceBanner } from "@/components/workspaces/no-workspace-banner";
@@ -108,7 +107,8 @@ export default async function DashboardPage() {
           <h2 className="text-sm font-semibold">
             {t("dashboard.projects_progress")}
           </h2>
-          <ProjectList projects={projects} canManage={false} />
+          {/* TO DO */}
+          {/* <ProjectList projects={projects} canManage={false} /> */}
         </section>
       </div>
     </div>

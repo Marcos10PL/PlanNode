@@ -216,6 +216,17 @@ CREATE POLICY "Non-guest members can delete tasks"
 ON public.tasks FOR DELETE
 USING (public.can_edit_project(project_id, (SELECT auth.uid())));
 
+-- RPC: bulk-update task positions (and optionally status) in a single UPDATE
+CREATE OR REPLACE FUNCTION public.reorder_tasks(p_list_id uuid, p_changes jsonb)
+RETURNS void AS $$
+  UPDATE public.tasks t
+  SET position = c.position,
+      status = COALESCE(c.status, t.status)
+  FROM jsonb_to_recordset(p_changes) AS c(id uuid, position integer, status public.task_status)
+  WHERE t.id = c.id
+    AND t.list_id = p_list_id;
+$$ LANGUAGE sql SET search_path = '';
+
 -- Trigger: subtasks are limited to one level of nesting and must stay
 -- within the same list/project as their parent
 CREATE OR REPLACE FUNCTION public.validate_subtask_parent()
@@ -333,6 +344,7 @@ REVOKE EXECUTE ON FUNCTION public.can_access_project(uuid, uuid) FROM anon;
 REVOKE EXECUTE ON FUNCTION public.can_edit_project(uuid, uuid) FROM anon;
 REVOKE EXECUTE ON FUNCTION public.is_project_manager(uuid, uuid) FROM anon;
 REVOKE EXECUTE ON FUNCTION public.add_default_task_list() FROM anon;
+REVOKE EXECUTE ON FUNCTION public.reorder_tasks(uuid, jsonb) FROM anon;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.projects TO authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.project_favorites TO authenticated;
