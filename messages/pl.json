@@ -1,7 +1,15 @@
 {
   "logo": "PlanNode",
   "common": {
-    "unexpected_error": "Coś poszło nie tak. Spróbuj ponownie."
+    "unexpected_error": "Coś poszło nie tak. Spróbuj ponownie.",
+    "manage": "Zarządzaj",
+    "description": "Opis",
+    "edit": "Edytuj",
+    "delete": "Usuń",
+    "insufficient_role": "Brak uprawnień do tej operacji",
+    "pick_date": "Wybierz datę",
+    "clear_date": "Wyczyść datę",
+    "sort_by": "Sortuj:"
   },
   "footer": {
     "all_rights_reserved": "PlanNode. Wszelkie prawa zastrzeżone."
@@ -265,7 +273,7 @@
     "team": "Zespół"
   },
   "no_workspace_banner": {
-    "title": "Utwórz swoją pierwszą przestrzeń roboczą",
+    "title": "Utwórz przestrzeń roboczą",
     "description": "Przestrzeń robocza to wspólne miejsce dla Twojego zespołu do zarządzania projektami i zadaniami.",
     "cta": "Utwórz przestrzeń"
   },
@@ -300,6 +308,9 @@
     "members_section": "Członkowie",
     "invitations_section": "Oczekujące zaproszenia",
     "no_members": "Brak członków.",
+    "clear_selection": "Wyczyść wybór",
+    "search_placeholder": "Szukaj po imieniu lub adresie e-mail...",
+    "no_results": "Brak wyników",
     "no_invitations": "Brak oczekujących zaproszeń.",
     "invite_email_label": "Adres e-mail",
     "invite_email_placeholder": "kolega@firma.pl",
@@ -343,7 +354,8 @@
     "new_badge": "Nowe",
     "delete": "Usuń",
     "view": "Przejdź",
-    "workspace_invitation_title": "{inviterName} zaprasza Cię do \"{workspaceName}\""
+    "workspace_invitation_title": "{inviterName} zaprasza Cię do \"{workspaceName}\"",
+    "task_assigned_title": "{assignerName} przypisał(a) Ci zadanie „{taskTitle}” w „{projectName}”"
   },
   "invite_page": {
     "title": "Zaproszenie do przestrzeni roboczej",
@@ -356,5 +368,222 @@
     "error_not_found": "To zaproszenie nie istnieje lub zostało już wykorzystane.",
     "error_expired": "To zaproszenie wygasło.",
     "error_email_mismatch": "To zaproszenie zostało wysłane na inny adres e-mail."
+  },
+  "sidebar": {
+    "projects": "Projekty",
+    "all_projects": "Aktywne",
+    "favorites": "Ulubione",
+    "completed": "Zakończone",
+    "empty_favorites": "Brak ulubionych projektów",
+    "empty_active": "Brak aktywnych projektów",
+    "empty_completed": "Brak zakończonych projektów",
+    "no_workspaces": "Utwórz przestrzeń roboczą, aby móc tworzyć projekty i dodawać zadania."
+  },
+  "dashboard": {
+    "title": "Panel",
+    "description": "Przegląd Twojej pracy w tej przestrzeni",
+    "my_tasks": "Moje zadania",
+    "no_tasks": "Brak zadań przypisanych do Ciebie",
+    "projects_progress": "Postęp projektów"
+  },
+  "projects": {
+    "title": "Projekty (aktywne)",
+    "title_favorites": "Projekty (ulubione)",
+    "title_completed": "Projekty (zakończone)",
+    "empty": "Brak projektów",
+    "private_badge": "Prywatny",
+    "favorite": "Dodaj do ulubionych",
+    "unfavorite": "Usuń z ulubionych",
+    "mark_completed": "Oznacz jako zakończony",
+    "mark_active": "Oznacz jako aktywny",
+    "appearance": {
+      "icon_label": "Ikona",
+      "color_label": "Kolor",
+      "trigger_label": "Ikona i kolor projektu"
+    },
+    "progress": "Postęp",
+    "task_count": "{done} z {total} zadań ukończonych",
+    "not_found_title": "Nie znaleziono projektu",
+    "not_found_description": "Ten projekt nie istnieje lub nie masz do niego dostępu.",
+    "back_to_projects": "Wróć do projektów",
+    "show_more": "Pokaż więcej",
+    "show_less": "Pokaż mniej",
+    "created_at": "Utworzono {date}",
+    "sort": {
+      "custom": "Domyślne",
+      "newest": "Najnowsze",
+      "date": "Najstarsze",
+      "name": "Nazwa",
+      "progress": "Postęp"
+    },
+    "create": {
+      "trigger": "Utwórz nowy",
+      "title": "Utwórz projekt",
+      "description": "Uzupełnij dane nowego projektu.",
+      "name_label": "Nazwa",
+      "name_placeholder": "Mój projekt",
+      "description_label": "Opis",
+      "description_placeholder": "Czego dotyczy ten projekt?",
+      "private_label": "Projekt prywatny",
+      "private_description": "Widoczny tylko dla przypisanych członków. Po włączeniu tej opcji przypisaniami możesz zarządzać w sekcji „Członkowie projektu”.",
+      "submit": "Utwórz",
+      "submitting": "Tworzenie...",
+      "success": "Projekt utworzony",
+      "error": "Nie udało się utworzyć projektu"
+    },
+    "edit": {
+      "trigger": "Edytuj projekt",
+      "title": "Edytuj projekt",
+      "description": "Zaktualizuj dane projektu.",
+      "name_label": "Nazwa",
+      "name_placeholder": "Mój projekt",
+      "description_label": "Opis",
+      "description_placeholder": "Czego dotyczy ten projekt?",
+      "private_label": "Projekt prywatny",
+      "private_description": "Widoczny tylko dla przypisanych członków. Po włączeniu tej opcji przypisaniami możesz zarządzać w sekcji „Członkowie projektu”.",
+      "cancel": "Anuluj",
+      "submit": "Zapisz",
+      "submitting": "Zapisywanie...",
+      "success": "Projekt zaktualizowany",
+      "error": "Nie udało się zaktualizować projektu"
+    },
+    "delete": {
+      "trigger": "Usuń projekt",
+      "confirm_title": "Usuń projekt",
+      "confirm_description": "Czy na pewno chcesz usunąć ten projekt? Wszystkie listy i zadania zostaną usunięte. Tej operacji nie można cofnąć.",
+      "success": "Projekt usunięty",
+      "error": "Nie udało się usunąć projektu"
+    },
+    "members": {
+      "trigger": "Zarządzaj członkami",
+      "title": "Członkowie projektu",
+      "description": "Wybierz, kto ma dostęp do tego prywatnego projektu. Właściciele i administratorzy zawsze mają dostęp.",
+      "cancel": "Anuluj",
+      "submit": "Zapisz",
+      "submitting": "Zapisywanie...",
+      "success": "Członkowie projektu zaktualizowani",
+      "error": "Nie udało się zaktualizować członków projektu",
+      "empty": "Brak członków do przypisania. Najpierw zaproś osoby do przestrzeni.",
+      "manage": "Zarządzaj",
+      "search_placeholder": "Szukaj po imieniu lub adresie e-mail...",
+      "no_results": "Brak wyników"
+    },
+    "lists_section": "Listy zadań",
+    "no_lists": "Brak list zadań"
+  },
+  "tasks": {
+    "empty": "Brak zadań na tej liście",
+    "add_task": "Dodaj zadanie",
+    "add_subtask": "Dodaj podzadanie",
+    "subtasks": "Podzadania",
+    "advance_status": "Przełącz status",
+    "no_assignee": "Brak przypisania",
+    "assign": "Przypisz osobę",
+    "assignee_change_error": "Nie udało się zmienić przypisania",
+    "due_date_change_error": "Nie udało się zmienić terminu",
+    "invalid_assignee": "Ta osoba nie ma dostępu do tego projektu",
+    "set_due_date": "Ustaw termin",
+    "filters": {
+      "search_placeholder": "Szukaj zadań...",
+      "all_priorities": "Wszystkie priorytety",
+      "all_assignees": "Wszyscy członkowie",
+      "priorities_selected": "Priorytety ({count})",
+      "members_selected": "Członkowie ({count})",
+      "clear": "Wyczyść filtry",
+      "no_results": "Brak zadań spełniających kryteria"
+    },
+    "sort": {
+      "default": "Domyślne",
+      "due_date": "Termin",
+      "priority": "Priorytet",
+      "name": "Nazwa"
+    },
+    "priority_change_error": "Nie udało się zmienić priorytetu",
+    "status_change_error": "Nie udało się zmienić statusu zadania",
+    "status_on_hold": "Wstrzymane",
+    "status_todo": "Do zrobienia",
+    "status_in_progress": "W trakcie",
+    "status_in_review": "W recenzji",
+    "status_in_tests": "W testach",
+    "status_done": "Ukończone",
+    "status_cancelled": "Anulowane",
+    "priority_low": "Niski",
+    "priority_medium": "Średni",
+    "priority_high": "Wysoki",
+    "priority_urgent": "Pilny",
+    "list_create": {
+      "trigger": "Dodaj listę",
+      "title": "Dodaj listę zadań",
+      "description": "Utwórz nową listę do grupowania zadań.",
+      "name_label": "Nazwa",
+      "name_placeholder": "Backlog",
+      "cancel": "Anuluj",
+      "submit": "Utwórz",
+      "submitting": "Tworzenie...",
+      "success": "Lista utworzona",
+      "error": "Nie udało się utworzyć listy"
+    },
+    "list_rename": {
+      "trigger": "Zmień nazwę listy",
+      "title": "Zmień nazwę listy",
+      "description": "Zmień nazwę tej listy.",
+      "name_label": "Nazwa",
+      "name_placeholder": "Backlog",
+      "cancel": "Anuluj",
+      "submit": "Zapisz",
+      "submitting": "Zapisywanie...",
+      "success": "Nazwa listy zmieniona",
+      "error": "Nie udało się zmienić nazwy listy"
+    },
+    "list_delete": {
+      "trigger": "Usuń listę",
+      "confirm_title": "Usuń listę zadań",
+      "confirm_description": "Czy na pewno chcesz usunąć tę listę? Wszystkie zadania na niej zostaną usunięte.",
+      "success": "Lista usunięta",
+      "error": "Nie udało się usunąć listy",
+      "last_list_error": "Nie można usunąć ostatniej listy w projekcie"
+    },
+    "create": {
+      "title": "Dodaj zadanie",
+      "description": "Uzupełnij dane zadania.",
+      "title_label": "Tytuł",
+      "title_placeholder": "Co trzeba zrobić?",
+      "description_label": "Opis",
+      "description_placeholder": "Dodaj więcej szczegółów...",
+      "status_label": "Status",
+      "priority_label": "Priorytet",
+      "assignee_label": "Przypisany",
+      "due_date_label": "Termin",
+      "cancel": "Anuluj",
+      "submit": "Utwórz",
+      "submitting": "Tworzenie...",
+      "success": "Zadanie utworzone",
+      "error": "Nie udało się utworzyć zadania"
+    },
+    "edit": {
+      "trigger": "Edytuj zadanie",
+      "title": "Edytuj zadanie",
+      "description": "Zaktualizuj dane zadania.",
+      "title_label": "Tytuł",
+      "title_placeholder": "Co trzeba zrobić?",
+      "description_label": "Opis",
+      "description_placeholder": "Dodaj więcej szczegółów...",
+      "status_label": "Status",
+      "priority_label": "Priorytet",
+      "assignee_label": "Przypisany",
+      "due_date_label": "Termin",
+      "cancel": "Anuluj",
+      "submit": "Zapisz",
+      "submitting": "Zapisywanie...",
+      "success": "Zadanie zaktualizowane",
+      "error": "Nie udało się zaktualizować zadania"
+    },
+    "delete": {
+      "trigger": "Usuń zadanie",
+      "confirm_title": "Usuń zadanie",
+      "confirm_description": "Czy na pewno chcesz usunąć to zadanie?",
+      "success": "Zadanie usunięte",
+      "error": "Nie udało się usunąć zadania"
+    }
   }
 }

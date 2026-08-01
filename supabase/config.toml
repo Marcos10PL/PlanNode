@@ -61,6 +61,7 @@ schema_paths = [
   "./schemas/app_config.sql",
   "./schemas/email_templates.sql",
   "./schemas/notifications.sql",
+  "./schemas/projects.sql",
 ]
 
 [db.seed]

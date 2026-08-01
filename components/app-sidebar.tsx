@@ -7,60 +7,71 @@ import {
   SidebarGroup,
   SidebarHeader,
   SidebarMenuButton,
-  SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { SectionSeparator } from "@/components/ui/section-separator";
 import { LINKS } from "@/const";
 import { usePathname } from "@/i18n/navigation";
+import { ProjectWithProgress } from "@/types/dto";
 import { cn, isActivePath } from "@/utils";
 import { LayoutDashboard } from "lucide-react";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import LanguageSwitcher from "./language-switcher";
+import { SidebarProjects } from "./nav/sidebar-projects";
 import { ThemeSwitcher } from "./theme-switcher";
 import { WorkspaceSwitcher } from "./workspaces/workspace-switcher";
 
-export function AppSidebar() {
+type Props = {
+  projects: ProjectWithProgress[];
+  workspaceId: string | null;
+  canManageProjects: boolean;
+  defaultExpandedProjectIds: string[];
+};
+
+export function AppSidebar({
+  projects,
+  workspaceId,
+  canManageProjects,
+  defaultExpandedProjectIds,
+}: Props) {
+  const t = useTranslations();
   const pathname = usePathname();
   const { setOpenMobile } = useSidebar();
 
   const isActive = (href: string) =>
-    isActivePath(pathname, href) &&
-    "bg-accent text-accent-foreground pointer-events-none!";
+    isActivePath(pathname, href) && "bg-accent text-accent-foreground";
 
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
         <WorkspaceSwitcher />
       </SidebarHeader>
+
       <SidebarContent>
         <SidebarGroup>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <Link
-                href={LINKS.DASHBOARD}
-                className={cn(isActive(LINKS.DASHBOARD))}
-                onClick={() => setOpenMobile(false)}
-              >
-                <LayoutDashboard className="mr-2" />
-                Dashboard
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
+          <SidebarMenuButton asChild tooltip="Dashboard">
+            <Link
+              href={LINKS.DASHBOARD}
+              className={cn(isActive(LINKS.DASHBOARD))}
+              onClick={() => setOpenMobile(false)}
+            >
+              <LayoutDashboard className="mr-1" />
+              Dashboard
+            </Link>
+          </SidebarMenuButton>
         </SidebarGroup>
+
+        <SectionSeparator title={t("sidebar.projects")} />
+
+        <SidebarProjects
+          projects={projects}
+          workspaceId={workspaceId}
+          canManage={canManageProjects}
+          defaultExpandedProjectIds={defaultExpandedProjectIds}
+        />
       </SidebarContent>
-      {/* <SidebarGroup>
-          <SidebarGroupLabel>Projects</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton>
-                  <Plus className="mr-2" />
-                  New Project
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup> */}
+
       <SidebarFooter className="border-t">
         <div className="flex items-center gap-2 group-data-[collapsible=icon]:hidden">
           <LanguageSwitcher />

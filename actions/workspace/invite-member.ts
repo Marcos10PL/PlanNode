@@ -9,7 +9,7 @@ import {
 } from "@/const";
 import { renderLocalizedEmailTemplate, sendEmail } from "@/utils/email";
 
-import { createClient } from "@/lib/supabase/server";
+import { getUserContext } from "@/lib/supabase/server";
 import { inviteMemberSchema, InviteMemberSchema } from "@/schema";
 import {
   generateExpirationDate,
@@ -25,10 +25,7 @@ export async function inviteMemberAction(
   const parsed = inviteMemberSchema().safeParse(data);
   if (!parsed.success) return { error: ERRORS.INVALID_DATA };
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase, user } = await getUserContext();
 
   if (!user) return { error: ERRORS.UNAUTHENTICATED };
 

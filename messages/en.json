@@ -1,7 +1,15 @@
 {
   "logo": "PlanNode",
   "common": {
-    "unexpected_error": "Something went wrong. Please try again."
+    "unexpected_error": "Something went wrong. Please try again.",
+    "manage": "Manage",
+    "description": "Description",
+    "edit": "Edit",
+    "delete": "Delete",
+    "insufficient_role": "You don't have permission for this action",
+    "pick_date": "Pick a date",
+    "clear_date": "Clear date",
+    "sort_by": "Sort by:"
   },
   "footer": {
     "all_rights_reserved": "PlanNode. All rights reserved."
@@ -265,7 +273,7 @@
     "team": "Team"
   },
   "no_workspace_banner": {
-    "title": "Create your first workspace",
+    "title": "Create your workspace",
     "description": "A workspace is a shared space for your team to manage projects and tasks.",
     "cta": "Create workspace"
   },
@@ -300,6 +308,9 @@
     "members_section": "Members",
     "invitations_section": "Pending invitations",
     "no_members": "No members yet.",
+    "clear_selection": "Clear selection",
+    "search_placeholder": "Search by name or email...",
+    "no_results": "No results",
     "no_invitations": "No pending invitations.",
     "invite_email_label": "Email address",
     "invite_email_placeholder": "colleague@example.com",
@@ -343,7 +354,8 @@
     "new_badge": "New",
     "delete": "Delete",
     "view": "View",
-    "workspace_invitation_title": "{inviterName} invited you to \"{workspaceName}\""
+    "workspace_invitation_title": "{inviterName} invited you to \"{workspaceName}\"",
+    "task_assigned_title": "{assignerName} assigned you the task \"{taskTitle}\" in \"{projectName}\""
   },
   "invite_page": {
     "title": "Workspace invitation",
@@ -356,5 +368,222 @@
     "error_not_found": "This invitation does not exist or has already been used.",
     "error_expired": "This invitation has expired.",
     "error_email_mismatch": "This invitation was sent to a different email address."
+  },
+  "sidebar": {
+    "projects": "Projects",
+    "all_projects": "Active",
+    "favorites": "Favorites",
+    "completed": "Completed",
+    "empty_favorites": "No favorite projects",
+    "empty_active": "No active projects",
+    "empty_completed": "No completed projects",
+    "no_workspaces": "Create a workspace to start adding projects and tasks."
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "description": "Overview of your work in this workspace",
+    "my_tasks": "My tasks",
+    "no_tasks": "No tasks assigned to you",
+    "projects_progress": "Projects progress"
+  },
+  "projects": {
+    "title": "Projects (active)",
+    "title_favorites": "Projects (favorites)",
+    "title_completed": "Projects (completed)",
+    "empty": "No projects yet",
+    "private_badge": "Private",
+    "favorite": "Add to favorites",
+    "unfavorite": "Remove from favorites",
+    "mark_completed": "Mark as completed",
+    "mark_active": "Mark as active",
+    "appearance": {
+      "icon_label": "Icon",
+      "color_label": "Color",
+      "trigger_label": "Project icon and color"
+    },
+    "progress": "Progress",
+    "task_count": "{done} of {total} tasks done",
+    "not_found_title": "Project not found",
+    "not_found_description": "This project does not exist or you don't have access to it.",
+    "back_to_projects": "Back to projects",
+    "show_more": "Show more",
+    "show_less": "Show less",
+    "created_at": "Created {date}",
+    "sort": {
+      "custom": "Default",
+      "newest": "Newest",
+      "date": "Oldest",
+      "name": "Name",
+      "progress": "Progress"
+    },
+    "create": {
+      "trigger": "Create new",
+      "title": "Create project",
+      "description": "Fill in the details for your new project.",
+      "name_label": "Name",
+      "name_placeholder": "My project",
+      "description_label": "Description",
+      "description_placeholder": "What is this project about?",
+      "private_label": "Private project",
+      "private_description": "Visible only to assigned members. Once enabled, you can manage assignments in the \"Project members\" section.",
+      "submit": "Create",
+      "submitting": "Creating...",
+      "success": "Project created",
+      "error": "Could not create project"
+    },
+    "edit": {
+      "trigger": "Edit project",
+      "title": "Edit project",
+      "description": "Update the project details.",
+      "name_label": "Name",
+      "name_placeholder": "My project",
+      "description_label": "Description",
+      "description_placeholder": "What is this project about?",
+      "private_label": "Private project",
+      "private_description": "Visible only to assigned members. Once enabled, you can manage assignments in the \"Project members\" section.",
+      "cancel": "Cancel",
+      "submit": "Save",
+      "submitting": "Saving...",
+      "success": "Project updated",
+      "error": "Could not update project"
+    },
+    "delete": {
+      "trigger": "Delete project",
+      "confirm_title": "Delete project",
+      "confirm_description": "Are you sure you want to delete this project? All task lists and tasks will be deleted. This action cannot be undone.",
+      "success": "Project deleted",
+      "error": "Could not delete project"
+    },
+    "members": {
+      "trigger": "Manage members",
+      "title": "Project members",
+      "description": "Select who can access this private project. Owners and admins always have access.",
+      "cancel": "Cancel",
+      "submit": "Save",
+      "submitting": "Saving...",
+      "success": "Project members updated",
+      "error": "Could not update project members",
+      "empty": "No members to assign. Invite people to the workspace first.",
+      "manage": "Manage",
+      "search_placeholder": "Search by name or email...",
+      "no_results": "No results"
+    },
+    "lists_section": "Task lists",
+    "no_lists": "No task lists"
+  },
+  "tasks": {
+    "empty": "No tasks in this list",
+    "add_task": "Add task",
+    "add_subtask": "Add subtask",
+    "subtasks": "Subtasks",
+    "advance_status": "Switch status",
+    "no_assignee": "No assignee",
+    "assign": "Assign someone",
+    "assignee_change_error": "Could not change assignee",
+    "due_date_change_error": "Could not change due date",
+    "invalid_assignee": "This person has no access to this project",
+    "set_due_date": "Set due date",
+    "filters": {
+      "search_placeholder": "Search tasks...",
+      "all_priorities": "All priorities",
+      "all_assignees": "All members",
+      "priorities_selected": "Priorities ({count})",
+      "members_selected": "Members ({count})",
+      "clear": "Clear filters",
+      "no_results": "No tasks match the filters"
+    },
+    "sort": {
+      "default": "Default",
+      "due_date": "Due date",
+      "priority": "Priority",
+      "name": "Name"
+    },
+    "priority_change_error": "Could not change priority",
+    "status_change_error": "Could not change task status",
+    "status_on_hold": "On hold",
+    "status_todo": "To do",
+    "status_in_progress": "In progress",
+    "status_in_review": "In review",
+    "status_in_tests": "In tests",
+    "status_done": "Done",
+    "status_cancelled": "Cancelled",
+    "priority_low": "Low",
+    "priority_medium": "Medium",
+    "priority_high": "High",
+    "priority_urgent": "Urgent",
+    "list_create": {
+      "trigger": "Add list",
+      "title": "Add task list",
+      "description": "Create a new list to group tasks.",
+      "name_label": "Name",
+      "name_placeholder": "Backlog",
+      "cancel": "Cancel",
+      "submit": "Create",
+      "submitting": "Creating...",
+      "success": "List created",
+      "error": "Could not create list"
+    },
+    "list_rename": {
+      "trigger": "Rename list",
+      "title": "Rename task list",
+      "description": "Change the name of this list.",
+      "name_label": "Name",
+      "name_placeholder": "Backlog",
+      "cancel": "Cancel",
+      "submit": "Save",
+      "submitting": "Saving...",
+      "success": "List renamed",
+      "error": "Could not rename list"
+    },
+    "list_delete": {
+      "trigger": "Delete list",
+      "confirm_title": "Delete task list",
+      "confirm_description": "Are you sure you want to delete this list? All tasks in it will be deleted.",
+      "success": "List deleted",
+      "error": "Could not delete list",
+      "last_list_error": "You cannot delete the last list in a project"
+    },
+    "create": {
+      "title": "Add task",
+      "description": "Fill in the task details.",
+      "title_label": "Title",
+      "title_placeholder": "What needs to be done?",
+      "description_label": "Description",
+      "description_placeholder": "Add more details...",
+      "status_label": "Status",
+      "priority_label": "Priority",
+      "assignee_label": "Assignee",
+      "due_date_label": "Due date",
+      "cancel": "Cancel",
+      "submit": "Create",
+      "submitting": "Creating...",
+      "success": "Task created",
+      "error": "Could not create task"
+    },
+    "edit": {
+      "trigger": "Edit task",
+      "title": "Edit task",
+      "description": "Update the task details.",
+      "title_label": "Title",
+      "title_placeholder": "What needs to be done?",
+      "description_label": "Description",
+      "description_placeholder": "Add more details...",
+      "status_label": "Status",
+      "priority_label": "Priority",
+      "assignee_label": "Assignee",
+      "due_date_label": "Due date",
+      "cancel": "Cancel",
+      "submit": "Save",
+      "submitting": "Saving...",
+      "success": "Task updated",
+      "error": "Could not update task"
+    },
+    "delete": {
+      "trigger": "Delete task",
+      "confirm_title": "Delete task",
+      "confirm_description": "Are you sure you want to delete this task?",
+      "success": "Task deleted",
+      "error": "Could not delete task"
+    }
   }
 }

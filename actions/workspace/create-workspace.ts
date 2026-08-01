@@ -1,7 +1,7 @@
 "use server";
 
 import { ERRORS, LINKS } from "@/const";
-import { createClient } from "@/lib/supabase/server";
+import { getUserContext } from "@/lib/supabase/server";
 import { createWorkspaceSchema, CreateWorkspaceSchema } from "@/schema";
 import { Workspace } from "@/types/dto";
 import { revalidatePath } from "next/cache";
@@ -12,10 +12,7 @@ export async function createWorkspaceAction(data: CreateWorkspaceSchema) {
   const parsed = createWorkspaceSchema().safeParse(data);
   if (!parsed.success) return { error: ERRORS.INVALID_DATA };
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase, user } = await getUserContext();
 
   if (!user) return { error: ERRORS.UNAUTHENTICATED };
 

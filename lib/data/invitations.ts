@@ -1,8 +1,7 @@
-import { INVITATION_STATUSES, LINKS, MANAGER_ROLES } from "@/const";
+import { INVITATION_STATUSES, MANAGER_ROLES } from "@/const";
 import { InvitationDetails, WorkspaceInvitation } from "@/types/dto";
-import { redirect } from "next/navigation";
 import { cache } from "react";
-import { createClient } from "../supabase/server";
+import { createClient, requireUserContext } from "../supabase/server";
 
 export const getInvitationByToken = cache(async (token: string) => {
   const supabase = await createClient();
@@ -35,12 +34,7 @@ export const getInvitationByToken = cache(async (token: string) => {
 });
 
 export const getWorkspaceInvitations = cache(async (workspaceId: string) => {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) redirect(LINKS.LOGIN);
+  const { supabase, user } = await requireUserContext();
 
   const { data: membership } = await supabase
     .from("workspace_members")

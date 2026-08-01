@@ -1,16 +1,13 @@
 "use server";
 
 import { ERRORS, LINKS } from "@/const";
-import { createClient } from "@/lib/supabase/server";
+import { getUserContext } from "@/lib/supabase/server";
 import { generateInvitationRoute } from "@/utils/helpers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 export async function acceptInvitationAction(token: string) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase, user } = await getUserContext();
 
   if (!user) return { error: ERRORS.UNAUTHENTICATED };
 

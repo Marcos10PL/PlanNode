@@ -1,35 +1,12 @@
-"use client";
-
 import { LINKS } from "@/const";
-import { createClient } from "@/lib/supabase/client";
 import { Bell } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 
 type Props = {
   count: number;
 };
 
 export function NotificationLink({ count }: Props) {
-  const router = useRouter();
-
-  useEffect(() => {
-    const supabase = createClient();
-    const channel = supabase
-      .channel("notifications-changes")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "notifications" },
-        () => router.refresh(),
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [router]);
-
   return (
     <Link
       href={LINKS.NOTIFICATIONS}

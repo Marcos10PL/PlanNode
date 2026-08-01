@@ -1,7 +1,7 @@
 "use client";
 
 import { ControlledSelectField } from "@/components/ui/controlled-select-field";
-import InfoPopover from "@/components/ui/info-popover";
+import { InfoPopover } from "@/components/ui/info-popover";
 
 import { INVITABLE_ROLES } from "@/const";
 import { WorkspaceRole } from "@/types/entities";
@@ -27,7 +27,7 @@ export function RoleSelect({ pending, control, noLabel }: Props) {
 
   const roleOptions = INVITABLE_ROLES.map(r => ({
     value: r,
-    label: getRoleLabel(r, t)!,
+    label: getRoleLabel(r, t),
   }));
 
   return (

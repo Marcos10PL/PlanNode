@@ -2,6 +2,9 @@ import { APP_CONFIG_KEYS } from "@/const";
 import {
   NotificationTable,
   ProfileTable,
+  ProjectTable,
+  TaskListTable,
+  TaskTable,
   WorkspaceInvitationTable,
   WorkspaceMemberTable,
   WorkspaceTable,
@@ -31,13 +34,20 @@ export type Workspace = ToCamelCase<
 
 export type Profile = ToCamelCase<ProfileTable>;
 
+export type TaskAssignedMetadata = {
+  taskTitle: string;
+  projectName: string;
+  assignerName: string;
+  taskId: string;
+};
+
 export type Notification = ToCamelCase<
   Pick<
     NotificationTable,
     "id" | "type" | "metadata" | "link" | "read_at" | "created_at"
   >
 > & {
-  metadata: WorkspaceInvitationMetadata | null;
+  metadata: WorkspaceInvitationMetadata | TaskAssignedMetadata | null;
 };
 
 export type WorkspaceInvitation = ToCamelCase<
@@ -56,4 +66,74 @@ export type WorkspaceMember = {
   role: WorkspaceMemberTable["role"];
   fullName: ProfileTable["full_name"];
   email: ProfileTable["email"];
+};
+
+export type Project = ToCamelCase<
+  Pick<
+    ProjectTable,
+    | "id"
+    | "workspace_id"
+    | "name"
+    | "description"
+    | "is_private"
+    | "is_completed"
+    | "icon"
+    | "color"
+    | "created_by"
+    | "created_at"
+  >
+> & {
+  isFavorite: boolean;
+};
+
+export type ProjectWithProgress = Project & {
+  favoritePosition: number | null;
+  totalTasks: number;
+  doneTasks: number;
+  cancelledTasks: number;
+  lists: ProjectListSummary[];
+};
+
+export type TaskAssignee = {
+  id: ProfileTable["id"];
+  fullName: ProfileTable["full_name"];
+  email: ProfileTable["email"];
+};
+
+export type Task = ToCamelCase<
+  Pick<
+    TaskTable,
+    | "id"
+    | "project_id"
+    | "list_id"
+    | "parent_task_id"
+    | "title"
+    | "description"
+    | "status"
+    | "priority"
+    | "assignee_id"
+    | "due_date"
+    | "position"
+    | "created_by"
+  >
+> & {
+  assignee: TaskAssignee | null;
+};
+
+export type TaskListWithTasks = ToCamelCase<
+  Pick<TaskListTable, "id" | "project_id" | "name" | "position">
+> & {
+  tasks: Task[];
+};
+
+export type ProjectListSummary = {
+  id: TaskListTable["id"];
+  name: TaskListTable["name"];
+  taskCount: number;
+  doneCount: number;
+  cancelledCount: number;
+};
+
+export type MyTask = Task & {
+  projectName: string;
 };

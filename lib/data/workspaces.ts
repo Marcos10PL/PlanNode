@@ -1,17 +1,9 @@
-import { LINKS } from "@/const";
 import { Workspace } from "@/types/dto";
-import { redirect } from "next/navigation";
 import { cache } from "react";
-import { createClient } from "../supabase/server";
+import { requireUserContext } from "../supabase/server";
 
 export const getWorkspaces = cache(async () => {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) redirect(LINKS.LOGIN);
+  const { supabase, user } = await requireUserContext();
 
   const { data } = await supabase
     .from("workspaces")

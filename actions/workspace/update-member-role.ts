@@ -1,7 +1,7 @@
 ﻿"use server";
 
 import { ERRORS, LINKS, MANAGER_ROLES, WORKSPACE_ROLES } from "@/const";
-import { createClient } from "@/lib/supabase/server";
+import { getUserContext } from "@/lib/supabase/server";
 import { updateMemberRoleSchema, UpdateMemberRoleSchema } from "@/schema";
 import { revalidatePath } from "next/cache";
 
@@ -13,10 +13,7 @@ export async function updateMemberRoleAction(
   const parsed = updateMemberRoleSchema().safeParse(data);
   if (!parsed.success) return { error: ERRORS.INVALID_DATA };
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase, user } = await getUserContext();
 
   if (!user) return { error: ERRORS.UNAUTHENTICATED };
 
