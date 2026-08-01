@@ -107,6 +107,14 @@ export const NOTIFICATION_TYPES = {
   TASK_ASSIGNED: "task_assigned",
 } as const;
 
+export const TASK_EVENT_TYPES = {
+  TASK_CREATED: "task_created",
+  STATUS_CHANGED: "status_changed",
+  ASSIGNEE_CHANGED: "assignee_changed",
+  PRIORITY_CHANGED: "priority_changed",
+  DUE_DATE_CHANGED: "due_date_changed",
+} as const;
+
 export const TASK_STATUSES = {
   ON_HOLD: "on_hold",
   TODO: "todo",

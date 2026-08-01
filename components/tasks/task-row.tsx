@@ -15,7 +15,7 @@ import { Task, TaskAssignee, WorkspaceMember } from "@/types/dto";
 import { TaskPriority, TaskStatus } from "@/types/entities";
 import { cn, getPriorityLabel, isTaskOverdue } from "@/utils";
 import { type DragEndEvent } from "@dnd-kit/react";
-import { LayoutList, Pencil, StepForward, Trash2 } from "lucide-react";
+import { History, LayoutList, Pencil, StepForward, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -53,10 +53,23 @@ export function TaskRow({
   onAddSubtask,
 }: Props) {
   const t = useTranslations();
-  const [editOpen, setEditOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalTab, setModalTab] = useState<"details" | "activity">(
+    "details",
+  );
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [isPending, setIsPending] = useState(false);
   const [subtasksExpanded, setSubtasksExpanded] = useState(false);
+
+  const openDetails = () => {
+    setModalTab("details");
+    setModalOpen(true);
+  };
+
+  const openActivity = () => {
+    setModalTab("activity");
+    setModalOpen(true);
+  };
 
   const isSubtask = !!task.parentTaskId;
   const subtasksDone = subtasks.filter(
@@ -143,7 +156,7 @@ export function TaskRow({
             "relative flex items-center gap-2 px-2.5 py-1.5 transition-colors hover:bg-accent/50",
             canEdit && "cursor-pointer",
           )}
-          onClick={canEdit ? () => setEditOpen(true) : undefined}
+          onClick={canEdit ? openDetails : undefined}
         >
           {dragHandle && (
             <div onClick={stopPropagation} className="shrink-0 absolute">
@@ -262,7 +275,7 @@ export function TaskRow({
                     size="icon"
                     className="h-7 w-7 text-info"
                     disabled={isPending}
-                    onClick={() => setEditOpen(true)}
+                    onClick={openDetails}
                   >
                     <Pencil className="h-4 w-4" />
                   </Button>
@@ -271,6 +284,22 @@ export function TaskRow({
               </Tooltip>
             </div>
           )}
+
+          <div onClick={stopPropagation} className="shrink-0">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 text-muted-foreground"
+                  onClick={openActivity}
+                >
+                  <History className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{t("tasks.view_activity")}</TooltipContent>
+            </Tooltip>
+          </div>
 
           {canEdit && (
             <div onClick={stopPropagation} className="shrink-0">
@@ -308,8 +337,9 @@ export function TaskRow({
         listId={task.listId}
         members={members}
         task={task}
-        open={editOpen}
-        onOpenChange={setEditOpen}
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        initialTab={modalTab}
       />
 
       <ConfirmModal

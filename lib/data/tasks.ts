@@ -1,5 +1,5 @@
 import { TASK_STATUSES } from "@/const";
-import { MyTask, Task, TaskListWithTasks } from "@/types/dto";
+import { MyTask, Task, TaskEvent, TaskListWithTasks } from "@/types/dto";
 import type { QueryData } from "@supabase/supabase-js";
 import { cache } from "react";
 import { Client, requireUserContext } from "../supabase/server";
@@ -54,6 +54,38 @@ export const getTaskList = cache(async (listId: string) => {
     position: data.position,
     tasks: data.tasks.map(mapTask),
   } satisfies TaskListWithTasks;
+});
+
+const TASK_EVENT_SELECT =
+  "id, task_id, type, metadata, created_at, user:profiles!task_events_user_id_fkey(id, full_name, email)";
+
+const taskEventRowQuery = (supabase: Client) =>
+  supabase.from("task_events").select(TASK_EVENT_SELECT);
+
+type TaskEventRow = QueryData<ReturnType<typeof taskEventRowQuery>>[number];
+
+const mapTaskEvent = (e: TaskEventRow) =>
+  ({
+    id: e.id,
+    taskId: e.task_id,
+    type: e.type,
+    metadata: e.metadata as TaskEvent["metadata"],
+    createdAt: e.created_at,
+    user: e.user
+      ? { id: e.user.id, fullName: e.user.full_name, email: e.user.email }
+      : null,
+  }) satisfies TaskEvent;
+
+export const getTaskEvents = cache(async (taskId: string) => {
+  const { supabase } = await requireUserContext();
+
+  const { data } = await supabase
+    .from("task_events")
+    .select(TASK_EVENT_SELECT)
+    .eq("task_id", taskId)
+    .order("created_at", { ascending: false });
+
+  return data?.map(mapTaskEvent) ?? [];
 });
 
 export const getMyTasks = cache(async (workspaceId: string) => {

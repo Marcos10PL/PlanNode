@@ -1,6 +1,6 @@
 "use server";
 
-import { ERRORS, LINKS, NOTIFICATION_TYPES } from "@/const";
+import { ERRORS, LINKS, NOTIFICATION_TYPES, TASK_EVENT_TYPES } from "@/const";
 import { canEditProject, getUserContext } from "@/lib/supabase/server";
 import { createTaskSchema, CreateTaskSchema } from "@/schema";
 import { generateProjectRoute } from "@/utils/helpers";
@@ -73,6 +73,13 @@ export async function createTaskAction(
     .single();
 
   if (insertError || !task) return { error: ERRORS.SERVER_ERROR };
+
+  await supabase.from("task_events").insert({
+    task_id: task.id,
+    user_id: user.id,
+    type: TASK_EVENT_TYPES.TASK_CREATED,
+    metadata: {},
+  });
 
   if (assigneeId && assigneeId !== user.id) {
     const [{ data: project }, { data: assignerProfile }] = await Promise.all([
