@@ -1,7 +1,7 @@
 # Supabase
 .branches
 .temp
-snippets
+/snippets
 
 # dotenvx
 .env.keys
