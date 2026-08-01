@@ -3,19 +3,22 @@
 import { deleteTaskAction } from "@/actions/task/delete-task";
 import { Button } from "@/components/ui/button";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
+import { DeleteButton } from "@/components/ui/delete-button";
+import { EditButton } from "@/components/ui/edit-button";
 import { InfoPopover } from "@/components/ui/info-popover";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { TooltipIconButton } from "@/components/ui/tooltip-icon-button";
 import { ERRORS, TASK_STATUSES, TASK_STATUS_ORDER } from "@/const";
 import { UpdateTaskSchema } from "@/schema";
 import { Task, TaskAssignee, WorkspaceMember } from "@/types/dto";
 import { TaskPriority, TaskStatus } from "@/types/entities";
 import { cn, getPriorityLabel, isTaskOverdue } from "@/utils";
 import { type DragEndEvent } from "@dnd-kit/react";
-import { History, LayoutList, Pencil, StepForward, Trash2 } from "lucide-react";
+import { History, LayoutList, StepForward } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -30,6 +33,7 @@ type Props = {
   task: Task;
   members: WorkspaceMember[];
   canEdit: boolean;
+  canManage: boolean;
   dragHandle?: React.ReactNode;
   onUpdateTask: (
     taskId: string,
@@ -46,6 +50,7 @@ export function TaskRow({
   task,
   members,
   canEdit,
+  canManage,
   dragHandle,
   onUpdateTask,
   subtasks = [],
@@ -54,15 +59,13 @@ export function TaskRow({
 }: Props) {
   const t = useTranslations();
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalTab, setModalTab] = useState<"details" | "activity">(
-    "details",
-  );
+  const [modalTab, setModalTab] = useState<"details" | "activity">("details");
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [isPending, setIsPending] = useState(false);
   const [subtasksExpanded, setSubtasksExpanded] = useState(false);
 
   const openDetails = () => {
-    setModalTab("details");
+    setModalTab("activity"); // TODO: revert to "details"
     setModalOpen(true);
   };
 
@@ -241,19 +244,14 @@ export function TaskRow({
               className="w-37"
             />
             {canEdit && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    className="w-6 h-8"
-                    onClick={handleAdvanceStatus}
-                  >
-                    <StepForward className="size-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>{t("tasks.advance_status")}</TooltipContent>
-              </Tooltip>
+              <TooltipIconButton
+                icon={StepForward}
+                label={t("tasks.advance_status")}
+                onClick={handleAdvanceStatus}
+                disabled={isPending}
+                variant="secondary"
+                className="h-8"
+              />
             )}
           </div>
 
@@ -268,55 +266,25 @@ export function TaskRow({
 
           {canEdit && (
             <div onClick={stopPropagation} className="lg:hidden shrink-0">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7 text-info"
-                    disabled={isPending}
-                    onClick={openDetails}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>{t("common.edit")}</TooltipContent>
-              </Tooltip>
+              <EditButton onClick={openDetails} disabled={isPending} />
             </div>
           )}
 
           <div onClick={stopPropagation} className="shrink-0">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7 text-muted-foreground"
-                  onClick={openActivity}
-                >
-                  <History className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>{t("tasks.view_activity")}</TooltipContent>
-            </Tooltip>
+            <TooltipIconButton
+              icon={History}
+              label={t("tasks.view_activity")}
+              onClick={openActivity}
+              className="text-muted-foreground"
+            />
           </div>
 
           {canEdit && (
             <div onClick={stopPropagation} className="shrink-0">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7 text-destructive"
-                    disabled={isPending}
-                    onClick={() => setDeleteOpen(true)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>{t("common.delete")}</TooltipContent>
-              </Tooltip>
+              <DeleteButton
+                onClick={() => setDeleteOpen(true)}
+                disabled={isPending}
+              />
             </div>
           )}
         </div>
@@ -326,6 +294,7 @@ export function TaskRow({
             subtasks={subtasks}
             members={members}
             canEdit={canEdit}
+            canManage={canManage}
             onUpdateTask={onUpdateTask}
             onDragEnd={onSubtaskDragEnd ?? (() => {})}
             onAddSubtask={onAddSubtask ?? (() => {})}
@@ -337,6 +306,8 @@ export function TaskRow({
         listId={task.listId}
         members={members}
         task={task}
+        canEdit={canEdit}
+        canManage={canManage}
         open={modalOpen}
         onOpenChange={setModalOpen}
         initialTab={modalTab}

@@ -3,6 +3,7 @@ import {
   NotificationTable,
   ProfileTable,
   ProjectTable,
+  TaskCommentTable,
   TaskEventTable,
   TaskListTable,
   TaskTable,
@@ -179,3 +180,16 @@ export type TaskEvent = ToCamelCase<
   metadata: TaskEventMetadata;
   user: TaskEventUser | null;
 };
+
+export type TaskComment = ToCamelCase<
+  Pick<
+    TaskCommentTable,
+    "id" | "task_id" | "content" | "created_at" | "updated_at"
+  >
+> & {
+  user: TaskEventUser | null;
+};
+
+export type TaskTimelineItem =
+  | ({ kind: "event" } & TaskEvent)
+  | ({ kind: "comment" } & TaskComment);

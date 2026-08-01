@@ -21,8 +21,16 @@ export const createTaskSchema = (t?: Translations) =>
 export const updateTaskSchema = (t?: Translations) =>
   createTaskSchema(t).partial();
 
+export const createTaskCommentSchema = (t?: Translations) =>
+  z.object({
+    content: nameField(VALIDATION_MAX.TASK_COMMENT, t),
+  });
+
 export type CreateTaskListSchema = z.infer<
   ReturnType<typeof createTaskListSchema>
 >;
 export type CreateTaskSchema = z.infer<ReturnType<typeof createTaskSchema>>;
 export type UpdateTaskSchema = z.infer<ReturnType<typeof updateTaskSchema>>;
+export type CreateTaskCommentSchema = z.infer<
+  ReturnType<typeof createTaskCommentSchema>
+>;

@@ -1,5 +1,12 @@
 import { TASK_STATUSES } from "@/const";
-import { MyTask, Task, TaskEvent, TaskListWithTasks } from "@/types/dto";
+import {
+  MyTask,
+  Task,
+  TaskComment,
+  TaskEvent,
+  TaskListWithTasks,
+  TaskTimelineItem,
+} from "@/types/dto";
 import type { QueryData } from "@supabase/supabase-js";
 import { cache } from "react";
 import { Client, requireUserContext } from "../supabase/server";
@@ -76,16 +83,54 @@ const mapTaskEvent = (e: TaskEventRow) =>
       : null,
   }) satisfies TaskEvent;
 
-export const getTaskEvents = cache(async (taskId: string) => {
+const TASK_COMMENT_SELECT =
+  "id, task_id, content, created_at, updated_at, user:profiles!task_comments_user_id_fkey(id, full_name, email)";
+
+const taskCommentRowQuery = (supabase: Client) =>
+  supabase.from("task_comments").select(TASK_COMMENT_SELECT);
+
+type TaskCommentRow = QueryData<ReturnType<typeof taskCommentRowQuery>>[number];
+
+const mapTaskComment = (c: TaskCommentRow) =>
+  ({
+    id: c.id,
+    taskId: c.task_id,
+    content: c.content,
+    createdAt: c.created_at,
+    updatedAt: c.updated_at,
+    user: c.user
+      ? { id: c.user.id, fullName: c.user.full_name, email: c.user.email }
+      : null,
+  }) satisfies TaskComment;
+
+export const getTaskTimeline = cache(async (taskId: string) => {
   const { supabase } = await requireUserContext();
 
-  const { data } = await supabase
-    .from("task_events")
-    .select(TASK_EVENT_SELECT)
-    .eq("task_id", taskId)
-    .order("created_at", { ascending: false });
+  const [{ data: events }, { data: comments }] = await Promise.all([
+    supabase
+      .from("task_events")
+      .select(TASK_EVENT_SELECT)
+      .eq("task_id", taskId),
+    supabase
+      .from("task_comments")
+      .select(TASK_COMMENT_SELECT)
+      .eq("task_id", taskId),
+  ]);
 
-  return data?.map(mapTaskEvent) ?? [];
+  const items: TaskTimelineItem[] = [
+    ...(events?.map(e => ({ kind: "event" as const, ...mapTaskEvent(e) })) ??
+      []),
+    ...(comments?.map(c => ({
+      kind: "comment" as const,
+      ...mapTaskComment(c),
+    })) ?? []),
+  ];
+
+  items.sort(
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+  );
+
+  return items;
 });
 
 export const getMyTasks = cache(async (workspaceId: string) => {

@@ -3,16 +3,16 @@
 import { deleteNotificationAction } from "@/actions/notifications/delete-notification";
 import { markNotificationReadAction } from "@/actions/notifications/mark-read";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { DeleteButton } from "@/components/ui/delete-button";
+import { TooltipIconButton } from "@/components/ui/tooltip-icon-button";
 import { Notification } from "@/types/dto";
 import { cn, formatDate } from "@/utils";
-import { ExternalLink, Trash2 } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { ConfirmModal } from "../ui/confirm-modal";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 export function NotificationItem({
   notification,
@@ -83,36 +83,19 @@ export function NotificationItem({
 
       <div className="flex items-center gap-1 shrink-0">
         {notification.link && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-primary"
-                disabled={markReadPending}
-                onClick={handleView}
-              >
-                <ExternalLink className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>{t("view")}</TooltipContent>
-          </Tooltip>
+          <TooltipIconButton
+            icon={ExternalLink}
+            label={t("view")}
+            onClick={handleView}
+            disabled={markReadPending}
+            className="text-primary"
+          />
         )}
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-destructive"
-              disabled={isPending}
-              onClick={() => setIsConfirmModalOpen(true)}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>{t("delete")}</TooltipContent>
-        </Tooltip>
+        <DeleteButton
+          onClick={() => setIsConfirmModalOpen(true)}
+          disabled={isPending}
+        />
       </div>
 
       <ConfirmModal

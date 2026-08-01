@@ -599,7 +599,17 @@
       "due_date_changed": "Due date changed from \"{from}\" to \"{to}\"",
       "due_date_set": "Due date set to \"{to}\"",
       "due_date_removed": "Due date removed",
-      "show_email": "Show email"
+      "show_email": "Show email",
+      "comment_placeholder": "Write a comment...",
+      "comment_submit": "Add comment",
+      "comment_submitting": "Adding...",
+      "comment_cancel": "Cancel",
+      "comment_save": "Save",
+      "comment_edited": "edited",
+      "comment_error": "Could not save comment",
+      "comment_delete_error": "Could not delete comment",
+      "comment_delete_confirm_title": "Delete comment",
+      "comment_delete_confirm_description": "Are you sure you want to delete this comment?"
     }
   }
 }

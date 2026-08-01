@@ -39,7 +39,9 @@ export default async function TaskListPage({ params }: Props) {
     notFound();
   }
 
-  const { members, canEdit } = await getWorkspaceContext(project.workspaceId);
+  const { members, canEdit, canManage } = await getWorkspaceContext(
+    project.workspaceId,
+  );
 
   let assignableMembers = members;
   if (project.isPrivate) {
@@ -61,6 +63,7 @@ export default async function TaskListPage({ params }: Props) {
       list={list}
       members={assignableMembers}
       canEdit={canEdit}
+      canManage={canManage}
       defaultSort={defaultSort}
       defaultCollapsed={defaultCollapsed}
     />

@@ -63,6 +63,7 @@ export const VALIDATION_MAX = {
   TASK_LIST_NAME: 50,
   TASK_TITLE: 200,
   TASK_DESCRIPTION: 2000,
+  TASK_COMMENT: 2000,
 } as const;
 
 export const COOKIES = {

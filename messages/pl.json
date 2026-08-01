@@ -599,7 +599,17 @@
       "due_date_changed": "Zmieniono termin z „{from}” na „{to}”",
       "due_date_set": "Ustawiono termin na „{to}”",
       "due_date_removed": "Usunięto termin",
-      "show_email": "Pokaż e-mail"
+      "show_email": "Pokaż e-mail",
+      "comment_placeholder": "Napisz komentarz...",
+      "comment_submit": "Dodaj komentarz",
+      "comment_submitting": "Dodawanie...",
+      "comment_cancel": "Anuluj",
+      "comment_save": "Zapisz",
+      "comment_edited": "edytowano",
+      "comment_error": "Nie udało się zapisać komentarza",
+      "comment_delete_error": "Nie udało się usunąć komentarza",
+      "comment_delete_confirm_title": "Usuń komentarz",
+      "comment_delete_confirm_description": "Czy na pewno chcesz usunąć ten komentarz?"
     }
   }
 }
