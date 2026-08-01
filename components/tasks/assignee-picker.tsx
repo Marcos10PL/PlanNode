@@ -66,7 +66,11 @@ export function AssigneePicker({
           <span className="flex items-center gap-2 min-w-0">
             {selected ? (
               <>
-                <UserAvatar name={selected.fullName} className="h-5 w-5" />
+                <UserAvatar
+                  name={selected.fullName}
+                  userId={selected.id}
+                  className="h-5 w-5"
+                />
                 <span className="truncate">{selected.fullName}</span>
               </>
             ) : (

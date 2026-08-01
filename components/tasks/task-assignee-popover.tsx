@@ -24,7 +24,11 @@ export function TaskAssigneePopover({
 
   if (!canEdit) {
     return assignee ? (
-      <UserAvatar name={assignee.fullName} className="h-7 w-7 shrink-0" />
+      <UserAvatar
+        name={assignee.fullName}
+        userId={assignee.id}
+        className="h-7 w-7 shrink-0"
+      />
     ) : null;
   }
 
@@ -46,7 +50,11 @@ export function TaskAssigneePopover({
           className="h-7 w-7 shrink-0 rounded-full"
         >
           {assignee ? (
-            <UserAvatar name={assignee.fullName} className="h-7 w-7" />
+            <UserAvatar
+              name={assignee.fullName}
+              userId={assignee.id}
+              className="h-7 w-7"
+            />
           ) : (
             <UserRoundPlus className="h-4 w-4 text-muted-foreground" />
           )}
