@@ -3,6 +3,8 @@ import {
   NotificationTable,
   ProfileTable,
   ProjectTable,
+  TaskCommentTable,
+  TaskEventTable,
   TaskListTable,
   TaskTable,
   WorkspaceInvitationTable,
@@ -137,3 +139,57 @@ export type ProjectListSummary = {
 export type MyTask = Task & {
   projectName: string;
 };
+
+export type StatusChangedMetadata = {
+  from: Task["status"];
+  to: Task["status"];
+};
+
+export type PriorityChangedMetadata = {
+  from: Task["priority"];
+  to: Task["priority"];
+};
+
+export type AssigneeChangedMetadata = {
+  fromName: string | null;
+  fromEmail: string | null;
+  toName: string | null;
+  toEmail: string | null;
+};
+
+export type DueDateChangedMetadata = {
+  from: string | null;
+  to: string | null;
+};
+
+export type TaskEventUser = {
+  id: ProfileTable["id"];
+  fullName: ProfileTable["full_name"];
+  email: ProfileTable["email"];
+};
+
+export type TaskEventMetadata =
+  | StatusChangedMetadata
+  | PriorityChangedMetadata
+  | AssigneeChangedMetadata
+  | DueDateChangedMetadata;
+
+export type TaskEvent = ToCamelCase<
+  Pick<TaskEventTable, "id" | "task_id" | "type" | "created_at">
+> & {
+  metadata: TaskEventMetadata;
+  user: TaskEventUser | null;
+};
+
+export type TaskComment = ToCamelCase<
+  Pick<
+    TaskCommentTable,
+    "id" | "task_id" | "content" | "created_at" | "updated_at"
+  >
+> & {
+  user: TaskEventUser | null;
+};
+
+export type TaskTimelineItem =
+  | ({ kind: "event" } & TaskEvent)
+  | ({ kind: "comment" } & TaskComment);

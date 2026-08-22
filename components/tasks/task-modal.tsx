@@ -2,9 +2,6 @@
 
 import { createTaskAction } from "@/actions/task/create-task";
 import { updateTaskAction } from "@/actions/task/update-task";
-import { Button } from "@/components/ui/button";
-import { ControlledInputField } from "@/components/ui/controlled-input-field";
-import { ControlledTextareaField } from "@/components/ui/controlled-textarea-field";
 import {
   Dialog,
   DialogContent,
@@ -12,49 +9,58 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { DatePicker } from "@/components/ui/date-picker";
-import { Field, FieldLabel } from "@/components/ui/field";
-import {
-  ERRORS,
-  TASK_PRIORITIES,
-  TASK_STATUSES,
-  VALIDATION_MAX,
-} from "@/const";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ERRORS, TASK_PRIORITIES, TASK_STATUSES } from "@/const";
+import { useTaskTimeline } from "@/hooks/use-task-timeline";
 import { createTaskSchema, CreateTaskSchema } from "@/schema";
 import { Task, WorkspaceMember } from "@/types/dto";
 import { TaskStatus } from "@/types/entities";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
-import { useEffect } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { AssigneePicker } from "./assignee-picker";
-import { TaskPrioritySelect } from "./task-priority-select";
-import { TaskStatusSelect } from "./task-status-select";
+import { TaskActivityList } from "./task-activity-list";
+import { TaskDetailsForm } from "./task-details-form";
+
+type ModalTab = "details" | "activity";
 
 type Props = {
   listId: string;
   members: WorkspaceMember[];
   task?: Task;
+  canEdit: boolean;
+  canManage: boolean;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   selectedStatus?: TaskStatus;
   parentTaskId?: string;
+  initialTab?: ModalTab;
 };
 
 export function TaskModal({
   listId,
   members,
   task,
+  canEdit,
+  canManage,
   open,
   onOpenChange,
   selectedStatus,
   parentTaskId,
+  initialTab = "details",
 }: Props) {
   const t = useTranslations(task ? "tasks.edit" : "tasks.create");
   const tErrors = useTranslations("fields.errors");
   const tCommon = useTranslations("common");
   const tTasks = useTranslations("tasks");
+
+  const [activeTab, setActiveTab] = useState<ModalTab>(initialTab);
+  const {
+    items: timeline,
+    isLoading: timelineLoading,
+    refetch: loadTimeline,
+  } = useTaskTimeline(task?.id, open);
 
   const defaultValues: CreateTaskSchema = {
     title: task?.title ?? "",
@@ -71,8 +77,11 @@ export function TaskModal({
   });
 
   useEffect(() => {
-    if (open) form.reset(defaultValues);
-  }, [open, task]);
+    if (open) {
+      form.reset(defaultValues);
+      setActiveTab(initialTab);
+    }
+  }, [open, task, initialTab]);
 
   const onSubmit = async (data: CreateTaskSchema) => {
     try {
@@ -98,116 +107,50 @@ export function TaskModal({
     }
   };
 
+  const detailsForm = (
+    <TaskDetailsForm
+      form={form}
+      members={members}
+      isEditing={!!task}
+      onSubmit={onSubmit}
+      onCancel={() => onOpenChange(false)}
+    />
+  );
+
   return (
     <Dialog open={open} onOpenChange={o => !o && onOpenChange(false)}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{t("title")}</DialogTitle>
-          <DialogDescription>{t("description")}</DialogDescription>
+          {!task && <DialogDescription>{t("description")}</DialogDescription>}
         </DialogHeader>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
-          <ControlledInputField
-            control={form.control}
-            name="title"
-            label={t("title_label")}
-            placeholder={t("title_placeholder")}
-            maxLength={VALIDATION_MAX.TASK_TITLE}
-          />
-          <ControlledTextareaField
-            control={form.control}
-            name="description"
-            label={t("description_label")}
-            placeholder={t("description_placeholder")}
-            maxLength={VALIDATION_MAX.TASK_DESCRIPTION}
-          />
-          <div className="grid sm:grid-cols-2 gap-2">
-            <Controller
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <Field>
-                  <FieldLabel htmlFor="status">{t("status_label")}</FieldLabel>
-                  <TaskStatusSelect
-                    id="status"
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    className="w-full"
-                  />
-                </Field>
-              )}
-            />
-            <Controller
-              control={form.control}
-              name="priority"
-              render={({ field }) => (
-                <Field>
-                  <FieldLabel htmlFor="priority">
-                    {t("priority_label")}
-                  </FieldLabel>
-                  <TaskPrioritySelect
-                    id="priority"
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    className="w-full"
-                  />
-                </Field>
-              )}
-            />
-          </div>
-          <div className="grid sm:grid-cols-2 gap-2">
-            <Controller
-              control={form.control}
-              name="assigneeId"
-              render={({ field }) => (
-                <Field>
-                  <FieldLabel htmlFor="assigneeId">
-                    {t("assignee_label")}
-                  </FieldLabel>
-                  <AssigneePicker
-                    id="assigneeId"
-                    value={field.value}
-                    onChange={field.onChange}
-                    members={members}
-                  />
-                </Field>
-              )}
-            />
-            <Controller
-              control={form.control}
-              name="dueDate"
-              render={({ field }) => (
-                <Field>
-                  <FieldLabel htmlFor="dueDate">
-                    {t("due_date_label")}
-                  </FieldLabel>
-                  <DatePicker
-                    id="dueDate"
-                    value={field.value ?? null}
-                    onChange={field.onChange}
-                  />
-                </Field>
-              )}
-            />
-          </div>
-          <div className="flex gap-2 justify-end">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
-              {t("cancel")}
-            </Button>
-            <Button
-              type="submit"
-              disabled={
-                form.formState.isSubmitting ||
-                (!!task && !form.formState.isDirty)
-              }
-            >
-              {form.formState.isSubmitting ? t("submitting") : t("submit")}
-            </Button>
-          </div>
-        </form>
+
+        {task ? (
+          <Tabs
+            value={activeTab}
+            onValueChange={v => setActiveTab(v as ModalTab)}
+          >
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="details">{t("tab_details")}</TabsTrigger>
+              <TabsTrigger value="activity">{t("tab_activity")}</TabsTrigger>
+            </TabsList>
+            <TabsContent value="details" className="mt-4">
+              {detailsForm}
+            </TabsContent>
+            <TabsContent value="activity" className="mt-4">
+              <TaskActivityList
+                taskId={task.id}
+                items={timeline}
+                isLoading={timelineLoading}
+                canComment={canEdit}
+                canManageComments={canManage}
+                onChanged={loadTimeline}
+              />
+            </TabsContent>
+          </Tabs>
+        ) : (
+          detailsForm
+        )}
       </DialogContent>
     </Dialog>
   );

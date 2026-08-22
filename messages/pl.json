@@ -562,8 +562,7 @@
     },
     "edit": {
       "trigger": "Edytuj zadanie",
-      "title": "Edytuj zadanie",
-      "description": "Zaktualizuj dane zadania.",
+      "title": "Przeglądaj i aktualizuj zadanie",
       "title_label": "Tytuł",
       "title_placeholder": "Co trzeba zrobić?",
       "description_label": "Opis",
@@ -576,7 +575,9 @@
       "submit": "Zapisz",
       "submitting": "Zapisywanie...",
       "success": "Zadanie zaktualizowane",
-      "error": "Nie udało się zaktualizować zadania"
+      "error": "Nie udało się zaktualizować zadania",
+      "tab_details": "Szczegóły",
+      "tab_activity": "Aktywność"
     },
     "delete": {
       "trigger": "Usuń zadanie",
@@ -584,6 +585,31 @@
       "confirm_description": "Czy na pewno chcesz usunąć to zadanie?",
       "success": "Zadanie usunięte",
       "error": "Nie udało się usunąć zadania"
+    },
+    "view_activity": "Zobacz aktywność",
+    "activity": {
+      "loading": "Ładowanie...",
+      "empty": "Brak aktywności",
+      "unknown_user": "Nieznany użytkownik",
+      "you": "Ty",
+      "task_created": "Utworzono zadanie",
+      "status_changed": "Zmieniono status z „{from}” na „{to}”",
+      "priority_changed": "Zmieniono priorytet z „{from}” na „{to}”",
+      "assignee_changed": "Zmieniono przypisanie z „<fromInfo>{from}</fromInfo>” na „<toInfo>{to}</toInfo>”",
+      "due_date_changed": "Zmieniono termin z „{from}” na „{to}”",
+      "due_date_set": "Ustawiono termin na „{to}”",
+      "due_date_removed": "Usunięto termin",
+      "show_email": "Pokaż e-mail",
+      "comment_placeholder": "Napisz komentarz...",
+      "comment_submit": "Dodaj komentarz",
+      "comment_submitting": "Dodawanie...",
+      "comment_cancel": "Anuluj",
+      "comment_save": "Zapisz",
+      "comment_edited": "edytowano",
+      "comment_error": "Nie udało się zapisać komentarza",
+      "comment_delete_error": "Nie udało się usunąć komentarza",
+      "comment_delete_confirm_title": "Usuń komentarz",
+      "comment_delete_confirm_description": "Czy na pewno chcesz usunąć ten komentarz?"
     }
   }
 }

@@ -40,7 +40,10 @@ export function RoleSelect({ pending, control, noLabel }: Props) {
         disabled={pending}
       />
 
-      <InfoPopover label={t("team.role_info_label")}>
+      <InfoPopover
+        label={t("team.role_info_label")}
+        className="h-9 w-9 self-end"
+      >
         <div className="flex flex-col gap-2">
           {roleOptions.map(({ value, label }) => (
             <div key={value}>

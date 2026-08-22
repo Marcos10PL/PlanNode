@@ -13,6 +13,7 @@ type Props = {
   index: number;
   members: WorkspaceMember[];
   canEdit: boolean;
+  canManage: boolean;
   dragEnabled: boolean;
   onUpdateTask: (
     taskId: string,
@@ -30,6 +31,7 @@ export function SortableTaskRow({
   index,
   members,
   canEdit,
+  canManage,
   dragEnabled,
   onUpdateTask,
   subtasks,
@@ -49,16 +51,14 @@ export function SortableTaskRow({
         task={task}
         members={members}
         canEdit={canEdit}
+        canManage={canManage}
         onUpdateTask={onUpdateTask}
         subtasks={subtasks}
         onSubtaskDragEnd={onSubtaskDragEnd}
         onAddSubtask={onAddSubtask}
         dragHandle={
           dragEnabled ? (
-            <DragHandle
-              ref={handleRef}
-              className="py-2 px-1 -ml-7.5"
-            />
+            <DragHandle ref={handleRef} className="py-2 px-1 -ml-7.5" />
           ) : undefined
         }
       />

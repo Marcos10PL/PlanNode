@@ -31,7 +31,7 @@ export function UserRow({
 
   return (
     <div className={cn("flex items-center gap-3 py-2", className)}>
-      <UserAvatar name={name} />
+      <UserAvatar name={name} userId={userId} />
 
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium line-clamp-1">

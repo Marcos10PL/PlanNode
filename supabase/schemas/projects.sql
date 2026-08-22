@@ -65,12 +65,32 @@ CREATE TABLE public.tasks (
   FOREIGN KEY (list_id, project_id) REFERENCES public.task_lists(id, project_id) ON DELETE CASCADE
 );
 
+CREATE TABLE public.task_events (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  task_id uuid NOT NULL REFERENCES public.tasks(id) ON DELETE CASCADE,
+  user_id uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
+  type text NOT NULL,
+  metadata jsonb NOT NULL DEFAULT '{}',
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE public.task_comments (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  task_id uuid NOT NULL REFERENCES public.tasks(id) ON DELETE CASCADE,
+  user_id uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
+  content text NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
 -- RLS
 ALTER TABLE public.projects ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.project_favorites ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.project_members ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.task_lists ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.tasks ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.task_events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.task_comments ENABLE ROW LEVEL SECURITY;
 
 -- Helper functions
 CREATE OR REPLACE FUNCTION public.can_access_project(p_project_id uuid, p_user_id uuid)
@@ -108,9 +128,6 @@ RETURNS boolean AS $$
 $$ LANGUAGE sql SECURITY DEFINER SET search_path = '';
 
 -- Policies: projects
--- Uses the row's own columns instead of can_access_project() — a self-lookup
--- through the function cannot see a row inserted by the same statement,
--- which breaks INSERT ... RETURNING.
 CREATE POLICY "Members can see accessible projects"
 ON public.projects FOR SELECT
 USING (
@@ -216,6 +233,66 @@ CREATE POLICY "Non-guest members can delete tasks"
 ON public.tasks FOR DELETE
 USING (public.can_edit_project(project_id, (SELECT auth.uid())));
 
+-- Policies: task_events
+CREATE POLICY "Users with project access can see task events"
+ON public.task_events FOR SELECT
+USING (
+  EXISTS (
+    SELECT 1 FROM public.tasks t
+    WHERE t.id = task_events.task_id
+      AND public.can_access_project(t.project_id, (SELECT auth.uid()))
+  )
+);
+
+CREATE POLICY "Non-guest members can create task events"
+ON public.task_events FOR INSERT
+WITH CHECK (
+  user_id = (SELECT auth.uid())
+  AND EXISTS (
+    SELECT 1 FROM public.tasks t
+    WHERE t.id = task_events.task_id
+      AND public.can_edit_project(t.project_id, (SELECT auth.uid()))
+  )
+);
+
+-- Policies: task_comments
+CREATE POLICY "Users with project access can see task comments"
+ON public.task_comments FOR SELECT
+USING (
+  EXISTS (
+    SELECT 1 FROM public.tasks t
+    WHERE t.id = task_comments.task_id
+      AND public.can_access_project(t.project_id, (SELECT auth.uid()))
+  )
+);
+
+CREATE POLICY "Non-guest members can create task comments"
+ON public.task_comments FOR INSERT
+WITH CHECK (
+  user_id = (SELECT auth.uid())
+  AND EXISTS (
+    SELECT 1 FROM public.tasks t
+    WHERE t.id = task_comments.task_id
+      AND public.can_edit_project(t.project_id, (SELECT auth.uid()))
+  )
+);
+
+CREATE POLICY "Authors can update their own task comments"
+ON public.task_comments FOR UPDATE
+USING (user_id = (SELECT auth.uid()))
+WITH CHECK (user_id = (SELECT auth.uid()));
+
+CREATE POLICY "Authors and project managers can delete task comments"
+ON public.task_comments FOR DELETE
+USING (
+  user_id = (SELECT auth.uid())
+  OR EXISTS (
+    SELECT 1 FROM public.tasks t
+    WHERE t.id = task_comments.task_id
+      AND public.is_project_manager(t.project_id, (SELECT auth.uid()))
+  )
+);
+
 -- RPC: bulk-update task positions (and optionally status) in a single UPDATE
 CREATE OR REPLACE FUNCTION public.reorder_tasks(p_list_id uuid, p_changes jsonb)
 RETURNS void AS $$
@@ -287,6 +364,10 @@ CREATE OR REPLACE TRIGGER set_tasks_updated_at
   BEFORE UPDATE ON public.tasks
   FOR EACH ROW EXECUTE PROCEDURE public.set_updated_at();
 
+CREATE OR REPLACE TRIGGER set_task_comments_updated_at
+  BEFORE UPDATE ON public.task_comments
+  FOR EACH ROW EXECUTE PROCEDURE public.set_updated_at();
+
 -- Triggers: clear assignee when project member is removed
 CREATE OR REPLACE FUNCTION public.clear_assignee_on_project_member_removed()
 RETURNS TRIGGER AS $$
@@ -333,6 +414,8 @@ CREATE INDEX idx_tasks_parent_task_id ON public.tasks(parent_task_id);
 CREATE INDEX idx_tasks_list_id ON public.tasks(list_id, position);
 CREATE INDEX idx_tasks_assignee_due ON public.tasks(assignee_id, due_date);
 CREATE INDEX idx_tasks_project_status ON public.tasks(project_id, status);
+CREATE INDEX idx_task_events_task_created ON public.task_events(task_id, created_at);
+CREATE INDEX idx_task_comments_task_created ON public.task_comments(task_id, created_at);
 
 -- Permissions
 REVOKE ALL ON public.projects FROM anon;
@@ -340,6 +423,8 @@ REVOKE ALL ON public.project_favorites FROM anon;
 REVOKE ALL ON public.project_members FROM anon;
 REVOKE ALL ON public.task_lists FROM anon;
 REVOKE ALL ON public.tasks FROM anon;
+REVOKE ALL ON public.task_events FROM anon;
+REVOKE ALL ON public.task_comments FROM anon;
 REVOKE EXECUTE ON FUNCTION public.can_access_project(uuid, uuid) FROM anon;
 REVOKE EXECUTE ON FUNCTION public.can_edit_project(uuid, uuid) FROM anon;
 REVOKE EXECUTE ON FUNCTION public.is_project_manager(uuid, uuid) FROM anon;
@@ -351,12 +436,19 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON public.project_favorites TO authenticate
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.project_members TO authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.task_lists TO authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.tasks TO authenticated;
+GRANT SELECT, INSERT ON public.task_events TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.task_comments TO authenticated;
 GRANT ALL ON public.projects TO service_role;
 GRANT ALL ON public.project_favorites TO service_role;
 GRANT ALL ON public.project_members TO service_role;
 GRANT ALL ON public.task_lists TO service_role;
 GRANT ALL ON public.tasks TO service_role;
+GRANT ALL ON public.task_events TO service_role;
+GRANT ALL ON public.task_comments TO service_role;
 
--- Realtime
+ALTER TABLE public.task_comments REPLICA IDENTITY FULL;
+
 ALTER PUBLICATION supabase_realtime ADD TABLE public.tasks;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.task_lists;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.task_events;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.task_comments;

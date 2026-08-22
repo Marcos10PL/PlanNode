@@ -11,6 +11,7 @@ type Props = {
   subtasks: Task[];
   members: WorkspaceMember[];
   canEdit: boolean;
+  canManage: boolean;
   onUpdateTask: (
     taskId: string,
     patch: Partial<Task>,
@@ -25,6 +26,7 @@ export function SubtaskList({
   subtasks,
   members,
   canEdit,
+  canManage,
   onUpdateTask,
   onDragEnd,
   onAddSubtask,
@@ -42,6 +44,7 @@ export function SubtaskList({
               index={index}
               members={members}
               canEdit={canEdit}
+              canManage={canManage}
               dragEnabled={canEdit}
               onUpdateTask={onUpdateTask}
             />

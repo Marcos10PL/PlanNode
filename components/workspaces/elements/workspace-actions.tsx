@@ -2,16 +2,13 @@
 
 import { leaveWorkspaceAction } from "@/actions/workspace/leave-workspace";
 import { useUser } from "@/components/providers/user-provider";
-import { Button } from "@/components/ui/button";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { DeleteButton } from "@/components/ui/delete-button";
+import { EditButton } from "@/components/ui/edit-button";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { TooltipIconButton } from "@/components/ui/tooltip-icon-button";
 import { Workspace } from "@/types/dto";
-import { LogOut, Pencil, Trash2 } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -53,48 +50,17 @@ export function WorkspaceActions({ workspace }: { workspace: Workspace }) {
         <div className="flex items-center gap-1">
           {isOwner ? (
             <>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setEditOpen(true)}
-                    className="text-info"
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>{t("edit")}</TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setDeleteOpen(true)}
-                    className="text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>{t("delete")}</TooltipContent>
-              </Tooltip>
+              <EditButton onClick={() => setEditOpen(true)} />
+              <DeleteButton onClick={() => setDeleteOpen(true)} />
             </>
           ) : (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setLeaveOpen(true)}
-                  disabled={isLeaving}
-                  className="text-destructive"
-                >
-                  <LogOut className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>{t("leave")}</TooltipContent>
-            </Tooltip>
+            <TooltipIconButton
+              icon={LogOut}
+              label={t("leave")}
+              onClick={() => setLeaveOpen(true)}
+              disabled={isLeaving}
+              className="text-destructive"
+            />
           )}
         </div>
       </TooltipProvider>

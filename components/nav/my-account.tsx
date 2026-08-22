@@ -48,6 +48,7 @@ export function MyAccount() {
         <Button variant="ghost" size="icon" className="rounded-full group">
           <UserAvatar
             name={user?.profile.fullName}
+            userId={user?.user.id}
             className="border-2 border-gray-400 group-hover:border-gray-300 transition-colors"
           />
         </Button>

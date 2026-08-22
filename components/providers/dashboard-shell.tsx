@@ -2,6 +2,7 @@
 import { MyAccount } from "@/components/nav/my-account";
 import { NotificationsIndicator } from "@/components/notifications/notifications-indicator";
 import { AppConfigProvider } from "@/components/providers/app-config-provider";
+import { PresenceProvider } from "@/components/providers/presence-provider";
 import { UserProvider } from "@/components/providers/user-provider";
 import { WorkspaceProvider } from "@/components/providers/workspace-provider";
 import { RealtimeRefresher } from "@/components/realtime-refresher";
@@ -65,29 +66,31 @@ export async function DashboardShell({
           workspaces={workspaces}
           activeWorkspaceId={activeWorkspaceId}
         >
-          <SidebarProvider defaultOpen={sidebarOpen}>
-            <AppSidebar
-              projects={projects}
-              workspaceId={activeWorkspaceId}
-              canManageProjects={canManageProjects}
-              defaultExpandedProjectIds={defaultExpandedProjectIds}
-            />
+          <PresenceProvider>
+            <SidebarProvider defaultOpen={sidebarOpen}>
+              <AppSidebar
+                projects={projects}
+                workspaceId={activeWorkspaceId}
+                canManageProjects={canManageProjects}
+                defaultExpandedProjectIds={defaultExpandedProjectIds}
+              />
 
-            <div className="flex-1 min-w-0 flex flex-col h-screen">
-              <div className="flex justify-between items-center border-b p-2">
-                <SidebarTrigger />
-                <div className="flex items-center gap-2">
-                  <NotificationsIndicator />
-                  <MyAccount />
+              <div className="flex-1 min-w-0 flex flex-col h-screen">
+                <div className="flex justify-between items-center border-b p-2">
+                  <SidebarTrigger />
+                  <div className="flex items-center gap-2">
+                    <NotificationsIndicator />
+                    <MyAccount />
+                  </div>
+                </div>
+                <div className="flex-1 overflow-y-auto overflow-x-hidden pb-6">
+                  {children}
                 </div>
               </div>
-              <div className="flex-1 overflow-y-auto overflow-x-hidden pb-6">
-                {children}
-              </div>
-            </div>
 
-            <RealtimeRefresher />
-          </SidebarProvider>
+              <RealtimeRefresher />
+            </SidebarProvider>
+          </PresenceProvider>
         </WorkspaceProvider>
       </UserProvider>
     </AppConfigProvider>

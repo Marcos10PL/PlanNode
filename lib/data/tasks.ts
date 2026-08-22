@@ -1,5 +1,12 @@
 import { TASK_STATUSES } from "@/const";
-import { MyTask, Task, TaskListWithTasks } from "@/types/dto";
+import {
+  MyTask,
+  Task,
+  TaskComment,
+  TaskEvent,
+  TaskListWithTasks,
+  TaskTimelineItem,
+} from "@/types/dto";
 import type { QueryData } from "@supabase/supabase-js";
 import { cache } from "react";
 import { Client, requireUserContext } from "../supabase/server";
@@ -54,6 +61,76 @@ export const getTaskList = cache(async (listId: string) => {
     position: data.position,
     tasks: data.tasks.map(mapTask),
   } satisfies TaskListWithTasks;
+});
+
+const TASK_EVENT_SELECT =
+  "id, task_id, type, metadata, created_at, user:profiles!task_events_user_id_fkey(id, full_name, email)";
+
+const taskEventRowQuery = (supabase: Client) =>
+  supabase.from("task_events").select(TASK_EVENT_SELECT);
+
+type TaskEventRow = QueryData<ReturnType<typeof taskEventRowQuery>>[number];
+
+const mapTaskEvent = (e: TaskEventRow) =>
+  ({
+    id: e.id,
+    taskId: e.task_id,
+    type: e.type,
+    metadata: e.metadata as TaskEvent["metadata"],
+    createdAt: e.created_at,
+    user: e.user
+      ? { id: e.user.id, fullName: e.user.full_name, email: e.user.email }
+      : null,
+  }) satisfies TaskEvent;
+
+const TASK_COMMENT_SELECT =
+  "id, task_id, content, created_at, updated_at, user:profiles!task_comments_user_id_fkey(id, full_name, email)";
+
+const taskCommentRowQuery = (supabase: Client) =>
+  supabase.from("task_comments").select(TASK_COMMENT_SELECT);
+
+type TaskCommentRow = QueryData<ReturnType<typeof taskCommentRowQuery>>[number];
+
+const mapTaskComment = (c: TaskCommentRow) =>
+  ({
+    id: c.id,
+    taskId: c.task_id,
+    content: c.content,
+    createdAt: c.created_at,
+    updatedAt: c.updated_at,
+    user: c.user
+      ? { id: c.user.id, fullName: c.user.full_name, email: c.user.email }
+      : null,
+  }) satisfies TaskComment;
+
+export const getTaskTimeline = cache(async (taskId: string) => {
+  const { supabase } = await requireUserContext();
+
+  const [{ data: events }, { data: comments }] = await Promise.all([
+    supabase
+      .from("task_events")
+      .select(TASK_EVENT_SELECT)
+      .eq("task_id", taskId),
+    supabase
+      .from("task_comments")
+      .select(TASK_COMMENT_SELECT)
+      .eq("task_id", taskId),
+  ]);
+
+  const items: TaskTimelineItem[] = [
+    ...(events?.map(e => ({ kind: "event" as const, ...mapTaskEvent(e) })) ??
+      []),
+    ...(comments?.map(c => ({
+      kind: "comment" as const,
+      ...mapTaskComment(c),
+    })) ?? []),
+  ];
+
+  items.sort(
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+  );
+
+  return items;
 });
 
 export const getMyTasks = cache(async (workspaceId: string) => {

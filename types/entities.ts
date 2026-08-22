@@ -24,3 +24,5 @@ export type ProjectTable = Table<"projects">;
 export type ProjectMemberTable = Table<"project_members">;
 export type TaskListTable = Table<"task_lists">;
 export type TaskTable = Table<"tasks">;
+export type TaskEventTable = Table<"task_events">;
+export type TaskCommentTable = Table<"task_comments">;

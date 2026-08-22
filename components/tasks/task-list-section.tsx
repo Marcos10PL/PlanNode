@@ -58,6 +58,7 @@ type Props = {
   list: TaskListWithTasks;
   members: WorkspaceMember[];
   canEdit: boolean;
+  canManage: boolean;
   defaultSort: TaskSort;
   defaultCollapsed: TaskStatus[];
 };
@@ -66,6 +67,7 @@ export function TaskListSection({
   list,
   members,
   canEdit,
+  canManage,
   defaultSort,
   defaultCollapsed,
 }: Props) {
@@ -424,6 +426,7 @@ export function TaskListSection({
                             index={index}
                             members={members}
                             canEdit={canEdit}
+                            canManage={canManage}
                             dragEnabled={dragEnabled}
                             onUpdateTask={updateTaskField}
                             subtasks={subtasksByParent.get(task.id) ?? []}
@@ -457,6 +460,8 @@ export function TaskListSection({
       <TaskModal
         listId={list.id}
         members={members}
+        canEdit={canEdit}
+        canManage={canManage}
         open={createTaskOpen}
         onOpenChange={setCreateTaskOpen}
         selectedStatus={selectedTaskStatus}

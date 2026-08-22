@@ -63,6 +63,7 @@ export const VALIDATION_MAX = {
   TASK_LIST_NAME: 50,
   TASK_TITLE: 200,
   TASK_DESCRIPTION: 2000,
+  TASK_COMMENT: 2000,
 } as const;
 
 export const COOKIES = {
@@ -105,6 +106,14 @@ export const EMAIL_TEMPLATES = {
 export const NOTIFICATION_TYPES = {
   WORKSPACE_INVITATION: "workspace_invitation",
   TASK_ASSIGNED: "task_assigned",
+} as const;
+
+export const TASK_EVENT_TYPES = {
+  TASK_CREATED: "task_created",
+  STATUS_CHANGED: "status_changed",
+  ASSIGNEE_CHANGED: "assignee_changed",
+  PRIORITY_CHANGED: "priority_changed",
+  DUE_DATE_CHANGED: "due_date_changed",
 } as const;
 
 export const TASK_STATUSES = {
