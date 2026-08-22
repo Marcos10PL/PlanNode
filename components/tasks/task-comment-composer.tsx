@@ -36,7 +36,7 @@ export function TaskCommentComposer({ taskId, onChanged }: Props) {
         return;
       }
       setCommentText("");
-      onChanged();
+      await onChanged();
     } catch {
       toast.error(tCommon("unexpected_error"));
     } finally {

@@ -115,7 +115,7 @@ export async function updateTaskAction(taskId: string, data: UpdateTaskSchema) {
   }
 
   if (events.length > 0) {
-    await supabase.from("task_events").insert(
+    const { error: eventsError } = await supabase.from("task_events").insert(
       events.map(e => ({
         task_id: taskId,
         user_id: user.id,
@@ -123,6 +123,10 @@ export async function updateTaskAction(taskId: string, data: UpdateTaskSchema) {
         metadata: e.metadata,
       })),
     );
+
+    if (eventsError) {
+      console.error("Failed to insert task_events:", eventsError);
+    }
   }
 
   const assigneeChanged =

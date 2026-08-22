@@ -116,7 +116,7 @@ export function TaskCommentCard({
             : t("comment_delete_error"),
         );
       } else {
-        onChanged();
+        await onChanged();
       }
     } catch {
       toast.error(tCommon("unexpected_error"));

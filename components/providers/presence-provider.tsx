@@ -83,9 +83,15 @@ export function PresenceProvider({ children }: { children: React.ReactNode }) {
   return <PresenceContext value={{ isOnline }}>{children}</PresenceContext>;
 }
 
+const FALLBACK_PRESENCE: PresenceContextValue = { isOnline: () => false };
+
 export function usePresence() {
   const context = useContext(PresenceContext);
-  if (!context)
-    throw new Error("usePresence must be used within PresenceProvider");
+  if (!context) {
+    if (process.env.NODE_ENV !== "production") {
+      console.warn("usePresence used outside PresenceProvider");
+    }
+    return FALLBACK_PRESENCE;
+  }
   return context;
 }
