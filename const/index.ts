@@ -158,6 +158,13 @@ export const TASK_SORTS = {
   NAME: "name",
 } as const;
 
+export const TASK_VIEWS = {
+  LIST: "list",
+  KANBAN: "kanban",
+} as const;
+
+export type TaskView = (typeof TASK_VIEWS)[keyof typeof TASK_VIEWS];
+
 export const PROJECT_ICONS = {
   FOLDER_KANBAN: "folder-kanban",
   ROCKET: "rocket",

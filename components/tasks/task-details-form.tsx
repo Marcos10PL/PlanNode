@@ -58,7 +58,7 @@ export function TaskDetailsForm({
                 id="status"
                 value={field.value}
                 onValueChange={field.onChange}
-                className="w-full"
+                className="w-full h-9!"
               />
             </Field>
           )}
@@ -68,14 +68,12 @@ export function TaskDetailsForm({
           name="priority"
           render={({ field }) => (
             <Field>
-              <FieldLabel htmlFor="priority">
-                {t("priority_label")}
-              </FieldLabel>
+              <FieldLabel htmlFor="priority">{t("priority_label")}</FieldLabel>
               <TaskPrioritySelect
                 id="priority"
                 value={field.value}
                 onValueChange={field.onChange}
-                className="w-full"
+                className="w-full h-9!"
               />
             </Field>
           )}
@@ -104,9 +102,7 @@ export function TaskDetailsForm({
           name="dueDate"
           render={({ field }) => (
             <Field>
-              <FieldLabel htmlFor="dueDate">
-                {t("due_date_label")}
-              </FieldLabel>
+              <FieldLabel htmlFor="dueDate">{t("due_date_label")}</FieldLabel>
               <DatePicker
                 id="dueDate"
                 value={field.value ?? null}

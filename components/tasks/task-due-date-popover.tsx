@@ -11,6 +11,7 @@ type Props = {
   isOverdue: boolean;
   canEdit: boolean;
   onChange: (value: string | null) => void;
+  noPlaceholder?: boolean;
 };
 
 export function TaskDueDatePopover({
@@ -18,6 +19,7 @@ export function TaskDueDatePopover({
   isOverdue,
   canEdit,
   onChange,
+  noPlaceholder = false,
 }: Props) {
   const t = useTranslations();
   const locale = useLocale();
@@ -59,7 +61,11 @@ export function TaskDueDatePopover({
         >
           <CalendarIcon className="size-4" />
           <span
-            className={cn("w-16 text-left tabular-nums", !dueDate && "pl-0.5")}
+            className={cn(
+              "w-16 text-left tabular-nums",
+              !dueDate && "pl-0.5",
+              noPlaceholder && !dueDate && "hidden",
+            )}
           >
             {dueDate ? formatDate(dueDate, locale) : "-- . -- . ----"}
           </span>

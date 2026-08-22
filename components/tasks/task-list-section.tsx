@@ -2,11 +2,18 @@
 
 import { reorderTasksAction } from "@/actions/task/reorder-tasks";
 import { updateTaskAction } from "@/actions/task/update-task";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { ManageMenu } from "@/components/ui/manage-menu";
-import { TaskProgress } from "@/components/ui/task-progress";
-import { ERRORS, TASK_SORTS, TASK_STATUS_ORDER, TASK_STATUSES } from "@/const";
+import {
+  ERRORS,
+  TASK_SORTS,
+  TASK_STATUS_ORDER,
+  TASK_STATUSES,
+  TASK_VIEWS,
+  TaskView,
+} from "@/const";
 import { useCookieState } from "@/hooks/use-cookie-state";
 import { useDeleteTaskList } from "@/hooks/use-delete-task-list";
 import { UpdateTaskSchema } from "@/schema";
@@ -22,6 +29,7 @@ import {
 import {
   getTaskListCollapsedCookie,
   getTaskListSortCookie,
+  getTaskListViewCookie,
 } from "@/utils/helpers";
 import { move } from "@dnd-kit/helpers";
 import {
@@ -37,6 +45,7 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AddRowButton } from "./add-row-button";
 import { TaskListModal } from "./create-task-list-modal";
+import { KANBAN_COLUMN_WIDTH, KANBAN_GAP, KanbanBoard } from "./kanban-board";
 import { SortableTaskRow } from "./sortable-task-row";
 import {
   DEFAULT_TASK_FILTERS,
@@ -61,6 +70,7 @@ type Props = {
   canManage: boolean;
   defaultSort: TaskSort;
   defaultCollapsed: TaskStatus[];
+  defaultView: TaskView;
 };
 
 export function TaskListSection({
@@ -70,6 +80,7 @@ export function TaskListSection({
   canManage,
   defaultSort,
   defaultCollapsed,
+  defaultView,
 }: Props) {
   const t = useTranslations("tasks");
   const tRoot = useTranslations();
@@ -89,6 +100,10 @@ export function TaskListSection({
     defaultCollapsed,
   );
   const collapsed = new Set(collapsedList);
+  const [view, setView] = useCookieState(
+    getTaskListViewCookie(list.id),
+    defaultView,
+  );
 
   const [tasks, setTasks] = useState<Task[]>(list.tasks);
 
@@ -296,6 +311,17 @@ export function TaskListSection({
     [topLevelTasks, filters, sort],
   );
 
+  const visibleTasksByStatus = useMemo(() => {
+    const groups = {} as Record<TaskStatus, Task[]>;
+    for (const status of TASK_STATUS_ORDER) groups[status] = [];
+    for (const task of visibleTasks) groups[task.status].push(task);
+    return groups;
+  }, [visibleTasks]);
+
+  const boardWidth =
+    TASK_STATUS_ORDER.length * KANBAN_COLUMN_WIDTH +
+    (TASK_STATUS_ORDER.length - 1) * KANBAN_GAP;
+
   const doneTasks = topLevelTasks.filter(
     task => task.status === TASK_STATUSES.DONE,
   ).length;
@@ -322,32 +348,31 @@ export function TaskListSection({
 
   return (
     <>
-      <div className="flex flex-col mt-4">
-        <div className="flex flex-col-reverse md:flex-row md:items-center gap-1">
-          <h2 className="text-sm font-semibold min-w-0 break-all">
-            {list.name} ({topLevelTasks.length})
-          </h2>
-          {canEdit && (
-            <div className="self-end">
-              <ManageMenu
-                disabled={isPending}
-                align="start"
-                items={listManageMenuItems}
-              />
+      <div className="flex flex-col mt-4 w-[100cqw] mx-[calc(50%-50cqw)] px-4 md:px-6">
+        <div
+          className="flex flex-col mx-auto"
+          style={{ width: `min(100%, ${boardWidth}px)` }}
+        >
+          <div className="flex flex-col-reverse md:flex-row md:items-center gap-1">
+            <div className="flex min-w-0 items-center gap-2">
+              <h2 className="text-sm font-semibold min-w-0 break-all">
+                {list.name}
+              </h2>
+              <Badge variant="secondary" className="shrink-0">
+                {doneTasks}/{topLevelTasks.length - cancelledTasks}
+              </Badge>
             </div>
-          )}
-        </div>
+            {canEdit && (
+              <div className="self-end">
+                <ManageMenu
+                  disabled={isPending}
+                  align="start"
+                  items={listManageMenuItems}
+                />
+              </div>
+            )}
+          </div>
 
-        <section className="my-4">
-          <TaskProgress
-            total={topLevelTasks.length}
-            done={doneTasks}
-            cancelled={cancelledTasks}
-            showLabel
-          />
-        </section>
-
-        {topLevelTasks.length > 0 && (
           <div className="my-4">
             <TaskFilters
               members={members}
@@ -355,99 +380,106 @@ export function TaskListSection({
               onChange={setFilters}
               sort={sort}
               onSortChange={setSort}
+              view={view}
+              onViewChange={setView}
             />
           </div>
-        )}
 
-        {topLevelTasks.length === 0 ? (
-          <>
-            <p className="text-sm text-muted-foreground py-2">{t("empty")}</p>
-            {canEdit && (
-              <AddRowButton
-                label={t("add_task")}
-                onClick={() => openCreateTask()}
+          {view === TASK_VIEWS.KANBAN ? (
+            <DragDropProvider
+              onDragOver={handleDragOver}
+              onDragEnd={handleDragEnd}
+            >
+              <KanbanBoard
+                tasksByStatus={visibleTasksByStatus}
+                collapsed={collapsed}
+                onToggleCollapse={toggleGroup}
+                members={members}
+                canEdit={canEdit}
+                canManage={canManage}
+                dragEnabled={dragEnabled}
+                onUpdateTask={updateTaskField}
+                subtasksByParent={subtasksByParent}
+                onSubtaskDragEnd={handleSubtaskDragEnd}
+                onAddTask={openCreateTask}
+                onAddSubtask={openCreateSubtask}
               />
-            )}
-          </>
-        ) : visibleTasks.length === 0 ? (
-          <p className="text-sm text-muted-foreground py-2">
-            {t("filters.no_results")}
-          </p>
-        ) : (
-          <DragDropProvider
-            onDragOver={handleDragOver}
-            onDragEnd={handleDragEnd}
-          >
-            <div className="flex flex-col gap-4">
-              {TASK_STATUS_ORDER.map(status => {
-                const tasks = visibleTasks.filter(
-                  task => task.status === status,
-                );
-                if (tasks.length === 0) return null;
+            </DragDropProvider>
+          ) : (
+            <DragDropProvider
+              onDragOver={handleDragOver}
+              onDragEnd={handleDragEnd}
+            >
+              <div className="flex flex-col gap-4">
+                {TASK_STATUS_ORDER.map(status => {
+                  const tasks = visibleTasksByStatus[status];
+                  const isCollapsed = collapsed.has(status);
 
-                const isCollapsed = collapsed.has(status);
-
-                return (
-                  <div key={status} className="flex flex-col gap-1 -ml-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => toggleGroup(status)}
-                      className="h-auto w-fit justify-start gap-2 py-2"
-                    >
-                      <span
-                        className={`h-2 w-2 rounded-full ${getStatusDotClass(status)}`}
-                      />
-                      <h3 className="text-xs font-semibold uppercase tracking-wide">
-                        {getStatusLabel(status, tRoot)}
-                      </h3>
-                      <span className="text-xs text-muted-foreground">
-                        {tasks.length}
-                      </span>
-                      <ChevronDown
-                        className={cn(
-                          "size-3.5 text-muted-foreground transition-transform",
-                          isCollapsed && "-rotate-90",
-                        )}
-                      />
-                    </Button>
-
-                    {!isCollapsed && (
-                      <div
-                        className={cn(
-                          "flex flex-col divide-y border-l pl-2 ml-[0.95rem]",
-                          getStatusBorderClass(status),
-                        )}
-                      >
-                        {tasks.map((task, index) => (
-                          <SortableTaskRow
-                            key={task.id}
-                            task={task}
-                            index={index}
-                            members={members}
-                            canEdit={canEdit}
-                            canManage={canManage}
-                            dragEnabled={dragEnabled}
-                            onUpdateTask={updateTaskField}
-                            subtasks={subtasksByParent.get(task.id) ?? []}
-                            onSubtaskDragEnd={handleSubtaskDragEnd(task.id)}
-                            onAddSubtask={() => openCreateSubtask(task.id)}
+                  return (
+                    <div key={status} className="flex flex-col gap-1 -ml-2">
+                      <div className="flex items-center">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => toggleGroup(status)}
+                          className="h-auto w-fit justify-start gap-2 py-2"
+                        >
+                          <span
+                            className={`h-2 w-2 rounded-full ${getStatusDotClass(status)}`}
                           />
-                        ))}
-                        {canEdit && (
-                          <AddRowButton
-                            label={t("add_task")}
-                            onClick={() => openCreateTask(status)}
+                          <h3 className="text-xs font-semibold uppercase tracking-wide">
+                            {getStatusLabel(status, tRoot)}
+                          </h3>
+                          <span className="text-xs text-muted-foreground">
+                            {tasks.length}
+                          </span>
+                          <ChevronDown
+                            className={cn(
+                              "size-3.5 text-muted-foreground transition-transform",
+                              isCollapsed && "-rotate-90",
+                            )}
                           />
-                        )}
+                        </Button>
                       </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </DragDropProvider>
-        )}
+
+                      {!isCollapsed && (
+                        <div
+                          className={cn(
+                            "flex flex-col divide-y border-l pl-2 ml-[0.95rem]",
+                            getStatusBorderClass(status),
+                          )}
+                        >
+                          {tasks.map((task, index) => (
+                            <SortableTaskRow
+                              key={task.id}
+                              task={task}
+                              index={index}
+                              members={members}
+                              canEdit={canEdit}
+                              canManage={canManage}
+                              dragEnabled={dragEnabled}
+                              onUpdateTask={updateTaskField}
+                              hiddenStatuses={collapsed}
+                              subtasks={subtasksByParent.get(task.id) ?? []}
+                              onSubtaskDragEnd={handleSubtaskDragEnd(task.id)}
+                              onAddSubtask={() => openCreateSubtask(task.id)}
+                            />
+                          ))}
+                          {canEdit && (
+                            <AddRowButton
+                              label={t("add_task")}
+                              onClick={() => openCreateTask(status)}
+                            />
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </DragDropProvider>
+          )}
+        </div>
       </div>
 
       <TaskListModal

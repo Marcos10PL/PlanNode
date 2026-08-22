@@ -1,11 +1,12 @@
 ﻿"use client";
 
+import { PillTab } from "@/components/ui/pill-tab";
+import { PillTabs } from "@/components/ui/pill-tabs";
 import { LINKS } from "@/const";
 import { usePathname } from "@/i18n/navigation";
 import { Translations } from "@/types";
-import { cn, isActivePath } from "@/utils";
+import { isActivePath } from "@/utils";
 import { useTranslations } from "next-intl";
-import Link from "next/link";
 
 const navItems = (t: Translations) => [
   {
@@ -27,21 +28,16 @@ export function NavSettings() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex overflow-x-auto border-b mt-5 mb-2 px-4 md:px-6 justify-center max-w-fit mx-auto">
+    <PillTabs>
       {navItems(t).map(item => (
-        <Link
+        <PillTab
           key={item.href}
           href={item.href}
-          className={cn(
-            "shrink-0 whitespace-nowrap px-3 py-2 text-sm border border-b-0 rounded-t-md mr-1.5 last:mr-0",
-            isActivePath(pathname, item.href)
-              ? "bg-muted border-primary/30 pointer-events-none"
-              : "border-transparent hover:bg-muted transition-colors",
-          )}
-        >
-          {item.label}
-        </Link>
+          label={item.label}
+          active={isActivePath(pathname, item.href)}
+          className="mr-1.5 last:mr-0"
+        />
       ))}
-    </nav>
+    </PillTabs>
   );
 }

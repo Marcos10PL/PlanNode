@@ -104,6 +104,10 @@ html {
     --ring: 0 0% 3.9%;
     --radius: 0.5rem;
     --info: 217.2 91.2% 59.8%;
+
+    --sb-track: var(--color-gray-100);
+    --sb-thumb: var(--color-gray-300);
+    --sb-thumb-hover: var(--color-gray-400);
   }
 
   .dark {
@@ -127,14 +131,40 @@ html {
     --input: 0 0% 14.9%;
     --ring: 0 0% 83.1%;
     --info: 217.2 91.2% 59.8%;
-  }
-}
 
-@layer base {
+    --sb-track: var(--color-gray-800);
+    --sb-thumb: var(--color-gray-600);
+    --sb-thumb-hover: var(--color-gray-500);
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--sb-track);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--sb-thumb);
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--sb-thumb-hover);
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--sb-thumb) var(--sb-track);
+  }
+
   * {
     @apply border-border;
   }
-  body {
+
+    body {
     @apply bg-background text-foreground;
   }
 }

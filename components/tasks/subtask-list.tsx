@@ -1,26 +1,12 @@
 "use client";
 
-import { UpdateTaskSchema } from "@/schema";
-import { Task, WorkspaceMember } from "@/types/dto";
-import { DragDropProvider, type DragEndEvent } from "@dnd-kit/react";
+import { SubtaskListProps } from "@/types/props";
+import { DragDropProvider } from "@dnd-kit/react";
 import { useTranslations } from "next-intl";
 import { AddRowButton } from "./add-row-button";
 import { SortableTaskRow } from "./sortable-task-row";
 
-type Props = {
-  subtasks: Task[];
-  members: WorkspaceMember[];
-  canEdit: boolean;
-  canManage: boolean;
-  onUpdateTask: (
-    taskId: string,
-    patch: Partial<Task>,
-    serverPatch: UpdateTaskSchema,
-    fallbackErrorKey: string,
-  ) => Promise<{ error?: string } | undefined>;
-  onDragEnd: (event: DragEndEvent) => void;
-  onAddSubtask: () => void;
-};
+type Props = SubtaskListProps;
 
 export function SubtaskList({
   subtasks,

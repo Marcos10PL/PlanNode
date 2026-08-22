@@ -1,5 +1,5 @@
 ﻿import type { ManageMenuItem } from "@/components/ui/manage-menu";
-import { TASK_PRIORITIES, TASK_STATUSES } from "@/const";
+import { TASK_PRIORITIES, TASK_STATUS_ORDER, TASK_STATUSES } from "@/const";
 import { Translations } from "@/types";
 import { Task } from "@/types/dto";
 import { TaskPriority, TaskStatus } from "@/types/entities";
@@ -38,13 +38,43 @@ const STATUS_DOT_MAP = {
 } as const satisfies Record<TaskStatus, string>;
 
 const STATUS_BORDER_MAP = {
-  [TASK_STATUSES.ON_HOLD]: "border-amber-500/50",
-  [TASK_STATUSES.TODO]: "border-gray-400/50",
-  [TASK_STATUSES.IN_PROGRESS]: "border-blue-500/50",
-  [TASK_STATUSES.IN_REVIEW]: "border-violet-500/50",
-  [TASK_STATUSES.IN_TESTS]: "border-cyan-500/50",
-  [TASK_STATUSES.DONE]: "border-primary/50",
-  [TASK_STATUSES.CANCELLED]: "border-red-500/50",
+  [TASK_STATUSES.ON_HOLD]: "border-amber-500/20",
+  [TASK_STATUSES.TODO]: "border-gray-400/20",
+  [TASK_STATUSES.IN_PROGRESS]: "border-blue-500/20",
+  [TASK_STATUSES.IN_REVIEW]: "border-violet-500/20",
+  [TASK_STATUSES.IN_TESTS]: "border-cyan-500/20",
+  [TASK_STATUSES.DONE]: "border-primary/20",
+  [TASK_STATUSES.CANCELLED]: "border-red-500/20",
+} as const satisfies Record<TaskStatus, string>;
+
+const STATUS_BG_MAP = {
+  [TASK_STATUSES.ON_HOLD]: "bg-amber-500/10",
+  [TASK_STATUSES.TODO]: "bg-gray-400/10",
+  [TASK_STATUSES.IN_PROGRESS]: "bg-blue-500/10",
+  [TASK_STATUSES.IN_REVIEW]: "bg-violet-500/10",
+  [TASK_STATUSES.IN_TESTS]: "bg-cyan-500/10",
+  [TASK_STATUSES.DONE]: "bg-primary/10",
+  [TASK_STATUSES.CANCELLED]: "bg-red-500/10",
+} as const satisfies Record<TaskStatus, string>;
+
+const STATUS_BG_STRONG_MAP = {
+  [TASK_STATUSES.ON_HOLD]: "bg-amber-500/20",
+  [TASK_STATUSES.TODO]: "bg-gray-400/20",
+  [TASK_STATUSES.IN_PROGRESS]: "bg-blue-500/20",
+  [TASK_STATUSES.IN_REVIEW]: "bg-violet-500/20",
+  [TASK_STATUSES.IN_TESTS]: "bg-cyan-500/20",
+  [TASK_STATUSES.DONE]: "bg-primary/20",
+  [TASK_STATUSES.CANCELLED]: "bg-red-500/20",
+} as const satisfies Record<TaskStatus, string>;
+
+const STATUS_BG_STRONG_HOVER_MAP = {
+  [TASK_STATUSES.ON_HOLD]: "hover:bg-amber-500/20",
+  [TASK_STATUSES.TODO]: "hover:bg-gray-400/20",
+  [TASK_STATUSES.IN_PROGRESS]: "hover:bg-blue-500/20",
+  [TASK_STATUSES.IN_REVIEW]: "hover:bg-violet-500/20",
+  [TASK_STATUSES.IN_TESTS]: "hover:bg-cyan-500/20",
+  [TASK_STATUSES.DONE]: "hover:bg-primary/20",
+  [TASK_STATUSES.CANCELLED]: "hover:bg-red-500/20",
 } as const satisfies Record<TaskStatus, string>;
 
 const PRIORITY_LABEL_KEYS = {
@@ -79,6 +109,14 @@ export const getStatusDotClass = (status: TaskStatus) => STATUS_DOT_MAP[status];
 export const getStatusBorderClass = (status: TaskStatus) =>
   STATUS_BORDER_MAP[status];
 
+export const getStatusBgClass = (status: TaskStatus) => STATUS_BG_MAP[status];
+
+export const getStatusBgStrongClass = (status: TaskStatus) =>
+  STATUS_BG_STRONG_MAP[status];
+
+export const getStatusBgStrongHoverClass = (status: TaskStatus) =>
+  STATUS_BG_STRONG_HOVER_MAP[status];
+
 export const getPriorityLabel = (priority: TaskPriority, t: Translations) =>
   t(PRIORITY_LABEL_KEYS[priority]);
 
@@ -98,6 +136,23 @@ export const isTaskOverdue = (task: Pick<Task, "dueDate" | "status">) => {
 
   const [year, month, day] = task.dueDate.split("-").map(Number);
   return new Date(year, month - 1, day, 23, 59, 59, 999) < new Date();
+};
+
+export const getNextStatus = (
+  currentStatus: TaskStatus,
+  hiddenStatuses?: Set<TaskStatus>,
+): TaskStatus => {
+  const currentIndex = TASK_STATUS_ORDER.indexOf(currentStatus);
+  let nextIndex = (currentIndex + 1) % TASK_STATUS_ORDER.length;
+
+  while (
+    hiddenStatuses?.has(TASK_STATUS_ORDER[nextIndex]) &&
+    nextIndex !== currentIndex
+  ) {
+    nextIndex = (nextIndex + 1) % TASK_STATUS_ORDER.length;
+  }
+
+  return TASK_STATUS_ORDER[nextIndex];
 };
 
 export const getListManageMenuItems = ({

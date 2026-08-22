@@ -37,7 +37,7 @@ export function TaskStatusSelect({
       onValueChange={v => onValueChange(v as TaskStatus)}
       disabled={disabled}
     >
-      <SelectTrigger id={id} size={size} className={className}>
+      <SelectTrigger id={id} size={size} className={cn("h-7!", className)}>
         <SelectValue />
       </SelectTrigger>
       <SelectContent>

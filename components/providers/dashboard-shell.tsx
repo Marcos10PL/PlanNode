@@ -83,7 +83,7 @@ export async function DashboardShell({
                     <MyAccount />
                   </div>
                 </div>
-                <div className="flex-1 overflow-y-auto overflow-x-hidden pb-6">
+                <div className="@container flex-1 overflow-y-auto overflow-x-hidden pb-6">
                   {children}
                 </div>
               </div>

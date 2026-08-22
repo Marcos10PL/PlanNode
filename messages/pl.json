@@ -4,6 +4,7 @@
     "unexpected_error": "Coś poszło nie tak. Spróbuj ponownie.",
     "manage": "Zarządzaj",
     "description": "Opis",
+    "description_hint": "Kliknij, żeby zobaczyć opis",
     "edit": "Edytuj",
     "delete": "Usuń",
     "insufficient_role": "Brak uprawnień do tej operacji",
@@ -337,7 +338,7 @@
     "role_admin": "Administrator",
     "role_member": "Członek",
     "role_guest": "Gość",
-    "role_info_label": "Informacje o rolach",
+    "role_info_label": "Kliknij, żeby zobaczyć informacje o rolach",
     "role_admin_description": "Może zapraszać członków, zmieniać role i zarządzać treścią. Nie może usunąć przestrzeni.",
     "role_member_description": "Standardowy dostęp do treści przestrzeni. Nie może zarządzać członkami.",
     "role_guest_description": "Ograniczony dostęp tylko do wybranych zasobów."
@@ -477,6 +478,7 @@
     "add_subtask": "Dodaj podzadanie",
     "subtasks": "Podzadania",
     "advance_status": "Przełącz status",
+    "advance_status_to": "Przełącz status na \"{status}\"",
     "no_assignee": "Brak przypisania",
     "assign": "Przypisz osobę",
     "assignee_change_error": "Nie udało się zmienić przypisania",
@@ -497,6 +499,10 @@
       "due_date": "Termin",
       "priority": "Priorytet",
       "name": "Nazwa"
+    },
+    "view": {
+      "list": "Lista",
+      "kanban": "Kanban"
     },
     "priority_change_error": "Nie udało się zmienić priorytetu",
     "status_change_error": "Nie udało się zmienić statusu zadania",
@@ -599,7 +605,7 @@
       "due_date_changed": "Zmieniono termin z „{from}” na „{to}”",
       "due_date_set": "Ustawiono termin na „{to}”",
       "due_date_removed": "Usunięto termin",
-      "show_email": "Pokaż e-mail",
+      "show_email": "Kliknij, żeby zobaczyć e-mail",
       "comment_placeholder": "Napisz komentarz...",
       "comment_submit": "Dodaj komentarz",
       "comment_submitting": "Dodawanie...",
