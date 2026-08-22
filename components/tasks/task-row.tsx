@@ -65,7 +65,7 @@ export function TaskRow({
   const [subtasksExpanded, setSubtasksExpanded] = useState(false);
 
   const openDetails = () => {
-    setModalTab("activity"); // TODO: revert to "details"
+    setModalTab("details");
     setModalOpen(true);
   };
 

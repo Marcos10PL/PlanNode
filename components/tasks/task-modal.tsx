@@ -48,7 +48,7 @@ export function TaskModal({
   onOpenChange,
   selectedStatus,
   parentTaskId,
-  initialTab = "activity", // TODO: revert to "details" default
+  initialTab = "details",
 }: Props) {
   const t = useTranslations(task ? "tasks.edit" : "tasks.create");
   const tErrors = useTranslations("fields.errors");
