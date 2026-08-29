@@ -1,6 +1,11 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import UserAvatar from "@/components/user-avatar";
 import { TaskAssignee, WorkspaceMember } from "@/types/dto";
 import { UserRoundPlus } from "lucide-react";
@@ -22,14 +27,29 @@ export function TaskAssigneePopover({
 }: Props) {
   const t = useTranslations();
 
+  const avatarContent = assignee ? (
+    <UserAvatar
+      name={assignee.fullName}
+      userId={assignee.id}
+      className="h-7 w-7"
+    />
+  ) : (
+    <UserRoundPlus className="h-4 w-4 text-muted-foreground" />
+  );
+
+  const tooltip = assignee ? assignee.fullName : t("tasks.no_assignee");
+
   if (!canEdit) {
-    return assignee ? (
-      <UserAvatar
-        name={assignee.fullName}
-        userId={assignee.id}
-        className="h-7 w-7 shrink-0"
-      />
-    ) : null;
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className="inline-flex h-7 w-7 shrink-0 cursor-default items-center justify-center rounded-full">
+            {avatarContent}
+          </span>
+        </TooltipTrigger>
+        <TooltipContent>{tooltip}</TooltipContent>
+      </Tooltip>
+    );
   }
 
   const handleChange = (assigneeId: string | null) => {
@@ -42,22 +62,14 @@ export function TaskAssigneePopover({
       value={assignee?.id ?? null}
       onChange={handleChange}
       members={members}
-      tooltip={assignee ? assignee.fullName : t("tasks.assign")}
+      tooltip={tooltip}
       trigger={
         <Button
           variant="ghost"
           size="icon"
           className="h-7 w-7 shrink-0 rounded-full"
         >
-          {assignee ? (
-            <UserAvatar
-              name={assignee.fullName}
-              userId={assignee.id}
-              className="h-7 w-7"
-            />
-          ) : (
-            <UserRoundPlus className="h-4 w-4 text-muted-foreground" />
-          )}
+          {avatarContent}
         </Button>
       }
     />

@@ -7,6 +7,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { TASK_PRIORITIES } from "@/const";
 import { TaskPriority } from "@/types/entities";
 import { cn, getPriorityFlagClass, getPriorityLabel } from "@/utils";
@@ -30,6 +35,7 @@ type Props = {
   value: TaskPriority;
   onValueChange: (value: TaskPriority) => void;
   disabled?: boolean;
+  readOnly?: boolean;
   size?: "sm" | "default";
   className?: string;
   id?: string;
@@ -41,12 +47,37 @@ export function TaskPrioritySelect({
   value,
   onValueChange,
   disabled,
+  readOnly,
   size = "default",
   className,
   id,
   iconOnly = false,
   ariaLabel,
 }: Props) {
+  const t = useTranslations();
+
+  if (readOnly) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className="inline-flex h-7 w-7 shrink-0 cursor-default items-center justify-center">
+            <Flag
+              className={cn(
+                "h-4 w-4 fill-current",
+                getPriorityFlagClass(value),
+              )}
+            />
+          </span>
+        </TooltipTrigger>
+        <TooltipContent>
+          {t("tasks.priority_tooltip", {
+            priority: ariaLabel ?? getPriorityLabel(value, t),
+          })}
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
+
   return (
     <Select
       value={value}

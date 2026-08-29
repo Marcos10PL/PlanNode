@@ -11,6 +11,7 @@ import { MemberList } from "@/components/workspaces/team/member-list";
 import { PendingInvitationsList } from "@/components/workspaces/team/pending-invitations-list";
 import { COOKIES } from "@/const";
 import { getWorkspaceContext, getWorkspaceInvitations } from "@/lib/data";
+import { cn } from "@/utils";
 import { getTranslations } from "next-intl/server";
 import { cookies } from "next/headers";
 
@@ -52,6 +53,9 @@ export default async function TeamPage() {
           <AccordionItem
             value={ACCORDION_VALUES.MEMBERS}
             disabled={!canManage} // for better UX - only one section, no accordion needed
+            className={cn({
+              "-mt-4": !canManage,
+            })}
           >
             <AccordionTrigger
               className={"disabled:opacity-100! disabled:[&>svg]:hidden"}

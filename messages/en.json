@@ -8,7 +8,7 @@
     "edit": "Edit",
     "delete": "Delete",
     "insufficient_role": "You don't have permission for this action",
-    "pick_date": "Pick a date",
+    "no_due_date": "No due date",
     "clear_date": "Clear date",
     "sort_by": "Sort by:"
   },
@@ -283,6 +283,7 @@
     "description": "Manage your workspaces",
     "create_workspace": "New workspace",
     "no_workspaces": "You don't have any workspaces yet.",
+    "no_own_workspaces": "You don't have any workspaces of your own yet.",
     "edit": "Edit",
     "delete": "Delete",
     "leave": "Leave workspace",
@@ -383,9 +384,11 @@
   "dashboard": {
     "title": "Dashboard",
     "description": "Overview of your work in this workspace",
-    "my_tasks": "My tasks",
-    "no_tasks": "No tasks assigned to you",
-    "projects_progress": "Projects progress"
+    "no_tasks": "No active tasks",
+    "overdue": "Overdue",
+    "due_today": "Today",
+    "due_this_week": "This week",
+    "later": "Later"
   },
   "projects": {
     "title": "Projects (active)",
@@ -479,8 +482,10 @@
     "subtasks": "Subtasks",
     "advance_status": "Switch status",
     "advance_status_to": "Switch status to \"{status}\"",
+    "priority_tooltip": "Priority: {priority}",
+    "no_tasks_for_status": "No tasks for this status",
+    "no_subtasks": "No subtasks",
     "no_assignee": "No assignee",
-    "assign": "Assign someone",
     "assignee_change_error": "Could not change assignee",
     "due_date_change_error": "Could not change due date",
     "invalid_assignee": "This person has no access to this project",
@@ -569,6 +574,7 @@
     "edit": {
       "trigger": "Edit task",
       "title": "View and update task",
+      "title_readonly": "View task",
       "title_label": "Title",
       "title_placeholder": "What needs to be done?",
       "description_label": "Description",

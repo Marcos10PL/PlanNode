@@ -136,6 +136,10 @@ export const TASK_STATUS_ORDER: TaskStatus[] = [
   TASK_STATUSES.CANCELLED,
 ];
 
+export const KANBAN_COLUMN_WIDTH = 260;
+export const KANBAN_COLLAPSED_WIDTH = 36;
+export const KANBAN_GAP = 10;
+
 export const TASK_PRIORITIES = {
   LOW: "low",
   MEDIUM: "medium",
@@ -164,6 +168,23 @@ export const TASK_VIEWS = {
 } as const;
 
 export type TaskView = (typeof TASK_VIEWS)[keyof typeof TASK_VIEWS];
+
+export const TASK_URGENCY_BUCKETS = {
+  OVERDUE: "overdue",
+  TODAY: "today",
+  THIS_WEEK: "this_week",
+  LATER: "later",
+} as const;
+
+export type TaskUrgencyBucket =
+  (typeof TASK_URGENCY_BUCKETS)[keyof typeof TASK_URGENCY_BUCKETS];
+
+export const TASK_URGENCY_BUCKET_ORDER: TaskUrgencyBucket[] = [
+  TASK_URGENCY_BUCKETS.OVERDUE,
+  TASK_URGENCY_BUCKETS.TODAY,
+  TASK_URGENCY_BUCKETS.THIS_WEEK,
+  TASK_URGENCY_BUCKETS.LATER,
+];
 
 export const PROJECT_ICONS = {
   FOLDER_KANBAN: "folder-kanban",

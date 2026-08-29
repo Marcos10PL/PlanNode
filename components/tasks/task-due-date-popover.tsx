@@ -22,19 +22,39 @@ export function TaskDueDatePopover({
   noPlaceholder = false,
 }: Props) {
   const t = useTranslations();
+  const tCommon = useTranslations("common");
   const locale = useLocale();
 
-  if (!canEdit) {
-    return dueDate ? (
+  const tooltip = dueDate ? t("tasks.set_due_date") : tCommon("no_due_date");
+
+  const content = (
+    <>
+      <CalendarIcon className="size-4" />
       <span
         className={cn(
-          "text-xs shrink-0",
+          "w-16 text-left tabular-nums",
+          !dueDate && "pl-0.5",
+          noPlaceholder && !dueDate && "hidden",
+        )}
+      >
+        {dueDate ? formatDate(dueDate, locale) : "-- . -- . ----"}
+      </span>
+    </>
+  );
+
+  if (!canEdit) {
+    if (noPlaceholder && !dueDate) return null;
+
+    return (
+      <span
+        className={cn(
+          "inline-flex h-7 shrink-0 cursor-default items-center gap-1.5 rounded-md px-2 text-xs font-normal",
           isOverdue ? "text-destructive font-medium" : "text-muted-foreground",
         )}
       >
-        {formatDate(dueDate, locale)}
+        {content}
       </span>
-    ) : null;
+    );
   }
 
   const handleChange = (value: string | null) => {
@@ -47,7 +67,7 @@ export function TaskDueDatePopover({
       value={dueDate}
       onChange={handleChange}
       align="end"
-      tooltip={t("tasks.set_due_date")}
+      tooltip={tooltip}
       trigger={
         <Button
           variant="ghost"
@@ -59,16 +79,7 @@ export function TaskDueDatePopover({
               : "text-muted-foreground",
           )}
         >
-          <CalendarIcon className="size-4" />
-          <span
-            className={cn(
-              "w-16 text-left tabular-nums",
-              !dueDate && "pl-0.5",
-              noPlaceholder && !dueDate && "hidden",
-            )}
-          >
-            {dueDate ? formatDate(dueDate, locale) : "-- . -- . ----"}
-          </span>
+          {content}
         </Button>
       }
     />

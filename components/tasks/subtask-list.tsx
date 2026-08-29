@@ -19,6 +19,16 @@ export function SubtaskList({
 }: Props) {
   const t = useTranslations("tasks");
 
+  if (subtasks.length === 0 && !canEdit) {
+    return (
+      <div className="ml-5 border-l pl-4">
+        <p className="text-sm text-muted-foreground py-2">
+          {t("no_subtasks")}
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="ml-5 border-l pl-2">
       <DragDropProvider onDragEnd={onDragEnd}>

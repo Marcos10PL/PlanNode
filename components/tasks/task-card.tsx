@@ -5,6 +5,7 @@ import { DeleteButton } from "@/components/ui/delete-button";
 import { TooltipIconButton } from "@/components/ui/tooltip-icon-button";
 import { useTaskItemActions } from "@/hooks/use-task-item-actions";
 import { TaskItemProps } from "@/types/props";
+import { cn } from "@/utils";
 import { History } from "lucide-react";
 import { InfoPopover } from "../ui/info-popover";
 import { AdvanceStatusButton } from "./advance-status-button";
@@ -56,7 +57,7 @@ export function TaskCard({
     <>
       <div
         className="flex flex-col gap-2.5 rounded-md border bg-background py-2 px-1.5 transition-colors hover:bg-accent/50 cursor-pointer"
-        onClick={canEdit ? openDetails : undefined}
+        onClick={openDetails}
       >
         <div className="flex items-start gap-0.5 min-w-0">
           {dragHandle && (
@@ -65,7 +66,11 @@ export function TaskCard({
             </div>
           )}
 
-          <p className="text-sm font-medium wrap-break-word line-clamp-2">
+          <p
+            className={cn("text-sm font-medium wrap-break-word line-clamp-2", {
+              "pl-1": !dragHandle,
+            })}
+          >
             {task.title}
           </p>
         </div>
@@ -97,7 +102,7 @@ export function TaskCard({
               <TaskPrioritySelect
                 value={task.priority}
                 onValueChange={handlePriorityChange}
-                disabled={!canEdit}
+                readOnly={!canEdit}
                 iconOnly
                 size="sm"
               />
