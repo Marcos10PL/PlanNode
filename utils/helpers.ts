@@ -31,6 +31,9 @@ export const getTaskListSortCookie = (listId: string) =>
 export const getTaskListCollapsedCookie = (listId: string) =>
   `task_list_collapsed_${listId}`;
 
+export const getTaskListViewCookie = (listId: string) =>
+  `task_list_view_${listId}`;
+
 export const parseCookieValue = <T>(
   raw: string | undefined,
   fallback: T,

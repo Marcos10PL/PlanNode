@@ -1,50 +1,23 @@
 "use client";
 
-import { deleteTaskAction } from "@/actions/task/delete-task";
-import { Button } from "@/components/ui/button";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { DeleteButton } from "@/components/ui/delete-button";
-import { EditButton } from "@/components/ui/edit-button";
 import { InfoPopover } from "@/components/ui/info-popover";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { TooltipIconButton } from "@/components/ui/tooltip-icon-button";
-import { ERRORS, TASK_STATUSES, TASK_STATUS_ORDER } from "@/const";
-import { UpdateTaskSchema } from "@/schema";
-import { Task, TaskAssignee, WorkspaceMember } from "@/types/dto";
-import { TaskPriority, TaskStatus } from "@/types/entities";
-import { cn, getPriorityLabel, isTaskOverdue } from "@/utils";
-import { type DragEndEvent } from "@dnd-kit/react";
-import { History, LayoutList, StepForward } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { useState } from "react";
-import { toast } from "sonner";
+import { useTaskItemActions } from "@/hooks/use-task-item-actions";
+import { TaskItemProps } from "@/types/props";
+import { cn, getPriorityLabel } from "@/utils";
+import { History } from "lucide-react";
+import { AdvanceStatusButton } from "./advance-status-button";
 import { SubtaskList } from "./subtask-list";
+import { SubtaskToggle } from "./subtask-toggle";
 import { TaskAssigneePopover } from "./task-assignee-popover";
 import { TaskDueDatePopover } from "./task-due-date-popover";
 import { TaskModal } from "./task-modal";
 import { TaskPrioritySelect } from "./task-priority-select";
 import { TaskStatusSelect } from "./task-status-select";
 
-type Props = {
-  task: Task;
-  members: WorkspaceMember[];
-  canEdit: boolean;
-  canManage: boolean;
-  dragHandle?: React.ReactNode;
-  onUpdateTask: (
-    taskId: string,
-    patch: Partial<Task>,
-    serverPatch: UpdateTaskSchema,
-    fallbackErrorKey: string,
-  ) => Promise<{ error?: string } | undefined>;
-  subtasks?: Task[];
-  onSubtaskDragEnd?: (event: DragEndEvent) => void;
-  onAddSubtask?: () => void;
-};
+type Props = TaskItemProps;
 
 export function TaskRow({
   task,
@@ -56,100 +29,31 @@ export function TaskRow({
   subtasks = [],
   onSubtaskDragEnd,
   onAddSubtask,
+  hiddenStatuses,
 }: Props) {
-  const t = useTranslations();
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalTab, setModalTab] = useState<"details" | "activity">("details");
-  const [deleteOpen, setDeleteOpen] = useState(false);
-  const [isPending, setIsPending] = useState(false);
-  const [subtasksExpanded, setSubtasksExpanded] = useState(false);
-
-  const openDetails = () => {
-    setModalTab("details");
-    setModalOpen(true);
-  };
-
-  const openActivity = () => {
-    setModalTab("activity");
-    setModalOpen(true);
-  };
-
-  const isSubtask = !!task.parentTaskId;
-  const subtasksDone = subtasks.filter(
-    s => s.status === TASK_STATUSES.DONE,
-  ).length;
-  const subtasksTotal = subtasks.filter(
-    s => s.status !== TASK_STATUSES.CANCELLED,
-  ).length;
-
-  const isOverdue = isTaskOverdue(task);
-
-  const handleStatusChange = (status: TaskStatus) => {
-    onUpdateTask(task.id, { status }, { status }, "tasks.status_change_error");
-  };
-
-  const handleAdvanceStatus = () => {
-    const currentIndex = TASK_STATUS_ORDER.indexOf(task.status);
-    const nextStatus =
-      TASK_STATUS_ORDER[(currentIndex + 1) % TASK_STATUS_ORDER.length];
-    handleStatusChange(nextStatus);
-  };
-
-  const handlePriorityChange = (priority: TaskPriority) => {
-    onUpdateTask(
-      task.id,
-      { priority },
-      { priority },
-      "tasks.priority_change_error",
-    );
-  };
-
-  const handleAssigneeChange = (assigneeId: string | null) => {
-    const member = assigneeId
-      ? members.find(m => m.id === assigneeId)
-      : undefined;
-    const assignee: TaskAssignee | null = member
-      ? { id: member.id, fullName: member.fullName, email: member.email }
-      : null;
-
-    onUpdateTask(
-      task.id,
-      { assigneeId, assignee },
-      { assigneeId },
-      "tasks.assignee_change_error",
-    );
-  };
-
-  const handleDueDateChange = (dueDate: string | null) => {
-    onUpdateTask(
-      task.id,
-      { dueDate },
-      { dueDate },
-      "tasks.due_date_change_error",
-    );
-  };
-
-  const handleDelete = async () => {
-    setIsPending(true);
-    try {
-      const result = await deleteTaskAction(task.id);
-      if (result?.error) {
-        toast.error(
-          result.error === ERRORS.INSUFFICIENT_ROLE
-            ? t("common.insufficient_role")
-            : t("tasks.delete.error"),
-        );
-      } else {
-        toast.success(t("tasks.delete.success"));
-      }
-    } catch {
-      toast.error(t("common.unexpected_error"));
-    } finally {
-      setIsPending(false);
-    }
-  };
-
-  const stopPropagation = (e: React.MouseEvent) => e.stopPropagation();
+  const {
+    t,
+    modalOpen,
+    setModalOpen,
+    modalTab,
+    deleteOpen,
+    setDeleteOpen,
+    isPending,
+    subtasksExpanded,
+    setSubtasksExpanded,
+    openDetails,
+    openActivity,
+    isSubtask,
+    subtasksDone,
+    subtasksTotal,
+    isOverdue,
+    handleStatusChange,
+    handlePriorityChange,
+    handleAssigneeChange,
+    handleDueDateChange,
+    handleDelete,
+    stopPropagation,
+  } = useTaskItemActions({ task, members, subtasks, onUpdateTask });
 
   return (
     <>
@@ -168,32 +72,13 @@ export function TaskRow({
           )}
 
           {!isSubtask && (
-            <div
-              onClick={stopPropagation}
-              className="flex items-center gap-1 shrink-0"
-            >
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant={subtasksExpanded ? "secondary" : "outline"}
-                    size="icon"
-                    className={cn(
-                      "h-7 min-w-fit",
-                      subtasks.length > 0 ? "px-1.5" : "px-0.5 w-7",
-                      subtasksExpanded && "border border-transparent",
-                    )}
-                    onClick={() => setSubtasksExpanded(v => !v)}
-                  >
-                    <LayoutList className="size-4" />
-                    {subtasks.length > 0 && (
-                      <span className="text-xs text-muted-foreground">
-                        {subtasksDone}/{subtasksTotal}
-                      </span>
-                    )}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>{t("tasks.subtasks")}</TooltipContent>
-              </Tooltip>
+            <div onClick={stopPropagation} className="shrink-0">
+              <SubtaskToggle
+                done={subtasksDone}
+                total={subtasksTotal}
+                expanded={subtasksExpanded}
+                onToggle={() => setSubtasksExpanded(v => !v)}
+              />
             </div>
           )}
 
@@ -202,7 +87,7 @@ export function TaskRow({
             {task.description && (
               <div onClick={stopPropagation} className="shrink-0">
                 <InfoPopover
-                  label={t("common.description")}
+                  label={t("common.description_hint")}
                   variant="ghost"
                   className="size-7 text-muted-foreground [&_svg]:size-4"
                 >
@@ -244,13 +129,11 @@ export function TaskRow({
               className="w-37"
             />
             {canEdit && (
-              <TooltipIconButton
-                icon={StepForward}
-                label={t("tasks.advance_status")}
-                onClick={handleAdvanceStatus}
+              <AdvanceStatusButton
+                status={task.status}
+                hiddenStatuses={hiddenStatuses}
+                onAdvance={handleStatusChange}
                 disabled={isPending}
-                variant="secondary"
-                className="h-8"
               />
             )}
           </div>
@@ -263,12 +146,6 @@ export function TaskRow({
               onChange={handleDueDateChange}
             />
           </div>
-
-          {canEdit && (
-            <div onClick={stopPropagation} className="lg:hidden shrink-0">
-              <EditButton onClick={openDetails} disabled={isPending} />
-            </div>
-          )}
 
           <div onClick={stopPropagation} className="shrink-0">
             <TooltipIconButton

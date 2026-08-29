@@ -4,6 +4,7 @@
     "unexpected_error": "Something went wrong. Please try again.",
     "manage": "Manage",
     "description": "Description",
+    "description_hint": "Click to see the description",
     "edit": "Edit",
     "delete": "Delete",
     "insufficient_role": "You don't have permission for this action",
@@ -337,7 +338,7 @@
     "role_admin": "Admin",
     "role_member": "Member",
     "role_guest": "Guest",
-    "role_info_label": "Role information",
+    "role_info_label": "Click to see role information",
     "role_admin_description": "Can invite members, change roles, and manage content. Cannot delete the workspace.",
     "role_member_description": "Standard access to workspace content. Cannot manage members.",
     "role_guest_description": "Limited access to selected resources only."
@@ -477,6 +478,7 @@
     "add_subtask": "Add subtask",
     "subtasks": "Subtasks",
     "advance_status": "Switch status",
+    "advance_status_to": "Switch status to \"{status}\"",
     "no_assignee": "No assignee",
     "assign": "Assign someone",
     "assignee_change_error": "Could not change assignee",
@@ -497,6 +499,10 @@
       "due_date": "Due date",
       "priority": "Priority",
       "name": "Name"
+    },
+    "view": {
+      "list": "List",
+      "kanban": "Kanban"
     },
     "priority_change_error": "Could not change priority",
     "status_change_error": "Could not change task status",
@@ -599,7 +605,7 @@
       "due_date_changed": "Due date changed from \"{from}\" to \"{to}\"",
       "due_date_set": "Due date set to \"{to}\"",
       "due_date_removed": "Due date removed",
-      "show_email": "Show email",
+      "show_email": "Click to see the email",
       "comment_placeholder": "Write a comment...",
       "comment_submit": "Add comment",
       "comment_submitting": "Adding...",

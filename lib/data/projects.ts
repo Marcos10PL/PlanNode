@@ -5,7 +5,7 @@ import { cache } from "react";
 import { Client, requireUserContext } from "../supabase/server";
 
 const PROJECT_BASE_FIELDS =
-  "id, workspace_id, name, description, is_private, is_completed, icon, color, created_by, created_at, task_lists(id, name, position, tasks(status))";
+  "id, workspace_id, name, description, is_private, is_completed, icon, color, created_by, created_at, task_lists(id, name, position, tasks(status, parent_task_id))";
 
 const projectRowQuery = (supabase: Client) =>
   supabase
@@ -15,7 +15,13 @@ const projectRowQuery = (supabase: Client) =>
 const mapProjectWithProgress = (
   row: QueryData<ReturnType<typeof projectRowQuery>>[number],
 ): ProjectWithProgress => {
-  const tasks = row.task_lists.flatMap(list => list.tasks);
+  // Subtasks have their own independent status, so a parent being marked
+  // done doesn't say anything about them — excluded from these counts so
+  // progress reflects top-level tasks only.
+  const topLevelTasksByList = row.task_lists.map(list =>
+    list.tasks.filter(t => !t.parent_task_id),
+  );
+  const tasks = topLevelTasksByList.flat();
   const favorite = row.project_favorites[0] as { position: number } | undefined;
 
   return {
@@ -35,15 +41,19 @@ const mapProjectWithProgress = (
     doneTasks: tasks.filter(t => t.status === TASK_STATUSES.DONE).length,
     cancelledTasks: tasks.filter(t => t.status === TASK_STATUSES.CANCELLED)
       .length,
-    lists: row.task_lists.map(list => ({
-      id: list.id,
-      name: list.name,
-      taskCount: list.tasks.length,
-      doneCount: list.tasks.filter(t => t.status === TASK_STATUSES.DONE).length,
-      cancelledCount: list.tasks.filter(
-        t => t.status === TASK_STATUSES.CANCELLED,
-      ).length,
-    })),
+    lists: row.task_lists.map((list, index) => {
+      const listTasks = topLevelTasksByList[index];
+      return {
+        id: list.id,
+        name: list.name,
+        taskCount: listTasks.length,
+        doneCount: listTasks.filter(t => t.status === TASK_STATUSES.DONE)
+          .length,
+        cancelledCount: listTasks.filter(
+          t => t.status === TASK_STATUSES.CANCELLED,
+        ).length,
+      };
+    }),
   } satisfies ProjectWithProgress;
 };
 

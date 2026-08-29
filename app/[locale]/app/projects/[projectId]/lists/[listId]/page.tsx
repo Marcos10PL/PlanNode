@@ -1,5 +1,5 @@
 import { TaskListSection } from "@/components/tasks/task-list-section";
-import { COOKIES, TASK_SORTS } from "@/const";
+import { COOKIES, TASK_SORTS, TASK_VIEWS } from "@/const";
 import {
   getProject,
   getProjectMemberIds,
@@ -10,6 +10,7 @@ import { TaskStatus } from "@/types/entities";
 import {
   getTaskListCollapsedCookie,
   getTaskListSortCookie,
+  getTaskListViewCookie,
   parseCookieValue,
 } from "@/utils/helpers";
 import { cookies } from "next/headers";
@@ -57,6 +58,10 @@ export default async function TaskListPage({ params }: Props) {
     cookieStore.get(getTaskListCollapsedCookie(list.id))?.value,
     [],
   );
+  const defaultView = parseCookieValue(
+    cookieStore.get(getTaskListViewCookie(list.id))?.value,
+    TASK_VIEWS.LIST,
+  );
 
   return (
     <TaskListSection
@@ -66,6 +71,7 @@ export default async function TaskListPage({ params }: Props) {
       canManage={canManage}
       defaultSort={defaultSort}
       defaultCollapsed={defaultCollapsed}
+      defaultView={defaultView}
     />
   );
 }

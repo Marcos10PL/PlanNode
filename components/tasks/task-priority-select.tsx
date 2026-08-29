@@ -57,7 +57,7 @@ export function TaskPrioritySelect({
         id={id}
         size={size}
         aria-label={ariaLabel}
-        className={className}
+        className={cn("h-7!", className)}
       >
         {iconOnly ? (
           <Flag

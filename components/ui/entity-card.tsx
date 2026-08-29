@@ -42,7 +42,7 @@ export function EntityCard({
           {badge}
           {description && (
             <InfoPopover
-              label={t("description")}
+              label={t("description_hint")}
               className="relative shrink-0 -mt-0.5"
             >
               {description}

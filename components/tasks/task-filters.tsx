@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/popover";
 import { SortSelect } from "@/components/ui/sort-select";
 import { Switch } from "@/components/ui/switch";
-import { TASK_PRIORITIES, TASK_SORTS } from "@/const";
+import { TASK_PRIORITIES, TASK_SORTS, TaskView } from "@/const";
 import { Task, WorkspaceMember } from "@/types/dto";
 import { TaskPriority } from "@/types/entities";
 import { cn } from "@/utils";
@@ -18,6 +18,7 @@ import { Check, ChevronDown, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { ReactNode, useState } from "react";
 import { PriorityOptionLabel } from "./task-priority-select";
+import { TaskViewToggle } from "./task-view-toggle";
 
 export type TaskSort = (typeof TASK_SORTS)[keyof typeof TASK_SORTS];
 
@@ -88,6 +89,8 @@ type Props = {
   onChange: (filters: TaskFiltersState) => void;
   sort: TaskSort;
   onSortChange: (sort: TaskSort) => void;
+  view: TaskView;
+  onViewChange: (view: TaskView) => void;
 };
 
 export function TaskFilters({
@@ -96,6 +99,8 @@ export function TaskFilters({
   onChange,
   sort,
   onSortChange,
+  view,
+  onViewChange,
 }: Props) {
   const t = useTranslations("tasks");
   const tTeam = useTranslations("team");
@@ -244,6 +249,7 @@ export function TaskFilters({
           options={Object.values(TASK_SORTS)}
           getLabel={s => t(`sort.${s}`)}
         />
+        <TaskViewToggle value={view} onChange={onViewChange} />
       </div>
     </div>
   );
