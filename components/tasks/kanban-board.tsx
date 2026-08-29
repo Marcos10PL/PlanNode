@@ -53,19 +53,18 @@ export function KanbanBoard({
   const tRoot = useTranslations();
   const boardRef = useRef<HTMLDivElement>(null);
 
+  const updateHeight = () => {
+    if (!boardRef.current) return;
+
+    const top = boardRef.current.getBoundingClientRect().top;
+    const height = window.innerHeight - top - BOTTOM_SPACING;
+    boardRef.current.style.setProperty(
+      "--kanban-column-max-height",
+      `${height}px`,
+    );
+  };
+
   useLayoutEffect(() => {
-    const updateHeight = () => {
-      if (!boardRef.current) return;
-
-      const top = boardRef.current.getBoundingClientRect().top;
-      const height = window.innerHeight - top - BOTTOM_SPACING;
-      boardRef.current.style.setProperty(
-        "--kanban-column-max-height",
-        `${height}px`,
-      );
-    };
-    updateHeight();
-
     const observer = new ResizeObserver(updateHeight);
     observer.observe(document.body);
     window.addEventListener("resize", updateHeight);
@@ -74,6 +73,10 @@ export function KanbanBoard({
       observer.disconnect();
       window.removeEventListener("resize", updateHeight);
     };
+  }, []);
+
+  useLayoutEffect(() => {
+    updateHeight();
   });
 
   return (
