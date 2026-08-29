@@ -56,6 +56,7 @@ export function MemberRow({ member, currentUserRole, workspaceId }: Props) {
         name={member.fullName}
         email={member.email}
         role={member.role}
+        showBadge
       >
         {canManage && (
           <ManageMenu

@@ -112,6 +112,7 @@ export function TaskModal({
       form={form}
       members={members}
       isEditing={!!task}
+      canEdit={canEdit}
       onSubmit={onSubmit}
       onCancel={() => onOpenChange(false)}
     />
@@ -121,7 +122,7 @@ export function TaskModal({
     <Dialog open={open} onOpenChange={o => !o && onOpenChange(false)}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t("title")}</DialogTitle>
+          <DialogTitle>{task && !canEdit ? t("title_readonly") : t("title")}</DialogTitle>
           {!task && <DialogDescription>{t("description")}</DialogDescription>}
         </DialogHeader>
 

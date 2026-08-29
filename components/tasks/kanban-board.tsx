@@ -1,7 +1,12 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { TASK_STATUS_ORDER } from "@/const";
+import {
+  KANBAN_COLLAPSED_WIDTH,
+  KANBAN_COLUMN_WIDTH,
+  KANBAN_GAP,
+  TASK_STATUS_ORDER,
+} from "@/const";
 import { Task } from "@/types/dto";
 import { TaskStatus } from "@/types/entities";
 import { TaskCoreProps } from "@/types/props";
@@ -19,10 +24,6 @@ import { AddRowButton } from "./add-row-button";
 import { SortableTaskCard } from "./sortable-task-card";
 
 const BOTTOM_SPACING = 48;
-
-export const KANBAN_COLUMN_WIDTH = 260;
-export const KANBAN_COLLAPSED_WIDTH = 36;
-export const KANBAN_GAP = 10;
 
 type Props = TaskCoreProps & {
   tasksByStatus: Record<TaskStatus, Task[]>;
@@ -154,29 +155,37 @@ export function KanbanBoard({
               </Button>
 
               <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-2">
-                {tasks.map((task, index) => (
-                  <SortableTaskCard
-                    key={task.id}
-                    task={task}
-                    index={index}
-                    members={members}
-                    canEdit={canEdit}
-                    canManage={canManage}
-                    dragEnabled={dragEnabled}
-                    onUpdateTask={onUpdateTask}
-                    hiddenStatuses={collapsed}
-                    subtasks={subtasksByParent.get(task.id) ?? []}
-                    onSubtaskDragEnd={onSubtaskDragEnd(task.id)}
-                    onAddSubtask={() => onAddSubtask(task.id)}
-                  />
-                ))}
-                {canEdit && (
-                  <div className="shrink-0">
-                    <AddRowButton
-                      label={t("add_task")}
-                      onClick={() => onAddTask(status)}
-                    />
-                  </div>
+                {tasks.length === 0 && !canEdit ? (
+                  <p className="text-sm text-muted-foreground pl-1">
+                    {t("no_tasks_for_status")}
+                  </p>
+                ) : (
+                  <>
+                    {tasks.map((task, index) => (
+                      <SortableTaskCard
+                        key={task.id}
+                        task={task}
+                        index={index}
+                        members={members}
+                        canEdit={canEdit}
+                        canManage={canManage}
+                        dragEnabled={dragEnabled}
+                        onUpdateTask={onUpdateTask}
+                        hiddenStatuses={collapsed}
+                        subtasks={subtasksByParent.get(task.id) ?? []}
+                        onSubtaskDragEnd={onSubtaskDragEnd(task.id)}
+                        onAddSubtask={() => onAddSubtask(task.id)}
+                      />
+                    ))}
+                    {canEdit && (
+                      <div className="shrink-0">
+                        <AddRowButton
+                          label={t("add_task")}
+                          onClick={() => onAddTask(status)}
+                        />
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </div>

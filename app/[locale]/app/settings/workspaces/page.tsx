@@ -69,11 +69,18 @@ export default function ProfileWorkspacesPage() {
             <AccordionItem key={section.value} value={section.value}>
               <AccordionTrigger>{section.label}</AccordionTrigger>
               <AccordionContent>
-                <Layout>
-                  {section.items.map(workspace => (
-                    <WorkspaceItem key={workspace.id} workspace={workspace} />
-                  ))}
-                </Layout>
+                {section.value === ACCORDION_VALUES.MY.value &&
+                section.items.length === 0 ? (
+                  <p className="text-sm text-muted-foreground mt-4 md:mt-0">
+                    {t("no_own_workspaces")}
+                  </p>
+                ) : (
+                  <Layout>
+                    {section.items.map(workspace => (
+                      <WorkspaceItem key={workspace.id} workspace={workspace} />
+                    ))}
+                  </Layout>
+                )}
               </AccordionContent>
             </AccordionItem>
           ))}

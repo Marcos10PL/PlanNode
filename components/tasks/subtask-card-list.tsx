@@ -19,6 +19,14 @@ export function SubtaskCardList({
 }: Props) {
   const t = useTranslations("tasks");
 
+  if (subtasks.length === 0 && !canEdit) {
+    return (
+      <p className="ml-2.5 text-sm text-muted-foreground">
+        {t("no_subtasks")}
+      </p>
+    );
+  }
+
   return (
     <div className="ml-2.5 flex flex-col gap-2">
       <DragDropProvider onDragEnd={onDragEnd}>

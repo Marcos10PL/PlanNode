@@ -6,7 +6,7 @@ import { InfoPopover } from "@/components/ui/info-popover";
 import { TooltipIconButton } from "@/components/ui/tooltip-icon-button";
 import { useTaskItemActions } from "@/hooks/use-task-item-actions";
 import { TaskItemProps } from "@/types/props";
-import { cn, getPriorityLabel } from "@/utils";
+import { getPriorityLabel } from "@/utils";
 import { History } from "lucide-react";
 import { AdvanceStatusButton } from "./advance-status-button";
 import { SubtaskList } from "./subtask-list";
@@ -59,11 +59,8 @@ export function TaskRow({
     <>
       <div className="flex flex-col divide-y">
         <div
-          className={cn(
-            "relative flex items-center gap-2 px-2.5 py-1.5 transition-colors hover:bg-accent/50",
-            canEdit && "cursor-pointer",
-          )}
-          onClick={canEdit ? openDetails : undefined}
+          className="relative flex cursor-pointer items-center gap-2 px-2.5 py-1.5 transition-colors hover:bg-accent/50"
+          onClick={openDetails}
         >
           {dragHandle && (
             <div onClick={stopPropagation} className="shrink-0 absolute">
@@ -110,33 +107,32 @@ export function TaskRow({
             <TaskPrioritySelect
               value={task.priority}
               onValueChange={handlePriorityChange}
-              disabled={!canEdit}
+              readOnly={!canEdit}
               iconOnly
               size="sm"
               ariaLabel={getPriorityLabel(task.priority, t)}
             />
           </div>
 
-          <div
-            onClick={stopPropagation}
-            className="hidden lg:flex items-center shrink-0 gap-0.5"
-          >
-            <TaskStatusSelect
-              value={task.status}
-              onValueChange={handleStatusChange}
-              disabled={!canEdit}
-              size="sm"
-              className="w-37"
-            />
-            {canEdit && (
+          {canEdit && (
+            <div
+              onClick={stopPropagation}
+              className="hidden lg:flex items-center shrink-0 gap-0.5"
+            >
+              <TaskStatusSelect
+                value={task.status}
+                onValueChange={handleStatusChange}
+                size="sm"
+                className="w-37"
+              />
               <AdvanceStatusButton
                 status={task.status}
                 hiddenStatuses={hiddenStatuses}
                 onAdvance={handleStatusChange}
                 disabled={isPending}
               />
-            )}
-          </div>
+            </div>
+          )}
 
           <div onClick={stopPropagation} className="hidden lg:block shrink-0">
             <TaskDueDatePopover

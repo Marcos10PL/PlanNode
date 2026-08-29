@@ -1,5 +1,11 @@
 ﻿import type { ManageMenuItem } from "@/components/ui/manage-menu";
-import { TASK_PRIORITIES, TASK_STATUS_ORDER, TASK_STATUSES } from "@/const";
+import {
+  TASK_PRIORITIES,
+  TASK_STATUS_ORDER,
+  TASK_STATUSES,
+  TASK_URGENCY_BUCKETS,
+  TaskUrgencyBucket,
+} from "@/const";
 import { Translations } from "@/types";
 import { Task } from "@/types/dto";
 import { TaskPriority, TaskStatus } from "@/types/entities";
@@ -136,6 +142,39 @@ export const isTaskOverdue = (task: Pick<Task, "dueDate" | "status">) => {
 
   const [year, month, day] = task.dueDate.split("-").map(Number);
   return new Date(year, month - 1, day, 23, 59, 59, 999) < new Date();
+};
+
+const URGENCY_BUCKET_LABEL_KEYS = {
+  [TASK_URGENCY_BUCKETS.OVERDUE]: "dashboard.overdue",
+  [TASK_URGENCY_BUCKETS.TODAY]: "dashboard.due_today",
+  [TASK_URGENCY_BUCKETS.THIS_WEEK]: "dashboard.due_this_week",
+  [TASK_URGENCY_BUCKETS.LATER]: "dashboard.later",
+} as const satisfies Record<TaskUrgencyBucket, string>;
+
+export const getTaskUrgencyBucketLabel = (
+  bucket: TaskUrgencyBucket,
+  t: Translations,
+) => t(URGENCY_BUCKET_LABEL_KEYS[bucket]);
+
+export const getTaskUrgencyBucket = (
+  dueDate: string | null,
+): TaskUrgencyBucket => {
+  if (!dueDate) return TASK_URGENCY_BUCKETS.LATER;
+
+  const [year, month, day] = dueDate.split("-").map(Number);
+  const due = new Date(year, month - 1, day);
+
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  const diffDays = Math.round(
+    (due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+  );
+
+  if (diffDays < 0) return TASK_URGENCY_BUCKETS.OVERDUE;
+  if (diffDays === 0) return TASK_URGENCY_BUCKETS.TODAY;
+  if (diffDays <= 7) return TASK_URGENCY_BUCKETS.THIS_WEEK;
+  return TASK_URGENCY_BUCKETS.LATER;
 };
 
 export const getNextStatus = (

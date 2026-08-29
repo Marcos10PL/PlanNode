@@ -18,6 +18,7 @@ type Props = {
   form: UseFormReturn<CreateTaskSchema>;
   members: WorkspaceMember[];
   isEditing: boolean;
+  canEdit: boolean;
   onSubmit: (data: CreateTaskSchema) => void;
   onCancel: () => void;
 };
@@ -26,6 +27,7 @@ export function TaskDetailsForm({
   form,
   members,
   isEditing,
+  canEdit,
   onSubmit,
   onCancel,
 }: Props) {
@@ -39,6 +41,7 @@ export function TaskDetailsForm({
         label={t("title_label")}
         placeholder={t("title_placeholder")}
         maxLength={VALIDATION_MAX.TASK_TITLE}
+        disabled={!canEdit}
       />
       <ControlledTextareaField
         control={form.control}
@@ -46,6 +49,7 @@ export function TaskDetailsForm({
         label={t("description_label")}
         placeholder={t("description_placeholder")}
         maxLength={VALIDATION_MAX.TASK_DESCRIPTION}
+        disabled={!canEdit}
       />
       <div className="grid sm:grid-cols-2 gap-2">
         <Controller
@@ -58,6 +62,7 @@ export function TaskDetailsForm({
                 id="status"
                 value={field.value}
                 onValueChange={field.onChange}
+                disabled={!canEdit}
                 className="w-full h-9!"
               />
             </Field>
@@ -73,6 +78,7 @@ export function TaskDetailsForm({
                 id="priority"
                 value={field.value}
                 onValueChange={field.onChange}
+                disabled={!canEdit}
                 className="w-full h-9!"
               />
             </Field>
@@ -93,6 +99,7 @@ export function TaskDetailsForm({
                 value={field.value}
                 onChange={field.onChange}
                 members={members}
+                disabled={!canEdit}
               />
             </Field>
           )}
@@ -107,25 +114,28 @@ export function TaskDetailsForm({
                 id="dueDate"
                 value={field.value ?? null}
                 onChange={field.onChange}
+                disabled={!canEdit}
               />
             </Field>
           )}
         />
       </div>
-      <div className="flex gap-2 justify-end">
-        <Button type="button" variant="outline" onClick={onCancel}>
-          {t("cancel")}
-        </Button>
-        <Button
-          type="submit"
-          disabled={
-            form.formState.isSubmitting ||
-            (isEditing && !form.formState.isDirty)
-          }
-        >
-          {form.formState.isSubmitting ? t("submitting") : t("submit")}
-        </Button>
-      </div>
+      {canEdit && (
+        <div className="flex gap-2 justify-end">
+          <Button type="button" variant="outline" onClick={onCancel}>
+            {t("cancel")}
+          </Button>
+          <Button
+            type="submit"
+            disabled={
+              form.formState.isSubmitting ||
+              (isEditing && !form.formState.isDirty)
+            }
+          >
+            {form.formState.isSubmitting ? t("submitting") : t("submit")}
+          </Button>
+        </div>
+      )}
     </form>
   );
 }

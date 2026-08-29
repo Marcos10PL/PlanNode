@@ -15,14 +15,13 @@ const projectRowQuery = (supabase: Client) =>
 const mapProjectWithProgress = (
   row: QueryData<ReturnType<typeof projectRowQuery>>[number],
 ): ProjectWithProgress => {
-  // Subtasks have their own independent status, so a parent being marked
-  // done doesn't say anything about them — excluded from these counts so
-  // progress reflects top-level tasks only.
+  // subtask counts are not included in the progress counts
   const topLevelTasksByList = row.task_lists.map(list =>
     list.tasks.filter(t => !t.parent_task_id),
   );
+
   const tasks = topLevelTasksByList.flat();
-  const favorite = row.project_favorites[0] as { position: number } | undefined;
+  const favorite = row.project_favorites[0];
 
   return {
     id: row.id,

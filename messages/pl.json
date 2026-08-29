@@ -8,7 +8,7 @@
     "edit": "Edytuj",
     "delete": "Usuń",
     "insufficient_role": "Brak uprawnień do tej operacji",
-    "pick_date": "Wybierz datę",
+    "no_due_date": "Brak terminu",
     "clear_date": "Wyczyść datę",
     "sort_by": "Sortuj:"
   },
@@ -283,6 +283,7 @@
     "description": "Zarządzaj swoimi przestrzeniami roboczymi",
     "create_workspace": "Nowa przestrzeń",
     "no_workspaces": "Nie masz jeszcze żadnych przestrzeni roboczych.",
+    "no_own_workspaces": "Nie posiadasz jeszcze własnych przestrzeni roboczych.",
     "edit": "Edytuj",
     "delete": "Usuń",
     "leave": "Opuść przestrzeń",
@@ -383,9 +384,11 @@
   "dashboard": {
     "title": "Panel",
     "description": "Przegląd Twojej pracy w tej przestrzeni",
-    "my_tasks": "Moje zadania",
-    "no_tasks": "Brak zadań przypisanych do Ciebie",
-    "projects_progress": "Postęp projektów"
+    "no_tasks": "Brak aktywnych zadań",
+    "overdue": "Zaległe",
+    "due_today": "Dziś",
+    "due_this_week": "Ten tydzień",
+    "later": "Później"
   },
   "projects": {
     "title": "Projekty (aktywne)",
@@ -479,8 +482,10 @@
     "subtasks": "Podzadania",
     "advance_status": "Przełącz status",
     "advance_status_to": "Przełącz status na \"{status}\"",
+    "priority_tooltip": "Priorytet: {priority}",
+    "no_tasks_for_status": "Brak zadań w tym statusie",
+    "no_subtasks": "Brak podzadań",
     "no_assignee": "Brak przypisania",
-    "assign": "Przypisz osobę",
     "assignee_change_error": "Nie udało się zmienić przypisania",
     "due_date_change_error": "Nie udało się zmienić terminu",
     "invalid_assignee": "Ta osoba nie ma dostępu do tego projektu",
@@ -569,6 +574,7 @@
     "edit": {
       "trigger": "Edytuj zadanie",
       "title": "Przeglądaj i aktualizuj zadanie",
+      "title_readonly": "Przeglądaj zadanie",
       "title_label": "Tytuł",
       "title_placeholder": "Co trzeba zrobić?",
       "description_label": "Opis",

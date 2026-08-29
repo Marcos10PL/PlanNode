@@ -76,7 +76,7 @@ export function DatePicker({
       {value ? (
         formatDate(value, locale)
       ) : (
-        <span className="text-muted-foreground">{t("pick_date")}</span>
+        <span className="text-muted-foreground">{t("no_due_date")}</span>
       )}
     </Button>
   );

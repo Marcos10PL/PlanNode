@@ -1,13 +1,14 @@
 "use client";
 
 import { reorderTasksAction } from "@/actions/task/reorder-tasks";
-import { updateTaskAction } from "@/actions/task/update-task";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { ManageMenu } from "@/components/ui/manage-menu";
 import {
   ERRORS,
+  KANBAN_COLUMN_WIDTH,
+  KANBAN_GAP,
   TASK_SORTS,
   TASK_STATUS_ORDER,
   TASK_STATUSES,
@@ -16,7 +17,7 @@ import {
 } from "@/const";
 import { useCookieState } from "@/hooks/use-cookie-state";
 import { useDeleteTaskList } from "@/hooks/use-delete-task-list";
-import { UpdateTaskSchema } from "@/schema";
+import { useOptimisticTaskUpdate } from "@/hooks/use-optimistic-task-update";
 import { Task, TaskListWithTasks, WorkspaceMember } from "@/types/dto";
 import { TaskStatus } from "@/types/entities";
 import {
@@ -45,7 +46,7 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AddRowButton } from "./add-row-button";
 import { TaskListModal } from "./create-task-list-modal";
-import { KANBAN_COLUMN_WIDTH, KANBAN_GAP, KanbanBoard } from "./kanban-board";
+import { KanbanBoard } from "./kanban-board";
 import { SortableTaskRow } from "./sortable-task-row";
 import {
   DEFAULT_TASK_FILTERS,
@@ -256,37 +257,7 @@ export function TaskListSection({
       }, 0);
     };
 
-  const updateTaskField = async (
-    taskId: string,
-    patch: Partial<Task>,
-    serverPatch: UpdateTaskSchema,
-    fallbackErrorKey: string,
-  ) => {
-    const previous = tasks;
-    setTasks(prev =>
-      prev.map(task => (task.id === taskId ? { ...task, ...patch } : task)),
-    );
-
-    try {
-      const result = await updateTaskAction(taskId, serverPatch);
-      if (result?.error) {
-        setTasks(previous);
-        toast.error(
-          result.error === ERRORS.INSUFFICIENT_ROLE
-            ? tRoot("common.insufficient_role")
-            : result.error === ERRORS.INVALID_ASSIGNEE
-              ? tRoot("tasks.invalid_assignee")
-              : tRoot(fallbackErrorKey),
-        );
-        router.refresh();
-      }
-      return result;
-    } catch {
-      setTasks(previous);
-      toast.error(tRoot("common.unexpected_error"));
-      router.refresh();
-    }
-  };
+  const updateTaskField = useOptimisticTaskUpdate(tasks, setTasks);
 
   const { remove, isPending } = useDeleteTaskList();
   const listManageMenuItems = getListManageMenuItems({
@@ -449,27 +420,39 @@ export function TaskListSection({
                             getStatusBorderClass(status),
                           )}
                         >
-                          {tasks.map((task, index) => (
-                            <SortableTaskRow
-                              key={task.id}
-                              task={task}
-                              index={index}
-                              members={members}
-                              canEdit={canEdit}
-                              canManage={canManage}
-                              dragEnabled={dragEnabled}
-                              onUpdateTask={updateTaskField}
-                              hiddenStatuses={collapsed}
-                              subtasks={subtasksByParent.get(task.id) ?? []}
-                              onSubtaskDragEnd={handleSubtaskDragEnd(task.id)}
-                              onAddSubtask={() => openCreateSubtask(task.id)}
-                            />
-                          ))}
-                          {canEdit && (
-                            <AddRowButton
-                              label={t("add_task")}
-                              onClick={() => openCreateTask(status)}
-                            />
+                          {tasks.length === 0 && !canEdit ? (
+                            <p className="text-sm text-muted-foreground py-2 pl-3">
+                              {t("no_tasks_for_status")}
+                            </p>
+                          ) : (
+                            <>
+                              {tasks.map((task, index) => (
+                                <SortableTaskRow
+                                  key={task.id}
+                                  task={task}
+                                  index={index}
+                                  members={members}
+                                  canEdit={canEdit}
+                                  canManage={canManage}
+                                  dragEnabled={dragEnabled}
+                                  onUpdateTask={updateTaskField}
+                                  hiddenStatuses={collapsed}
+                                  subtasks={subtasksByParent.get(task.id) ?? []}
+                                  onSubtaskDragEnd={handleSubtaskDragEnd(
+                                    task.id,
+                                  )}
+                                  onAddSubtask={() =>
+                                    openCreateSubtask(task.id)
+                                  }
+                                />
+                              ))}
+                              {canEdit && (
+                                <AddRowButton
+                                  label={t("add_task")}
+                                  onClick={() => openCreateTask(status)}
+                                />
+                              )}
+                            </>
                           )}
                         </div>
                       )}
