@@ -12,22 +12,24 @@ export const getNotifications = cache(
       .select("*")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
-      .range(offset, offset + limit - 1);
+      .range(offset, offset + limit);
 
-    const notifications =
-      data?.map(
-        n =>
-          ({
-            id: n.id,
-            type: n.type,
-            metadata: n.metadata as Notification["metadata"],
-            link: n.link,
-            readAt: n.read_at,
-            createdAt: n.created_at,
-          }) satisfies Notification,
-      ) ?? [];
+    const hasMore = (data?.length ?? 0) > limit;
+    const rows = hasMore ? (data?.slice(0, limit) ?? []) : (data ?? []);
 
-    return { notifications, hasMore: notifications.length === limit };
+    const notifications = rows.map(
+      n =>
+        ({
+          id: n.id,
+          type: n.type,
+          metadata: n.metadata as Notification["metadata"],
+          link: n.link,
+          readAt: n.read_at,
+          createdAt: n.created_at,
+        }) satisfies Notification,
+    );
+
+    return { notifications, hasMore };
   },
 );
 

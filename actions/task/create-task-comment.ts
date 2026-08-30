@@ -85,16 +85,20 @@ export async function createTaskCommentAction(
             );
           }
 
-          const { data: emailEnabled } = await supabase.rpc(
-            "get_email_notification_enabled",
-            {
-              p_user_id: recipientProfile.id,
-              p_type: NOTIFICATION_TYPES.TASK_COMMENT_ADDED,
-            },
-          );
+          try {
+            const { data: emailEnabled, error: emailPrefError } =
+              await supabase.rpc("get_email_notification_enabled", {
+                p_user_id: recipientProfile.id,
+                p_type: NOTIFICATION_TYPES.TASK_COMMENT_ADDED,
+              });
+            if (emailPrefError) {
+              console.error(
+                "[create-task-comment] Email preference check error:",
+                emailPrefError,
+              );
+            }
 
-          if (emailEnabled) {
-            try {
+            if (emailEnabled ?? true) {
               const { subject, html } = await renderLocalizedEmailTemplate(
                 EMAIL_TEMPLATES.TASK_COMMENT_ADDED,
                 recipientProfile.locale,
@@ -105,9 +109,9 @@ export async function createTaskCommentAction(
                 },
               );
               await sendEmail(recipientProfile.email, subject, html);
-            } catch (e) {
-              console.error("[create-task-comment] Email error:", e);
             }
+          } catch (e) {
+            console.error("[create-task-comment] Email error:", e);
           }
         }),
       );

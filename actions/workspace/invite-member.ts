@@ -111,10 +111,19 @@ export async function inviteMemberAction(
 
   let emailEnabled = true;
   if (invitedProfile) {
-    const { data } = await supabase.rpc("get_email_notification_enabled", {
-      p_user_id: invitedProfile.id,
-      p_type: NOTIFICATION_TYPES.WORKSPACE_INVITATION,
-    });
+    const { data, error: emailPrefError } = await supabase.rpc(
+      "get_email_notification_enabled",
+      {
+        p_user_id: invitedProfile.id,
+        p_type: NOTIFICATION_TYPES.WORKSPACE_INVITATION,
+      },
+    );
+    if (emailPrefError) {
+      console.error(
+        "[invite-member] Email preference check error:",
+        emailPrefError,
+      );
+    }
     emailEnabled = data ?? true;
   }
 

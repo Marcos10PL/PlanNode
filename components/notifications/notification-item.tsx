@@ -14,11 +14,17 @@ import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { ConfirmModal } from "../ui/confirm-modal";
 
+type Props = {
+  notification: Notification;
+  onDeleted: (id: string) => void;
+  onMarkedRead: (id: string) => void;
+};
+
 export function NotificationItem({
   notification,
-}: {
-  notification: Notification;
-}) {
+  onDeleted,
+  onMarkedRead,
+}: Props) {
   const t = useTranslations("notifications");
   const tCommon = useTranslations("common");
 
@@ -32,9 +38,15 @@ export function NotificationItem({
   const isUnread = !notification.readAt;
 
   const handleMarkRead = async () => {
+    if (!isUnread) return;
     setMarkReadPending(true);
     try {
-      await markNotificationReadAction({ id: notification.id });
+      const result = await markNotificationReadAction({ id: notification.id });
+      if (result?.error) {
+        toast.error(tCommon("unexpected_error"));
+      } else {
+        onMarkedRead(notification.id);
+      }
     } catch {
       toast.error(tCommon("unexpected_error"));
     } finally {
@@ -53,8 +65,13 @@ export function NotificationItem({
   const handleDelete = () => {
     startDeleteTransition(async () => {
       try {
-        await deleteNotificationAction({ id: notification.id });
-        toast.success(t("delete"));
+        const result = await deleteNotificationAction({ id: notification.id });
+        if (result?.error) {
+          toast.error(tCommon("unexpected_error"));
+        } else {
+          toast.success(t("delete"));
+          onDeleted(notification.id);
+        }
       } catch {
         toast.error(tCommon("unexpected_error"));
       }

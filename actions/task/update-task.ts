@@ -187,13 +187,20 @@ export async function updateTaskAction(taskId: string, data: UpdateTaskSchema) {
       }
 
       if (assigneeProfile) {
-        const { data: emailEnabled } = await supabase.rpc(
-          "get_email_notification_enabled",
-          { p_user_id: assigneeId, p_type: NOTIFICATION_TYPES.TASK_ASSIGNED },
-        );
+        try {
+          const { data: emailEnabled, error: emailPrefError } =
+            await supabase.rpc("get_email_notification_enabled", {
+              p_user_id: assigneeId,
+              p_type: NOTIFICATION_TYPES.TASK_ASSIGNED,
+            });
+          if (emailPrefError) {
+            console.error(
+              "[update-task] Email preference check error:",
+              emailPrefError,
+            );
+          }
 
-        if (emailEnabled) {
-          try {
+          if (emailEnabled ?? true) {
             const { subject, html } = await renderLocalizedEmailTemplate(
               EMAIL_TEMPLATES.TASK_ASSIGNED,
               assigneeProfile.locale,
@@ -205,9 +212,9 @@ export async function updateTaskAction(taskId: string, data: UpdateTaskSchema) {
               },
             );
             await sendEmail(assigneeProfile.email, subject, html);
-          } catch (e) {
-            console.error("[update-task] Email error:", e);
           }
+        } catch (e) {
+          console.error("[update-task] Email error:", e);
         }
       }
     }

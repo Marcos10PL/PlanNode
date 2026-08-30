@@ -99,16 +99,20 @@ export async function updateMemberRoleAction(
       }
 
       if (targetProfile) {
-        const { data: emailEnabled } = await supabase.rpc(
-          "get_email_notification_enabled",
-          {
-            p_user_id: memberId,
-            p_type: NOTIFICATION_TYPES.WORKSPACE_ROLE_CHANGED,
-          },
-        );
+        try {
+          const { data: emailEnabled, error: emailPrefError } =
+            await supabase.rpc("get_email_notification_enabled", {
+              p_user_id: memberId,
+              p_type: NOTIFICATION_TYPES.WORKSPACE_ROLE_CHANGED,
+            });
+          if (emailPrefError) {
+            console.error(
+              "[update-member-role] Email preference check error:",
+              emailPrefError,
+            );
+          }
 
-        if (emailEnabled) {
-          try {
+          if (emailEnabled ?? true) {
             const t = await getTranslations({ locale: targetProfile.locale });
             const { subject, html } = await renderLocalizedEmailTemplate(
               EMAIL_TEMPLATES.WORKSPACE_ROLE_CHANGED,
@@ -121,9 +125,9 @@ export async function updateMemberRoleAction(
               },
             );
             await sendEmail(targetProfile.email, subject, html);
-          } catch (e) {
-            console.error("[update-member-role] Email error:", e);
           }
+        } catch (e) {
+          console.error("[update-member-role] Email error:", e);
         }
       }
     }

@@ -23,7 +23,13 @@ export function NotificationList({
   const sentinelRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef(false);
 
+  const skipNextSyncRef = useRef(false);
+
   useEffect(() => {
+    if (skipNextSyncRef.current) {
+      skipNextSyncRef.current = false;
+      return;
+    }
     setNotifications(initialNotifications);
     setHasMore(initialHasMore);
   }, [initialNotifications, initialHasMore]);
@@ -55,6 +61,20 @@ export function NotificationList({
     return () => observer.disconnect();
   }, [hasMore, notifications.length]);
 
+  const handleItemDeleted = (id: string) => {
+    skipNextSyncRef.current = true;
+    setNotifications(prev => prev.filter(n => n.id !== id));
+  };
+
+  const handleItemMarkedRead = (id: string) => {
+    skipNextSyncRef.current = true;
+    setNotifications(prev =>
+      prev.map(n =>
+        n.id === id ? { ...n, readAt: new Date().toISOString() } : n,
+      ),
+    );
+  };
+
   return (
     <div className="flex flex-col gap-4">
       {notifications.length === 0 ? (
@@ -63,7 +83,12 @@ export function NotificationList({
         <>
           <div className="flex flex-col divide-y">
             {notifications.map(n => (
-              <NotificationItem key={n.id} notification={n} />
+              <NotificationItem
+                key={n.id}
+                notification={n}
+                onDeleted={handleItemDeleted}
+                onMarkedRead={handleItemMarkedRead}
+              />
             ))}
           </div>
           {hasMore && (
