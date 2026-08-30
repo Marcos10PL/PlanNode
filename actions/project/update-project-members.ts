@@ -83,35 +83,46 @@ export async function updateProjectMembersAction(
       ]);
 
       if (project?.is_private && adderProfile) {
-        for (const memberProfile of addedProfiles ?? []) {
-          await supabase.rpc("create_notification", {
-            p_user_id: memberProfile.id,
-            p_type: NOTIFICATION_TYPES.PROJECT_MEMBER_ADDED,
-            p_metadata: {
-              projectName: project.name,
-              addedByName: adderProfile.full_name,
-              projectId,
-            },
-            p_link: generateProjectRoute(projectId),
-          });
-
-          try {
-            const { subject, html } = await renderLocalizedEmailTemplate(
-              EMAIL_TEMPLATES.PROJECT_MEMBER_ADDED,
-              memberProfile.locale,
+        await Promise.all(
+          (addedProfiles ?? []).map(async memberProfile => {
+            const { error: notificationError } = await supabase.rpc(
+              "create_notification",
               {
-                projectName: project.name,
-                addedByName: adderProfile.full_name,
-                projectUrl: generateAbsoluteUrl(
-                  generateProjectRoute(projectId),
-                ),
+                p_user_id: memberProfile.id,
+                p_type: NOTIFICATION_TYPES.PROJECT_MEMBER_ADDED,
+                p_metadata: {
+                  projectName: project.name,
+                  addedByName: adderProfile.full_name,
+                  projectId,
+                },
+                p_link: generateProjectRoute(projectId),
               },
             );
-            await sendEmail(memberProfile.email, subject, html);
-          } catch (e) {
-            console.error("[update-project-members] Email error:", e);
-          }
-        }
+            if (notificationError) {
+              console.error(
+                "[update-project-members] Notification error:",
+                notificationError,
+              );
+            }
+
+            try {
+              const { subject, html } = await renderLocalizedEmailTemplate(
+                EMAIL_TEMPLATES.PROJECT_MEMBER_ADDED,
+                memberProfile.locale,
+                {
+                  projectName: project.name,
+                  addedByName: adderProfile.full_name,
+                  projectUrl: generateAbsoluteUrl(
+                    generateProjectRoute(projectId),
+                  ),
+                },
+              );
+              await sendEmail(memberProfile.email, subject, html);
+            } catch (e) {
+              console.error("[update-project-members] Email error:", e);
+            }
+          }),
+        );
       }
     }
   }

@@ -115,17 +115,23 @@ export async function createTaskAction(
     if (project && assignerProfile) {
       const taskPath = `${generateListRoute(list.project_id, listId)}?taskId=${task.id}&tab=${TASK_MODAL_TABS.DETAILS}`;
 
-      await supabase.rpc("create_notification", {
-        p_user_id: assigneeId,
-        p_type: NOTIFICATION_TYPES.TASK_ASSIGNED,
-        p_metadata: {
-          taskTitle: title,
-          projectName: project.name,
-          assignerName: assignerProfile.full_name,
-          taskId: task.id,
+      const { error: notificationError } = await supabase.rpc(
+        "create_notification",
+        {
+          p_user_id: assigneeId,
+          p_type: NOTIFICATION_TYPES.TASK_ASSIGNED,
+          p_metadata: {
+            taskTitle: title,
+            projectName: project.name,
+            assignerName: assignerProfile.full_name,
+            taskId: task.id,
+          },
+          p_link: taskPath,
         },
-        p_link: taskPath,
-      });
+      );
+      if (notificationError) {
+        console.error("[create-task] Notification error:", notificationError);
+      }
 
       if (assigneeProfile) {
         try {

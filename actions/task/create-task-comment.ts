@@ -63,33 +63,44 @@ export async function createTaskCommentAction(
       const taskPath = `${generateListRoute(task.project_id, task.list_id)}?taskId=${taskId}&tab=${TASK_MODAL_TABS.ACTIVITY}`;
       const taskUrl = generateAbsoluteUrl(taskPath);
 
-      for (const recipientProfile of recipientProfiles ?? []) {
-        await supabase.rpc("create_notification", {
-          p_user_id: recipientProfile.id,
-          p_type: NOTIFICATION_TYPES.TASK_COMMENT_ADDED,
-          p_metadata: {
-            taskTitle: task.title,
-            commenterName: commenterProfile.full_name,
-            taskId,
-          },
-          p_link: taskPath,
-        });
-
-        try {
-          const { subject, html } = await renderLocalizedEmailTemplate(
-            EMAIL_TEMPLATES.TASK_COMMENT_ADDED,
-            recipientProfile.locale,
+      await Promise.all(
+        (recipientProfiles ?? []).map(async recipientProfile => {
+          const { error: notificationError } = await supabase.rpc(
+            "create_notification",
             {
-              taskTitle: task.title,
-              commenterName: commenterProfile.full_name,
-              taskUrl,
+              p_user_id: recipientProfile.id,
+              p_type: NOTIFICATION_TYPES.TASK_COMMENT_ADDED,
+              p_metadata: {
+                taskTitle: task.title,
+                commenterName: commenterProfile.full_name,
+                taskId,
+              },
+              p_link: taskPath,
             },
           );
-          await sendEmail(recipientProfile.email, subject, html);
-        } catch (e) {
-          console.error("[create-task-comment] Email error:", e);
-        }
-      }
+          if (notificationError) {
+            console.error(
+              "[create-task-comment] Notification error:",
+              notificationError,
+            );
+          }
+
+          try {
+            const { subject, html } = await renderLocalizedEmailTemplate(
+              EMAIL_TEMPLATES.TASK_COMMENT_ADDED,
+              recipientProfile.locale,
+              {
+                taskTitle: task.title,
+                commenterName: commenterProfile.full_name,
+                taskUrl,
+              },
+            );
+            await sendEmail(recipientProfile.email, subject, html);
+          } catch (e) {
+            console.error("[create-task-comment] Email error:", e);
+          }
+        }),
+      );
     }
   }
 

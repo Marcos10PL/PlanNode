@@ -168,17 +168,23 @@ export async function updateTaskAction(taskId: string, data: UpdateTaskSchema) {
     if (project && assignerProfile) {
       const taskPath = `${generateListRoute(existing.project_id, existing.list_id)}?taskId=${taskId}&tab=${TASK_MODAL_TABS.DETAILS}`;
 
-      await supabase.rpc("create_notification", {
-        p_user_id: assigneeId,
-        p_type: NOTIFICATION_TYPES.TASK_ASSIGNED,
-        p_metadata: {
-          taskTitle: title ?? existing.title,
-          projectName: project.name,
-          assignerName: assignerProfile.full_name,
-          taskId,
+      const { error: notificationError } = await supabase.rpc(
+        "create_notification",
+        {
+          p_user_id: assigneeId,
+          p_type: NOTIFICATION_TYPES.TASK_ASSIGNED,
+          p_metadata: {
+            taskTitle: title ?? existing.title,
+            projectName: project.name,
+            assignerName: assignerProfile.full_name,
+            taskId,
+          },
+          p_link: taskPath,
         },
-        p_link: taskPath,
-      });
+      );
+      if (notificationError) {
+        console.error("[update-task] Notification error:", notificationError);
+      }
 
       if (assigneeProfile) {
         try {

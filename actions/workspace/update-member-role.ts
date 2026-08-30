@@ -78,16 +78,25 @@ export async function updateMemberRoleAction(
     ]);
 
     if (workspace && callerProfile) {
-      await supabase.rpc("create_notification", {
-        p_user_id: memberId,
-        p_type: NOTIFICATION_TYPES.WORKSPACE_ROLE_CHANGED,
-        p_metadata: {
-          workspaceName: workspace.name,
-          changedByName: callerProfile.full_name,
-          newRole: parsed.data.role,
+      const { error: notificationError } = await supabase.rpc(
+        "create_notification",
+        {
+          p_user_id: memberId,
+          p_type: NOTIFICATION_TYPES.WORKSPACE_ROLE_CHANGED,
+          p_metadata: {
+            workspaceName: workspace.name,
+            changedByName: callerProfile.full_name,
+            newRole: parsed.data.role,
+          },
+          p_link: LINKS.TEAM,
         },
-        p_link: LINKS.TEAM,
-      });
+      );
+      if (notificationError) {
+        console.error(
+          "[update-member-role] Notification error:",
+          notificationError,
+        );
+      }
 
       if (targetProfile) {
         try {
