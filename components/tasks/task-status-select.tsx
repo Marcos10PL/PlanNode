@@ -37,7 +37,17 @@ export function TaskStatusSelect({
       onValueChange={v => onValueChange(v as TaskStatus)}
       disabled={disabled}
     >
-      <SelectTrigger id={id} size={size} className={cn("h-7!", className)}>
+      <SelectTrigger
+        id={id}
+        size={size}
+        hideChevron={disabled}
+        className={cn(
+          "h-7!",
+          disabled &&
+            "disabled:pointer-events-none disabled:cursor-default disabled:opacity-100",
+          className,
+        )}
+      >
         <SelectValue />
       </SelectTrigger>
       <SelectContent>

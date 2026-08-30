@@ -70,7 +70,11 @@ export function DatePicker({
       type="button"
       variant="outline"
       disabled={disabled}
-      className={cn("w-full justify-start gap-2 font-normal", className)}
+      className={cn(
+        "w-full justify-start gap-2 font-normal bg-transparent dark:bg-input/30 dark:hover:bg-input/50",
+        disabled && "disabled:opacity-100",
+        className,
+      )}
     >
       <CalendarIcon className="size-4 text-muted-foreground" />
       {value ? (

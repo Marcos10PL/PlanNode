@@ -10,7 +10,11 @@
     "insufficient_role": "Brak uprawnień do tej operacji",
     "no_due_date": "Brak terminu",
     "clear_date": "Wyczyść datę",
-    "sort_by": "Sortuj:"
+    "sort_by": "Sortuj:",
+    "editor_link_add": "Dodaj",
+    "editor_link_save": "Zapisz",
+    "editor_link_placeholder": "https://...",
+    "editor_link_invalid": "Nieprawidłowy adres URL"
   },
   "footer": {
     "all_rights_reserved": "PlanNode. Wszelkie prawa zastrzeżone."

@@ -10,7 +10,11 @@
     "insufficient_role": "You don't have permission for this action",
     "no_due_date": "No due date",
     "clear_date": "Clear date",
-    "sort_by": "Sort by:"
+    "sort_by": "Sort by:",
+    "editor_link_add": "Add",
+    "editor_link_save": "Save",
+    "editor_link_placeholder": "https://...",
+    "editor_link_invalid": "Invalid URL"
   },
   "footer": {
     "all_rights_reserved": "PlanNode. All rights reserved."

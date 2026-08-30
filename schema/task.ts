@@ -1,5 +1,6 @@
 import { TASK_PRIORITIES, TASK_STATUSES, VALIDATION_MAX } from "@/const";
 import { Translations } from "@/types";
+import { isHtmlContentEmpty } from "@/utils/helpers";
 import { z } from "zod";
 import { descriptionField, nameField } from "./defaults";
 
@@ -23,7 +24,10 @@ export const updateTaskSchema = (t?: Translations) =>
 
 export const createTaskCommentSchema = (t?: Translations) =>
   z.object({
-    content: nameField(VALIDATION_MAX.TASK_COMMENT, t),
+    content: z
+      .string()
+      .max(VALIDATION_MAX.TASK_COMMENT)
+      .refine(val => !isHtmlContentEmpty(val), t?.("field_required")),
   });
 
 export type CreateTaskListSchema = z.infer<

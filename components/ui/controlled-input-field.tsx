@@ -25,6 +25,7 @@ type ControlledInputFieldControlledProps<
   disabled?: boolean;
   readOnly?: boolean;
   maxLength?: number;
+  className?: string;
 };
 
 type ControlledInputFieldReadonlyProps = {
@@ -74,6 +75,7 @@ function ControlledInputField<
     disabled,
     readOnly,
     maxLength,
+    className,
   } = props;
 
   return (
@@ -93,6 +95,7 @@ function ControlledInputField<
             readOnly={readOnly}
             maxLength={maxLength}
             aria-invalid={fieldState.invalid}
+            className={className}
           />
           {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
         </Field>

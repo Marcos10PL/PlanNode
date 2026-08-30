@@ -88,7 +88,13 @@ export function TaskPrioritySelect({
         id={id}
         size={size}
         aria-label={ariaLabel}
-        className={cn("h-7!", className)}
+        hideChevron={disabled}
+        className={cn(
+          "h-7!",
+          disabled &&
+            "disabled:pointer-events-none disabled:cursor-default disabled:opacity-100",
+          className,
+        )}
       >
         {iconOnly ? (
           <Flag

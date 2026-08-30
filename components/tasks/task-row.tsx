@@ -12,6 +12,7 @@ import { AdvanceStatusButton } from "./advance-status-button";
 import { SubtaskList } from "./subtask-list";
 import { SubtaskToggle } from "./subtask-toggle";
 import { TaskAssigneePopover } from "./task-assignee-popover";
+import { TaskDescriptionView } from "./task-description-view";
 import { TaskDueDatePopover } from "./task-due-date-popover";
 import { TaskModal } from "./task-modal";
 import { TaskPrioritySelect } from "./task-priority-select";
@@ -89,7 +90,7 @@ export function TaskRow({
                   variant="ghost"
                   className="size-7 text-muted-foreground [&_svg]:size-4"
                 >
-                  {task.description}
+                  <TaskDescriptionView html={task.description} />
                 </InfoPopover>
               </div>
             )}
