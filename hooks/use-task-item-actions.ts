@@ -8,7 +8,7 @@ import { TaskItemProps } from "@/types/props";
 import { isTaskOverdue } from "@/utils";
 import { useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
 type Props = Pick<TaskItemProps, "task" | "members" | "onUpdateTask"> & {
@@ -25,7 +25,7 @@ export function useTaskItemActions({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [isPending, setIsPending] = useState(false);
+  const [isPending, startDeleteTransition] = useTransition();
   const [subtasksExpanded, setSubtasksExpanded] = useState(false);
 
   const [modalOpen, setModalOpenState] = useState(
@@ -114,24 +114,24 @@ export function useTaskItemActions({
     );
   };
 
-  const handleDelete = async () => {
-    setIsPending(true);
-    try {
-      const result = await deleteTaskAction(task.id);
-      if (result?.error) {
-        toast.error(
-          result.error === ERRORS.INSUFFICIENT_ROLE
-            ? t("common.insufficient_role")
-            : t("tasks.delete.error"),
-        );
-      } else {
-        toast.success(t("tasks.delete.success"));
+  const handleDelete = () => {
+    startDeleteTransition(async () => {
+      try {
+        const result = await deleteTaskAction(task.id);
+        if (result?.error) {
+          toast.error(
+            result.error === ERRORS.INSUFFICIENT_ROLE
+              ? t("common.insufficient_role")
+              : t("tasks.delete.error"),
+          );
+        } else {
+          toast.success(t("tasks.delete.success"));
+          setDeleteOpen(false);
+        }
+      } catch {
+        toast.error(t("common.unexpected_error"));
       }
-    } catch {
-      toast.error(t("common.unexpected_error"));
-    } finally {
-      setIsPending(false);
-    }
+    });
   };
 
   const stopPropagation = (e: React.MouseEvent) => e.stopPropagation();

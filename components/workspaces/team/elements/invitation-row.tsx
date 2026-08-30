@@ -10,7 +10,7 @@ import { WorkspaceInvitation } from "@/types/dto";
 import { getRoleLabel, getRoleVariant } from "@/utils";
 import { Undo2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useTransition } from "react";
 import { toast } from "sonner";
 
 export const InvitationRow = ({
@@ -19,22 +19,21 @@ export const InvitationRow = ({
   invitation: WorkspaceInvitation;
 }) => {
   const t = useTranslations();
-  const [isPending, setIsPending] = useState(false);
+  const [isPending, startRevokeTransition] = useTransition();
 
-  const handleRevoke = async () => {
-    setIsPending(true);
-    try {
-      const result = await revokeInvitationAction(invitation.id);
-      if (result?.error) {
-        toast.error(t("team.revoke_error"));
-      } else {
-        toast.success(t("team.revoke_success"));
+  const handleRevoke = () => {
+    startRevokeTransition(async () => {
+      try {
+        const result = await revokeInvitationAction(invitation.id);
+        if (result?.error) {
+          toast.error(t("team.revoke_error"));
+        } else {
+          toast.success(t("team.revoke_success"));
+        }
+      } catch {
+        toast.error(t("common.unexpected_error"));
       }
-    } catch {
-      toast.error(t("common.unexpected_error"));
-    } finally {
-      setIsPending(false);
-    }
+    });
   };
 
   return (

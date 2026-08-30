@@ -2,62 +2,60 @@
 
 import { deleteNotificationAction } from "@/actions/notifications/delete-notification";
 import { markNotificationReadAction } from "@/actions/notifications/mark-read";
-import { Notification } from "@/types/dto";
 import { cn } from "@/utils";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { ConfirmModal } from "../ui/confirm-modal";
 
 type Props = {
   className?: string;
-  notifications: Notification[];
+  hasUnread: boolean;
+  hasNotifications: boolean;
 };
 
-export function NotificationsActions({ className, notifications }: Props) {
+export function NotificationsActions({
+  className,
+  hasUnread,
+  hasNotifications,
+}: Props) {
   const t = useTranslations("notifications");
   const tCommon = useTranslations("common");
 
-  const [isDeletingAll, setIsDeletingAll] = useState(false);
-  const [isMarkingAllRead, setIsMarkingAllRead] = useState(false);
+  const [isDeletingAll, startDeleteAllTransition] = useTransition();
+  const [isMarkingAllRead, startMarkAllReadTransition] = useTransition();
 
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
-  const hasUnread = notifications.some(n => !n.readAt);
-
-  const handleDeleteAll = async () => {
-    setIsDeletingAll(true);
-    try {
-      await deleteNotificationAction({ deleteAll: true });
-    } catch {
-      toast.error(tCommon("unexpected_error"));
-    } finally {
-      setIsDeletingAll(false);
-    }
+  const handleDeleteAll = () => {
+    startDeleteAllTransition(async () => {
+      try {
+        await deleteNotificationAction({ deleteAll: true });
+      } catch {
+        toast.error(tCommon("unexpected_error"));
+      }
+    });
   };
 
-  const handleMarkAllRead = async () => {
-    setIsMarkingAllRead(true);
-    try {
-      await markNotificationReadAction({ markAll: true });
-    } catch {
-      toast.error(tCommon("unexpected_error"));
-    } finally {
-      setIsMarkingAllRead(false);
-    }
+  const handleMarkAllRead = () => {
+    startMarkAllReadTransition(async () => {
+      try {
+        await markNotificationReadAction({ markAll: true });
+      } catch {
+        toast.error(tCommon("unexpected_error"));
+      }
+    });
   };
 
   return (
-    <div className={cn("flex flex-col mt-4 mb-6", className)}>
+    <div className={cn("flex flex-col", className)}>
       <div className="flex gap-2">
         <Button
           type="submit"
           variant="secondary"
           size="sm"
-          disabled={
-            isMarkingAllRead || !hasUnread || notifications.length === 0
-          }
+          disabled={isMarkingAllRead || !hasUnread}
           onClick={handleMarkAllRead}
         >
           {t("mark_all_read")}
@@ -67,7 +65,7 @@ export function NotificationsActions({ className, notifications }: Props) {
           type="submit"
           variant="outline"
           size="sm"
-          disabled={isDeletingAll || notifications.length === 0}
+          disabled={isDeletingAll || !hasNotifications}
           onClick={() => setIsConfirmModalOpen(true)}
         >
           {t("delete_all")}

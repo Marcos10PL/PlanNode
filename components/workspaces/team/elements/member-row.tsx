@@ -11,7 +11,7 @@ import { WorkspaceMember } from "@/types/dto";
 import { WorkspaceRole } from "@/types/entities";
 import { Pencil, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { UpdateMemberRoleModal } from "./update-member-role-modal";
 
@@ -26,27 +26,27 @@ export function MemberRow({ member, currentUserRole, workspaceId }: Props) {
   const { user } = useUser();
   const [changeRoleOpen, setChangeRoleOpen] = useState(false);
   const [removeOpen, setRemoveOpen] = useState(false);
-  const [isPending, setIsPending] = useState(false);
+  const [isPending, startRemoveTransition] = useTransition();
 
   const isSelf = member.id === user.id;
   const isOwner = member.role === WORKSPACE_ROLES.OWNER;
   const canManage =
     !isSelf && !isOwner && MANAGER_ROLES.includes(currentUserRole);
 
-  const handleRemove = async () => {
-    setIsPending(true);
-    try {
-      const result = await removeMemberAction(workspaceId, member.id);
-      if (result?.error) {
-        toast.error(t("team.remove_member_error"));
-      } else {
-        toast.success(t("team.remove_member_success"));
+  const handleRemove = () => {
+    startRemoveTransition(async () => {
+      try {
+        const result = await removeMemberAction(workspaceId, member.id);
+        if (result?.error) {
+          toast.error(t("team.remove_member_error"));
+        } else {
+          toast.success(t("team.remove_member_success"));
+          setRemoveOpen(false);
+        }
+      } catch {
+        toast.error(t("common.unexpected_error"));
       }
-    } catch {
-      toast.error(t("common.unexpected_error"));
-    } finally {
-      setIsPending(false);
-    }
+    });
   };
 
   return (

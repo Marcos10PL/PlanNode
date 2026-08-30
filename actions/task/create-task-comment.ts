@@ -86,16 +86,30 @@ export async function createTaskCommentAction(
           }
 
           try {
-            const { subject, html } = await renderLocalizedEmailTemplate(
-              EMAIL_TEMPLATES.TASK_COMMENT_ADDED,
-              recipientProfile.locale,
-              {
-                taskTitle: task.title,
-                commenterName: commenterProfile.full_name,
-                taskUrl,
-              },
-            );
-            await sendEmail(recipientProfile.email, subject, html);
+            const { data: emailEnabled, error: emailPrefError } =
+              await supabase.rpc("get_email_notification_enabled", {
+                p_user_id: recipientProfile.id,
+                p_type: NOTIFICATION_TYPES.TASK_COMMENT_ADDED,
+              });
+            if (emailPrefError) {
+              console.error(
+                "[create-task-comment] Email preference check error:",
+                emailPrefError,
+              );
+            }
+
+            if (emailEnabled ?? true) {
+              const { subject, html } = await renderLocalizedEmailTemplate(
+                EMAIL_TEMPLATES.TASK_COMMENT_ADDED,
+                recipientProfile.locale,
+                {
+                  taskTitle: task.title,
+                  commenterName: commenterProfile.full_name,
+                  taskUrl,
+                },
+              );
+              await sendEmail(recipientProfile.email, subject, html);
+            }
           } catch (e) {
             console.error("[create-task-comment] Email error:", e);
           }

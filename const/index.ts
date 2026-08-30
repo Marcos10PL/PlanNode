@@ -120,6 +120,8 @@ export const NOTIFICATION_TYPES = {
   WORKSPACE_ROLE_CHANGED: "workspace_role_changed",
 } as const;
 
+export const NOTIFICATIONS_PAGE_SIZE = 20;
+
 export const TASK_EVENT_TYPES = {
   TASK_CREATED: "task_created",
   STATUS_CHANGED: "status_changed",

@@ -1,5 +1,6 @@
 import { APP_CONFIG_KEYS } from "@/const";
 import {
+  NotificationPreferenceTable,
   NotificationTable,
   ProfileTable,
   ProjectTable,
@@ -75,6 +76,10 @@ export type Notification = ToCamelCase<
     | WorkspaceRoleChangedMetadata
     | null;
 };
+
+export type NotificationPreference = ToCamelCase<
+  Pick<NotificationPreferenceTable, "type" | "email_enabled" | "in_app_enabled">
+>;
 
 export type WorkspaceInvitation = ToCamelCase<
   Pick<WorkspaceInvitationTable, "id" | "email" | "role">

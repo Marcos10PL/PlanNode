@@ -10,7 +10,7 @@ import { TooltipIconButton } from "@/components/ui/tooltip-icon-button";
 import { Workspace } from "@/types/dto";
 import { LogOut } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { DeleteWorkspaceModal } from "../delete-workspace-modal";
 import { EditWorkspaceModal } from "../edit-workspace-modal";
@@ -24,24 +24,24 @@ export function WorkspaceActions({ workspace }: { workspace: Workspace }) {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [leaveOpen, setLeaveOpen] = useState(false);
 
-  const [isLeaving, setIsLeaving] = useState(false);
+  const [isLeaving, startLeaveTransition] = useTransition();
 
   const isOwner = workspace.ownerId === user?.id;
 
-  const handleLeave = async () => {
-    setIsLeaving(true);
-    try {
-      const result = await leaveWorkspaceAction(workspace.id);
-      if (result?.error) {
-        toast.error(t("leave_error"));
-      } else {
-        toast.success(t("leave_success"));
+  const handleLeave = () => {
+    startLeaveTransition(async () => {
+      try {
+        const result = await leaveWorkspaceAction(workspace.id);
+        if (result?.error) {
+          toast.error(t("leave_error"));
+        } else {
+          toast.success(t("leave_success"));
+          setLeaveOpen(false);
+        }
+      } catch {
+        toast.error(tCommon("unexpected_error"));
       }
-    } catch {
-      toast.error(tCommon("unexpected_error"));
-    } finally {
-      setIsLeaving(false);
-    }
+    });
   };
 
   return (

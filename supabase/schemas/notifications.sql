@@ -36,7 +36,33 @@ CREATE POLICY "users can delete own notifications"
 ON public.notifications FOR DELETE TO authenticated
 USING (user_id = (SELECT auth.uid()));
 
--- SECURITY DEFINER helper: lets server actions create notifications for any user
+-- Preferences
+CREATE TABLE public.notification_preferences (
+  user_id        uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  type           public.notification_type NOT NULL,
+  email_enabled  boolean NOT NULL DEFAULT true,
+  in_app_enabled boolean NOT NULL DEFAULT true,
+  PRIMARY KEY (user_id, type)
+);
+
+ALTER TABLE public.notification_preferences ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "users see own notification preferences"
+ON public.notification_preferences FOR SELECT TO authenticated
+USING (user_id = (SELECT auth.uid()));
+
+CREATE POLICY "users insert own notification preferences"
+ON public.notification_preferences FOR INSERT TO authenticated
+WITH CHECK (user_id = (SELECT auth.uid()));
+
+CREATE POLICY "users update own notification preferences"
+ON public.notification_preferences FOR UPDATE TO authenticated
+USING (user_id = (SELECT auth.uid()));
+
+REVOKE ALL ON public.notification_preferences FROM anon;
+GRANT SELECT, INSERT, UPDATE ON public.notification_preferences TO authenticated;
+GRANT ALL ON public.notification_preferences TO service_role;
+
 CREATE OR REPLACE FUNCTION public.create_notification(
   p_user_id  uuid,
   p_type     public.notification_type,
@@ -49,11 +75,36 @@ SECURITY DEFINER
 SET search_path = ''
 AS $$
   INSERT INTO public.notifications (user_id, type, metadata, link)
-  VALUES (p_user_id, p_type, p_metadata, p_link);
+  SELECT p_user_id, p_type, p_metadata, p_link
+  WHERE COALESCE(
+    (SELECT in_app_enabled FROM public.notification_preferences
+     WHERE user_id = p_user_id AND type = p_type),
+    true
+  );
 $$;
 
 GRANT EXECUTE ON FUNCTION public.create_notification(uuid, public.notification_type, jsonb, text) TO authenticated;
 REVOKE EXECUTE ON FUNCTION public.create_notification(uuid, public.notification_type, jsonb, text) FROM anon;
+
+CREATE OR REPLACE FUNCTION public.get_email_notification_enabled(
+  p_user_id uuid,
+  p_type    public.notification_type
+)
+RETURNS boolean
+LANGUAGE sql
+SECURITY DEFINER
+STABLE
+SET search_path = ''
+AS $$
+  SELECT COALESCE(
+    (SELECT email_enabled FROM public.notification_preferences
+     WHERE user_id = p_user_id AND type = p_type),
+    true
+  );
+$$;
+
+GRANT EXECUTE ON FUNCTION public.get_email_notification_enabled(uuid, public.notification_type) TO authenticated;
+REVOKE EXECUTE ON FUNCTION public.get_email_notification_enabled(uuid, public.notification_type) FROM anon;
 
 REVOKE ALL ON public.notifications FROM anon;
 REVOKE INSERT ON public.notifications FROM authenticated;

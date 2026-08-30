@@ -20,6 +20,7 @@ export type ProfileTable = Table<"profiles">;
 export type WorkspaceMemberTable = Table<"workspace_members">;
 export type WorkspaceInvitationTable = Table<"workspace_invitations">;
 export type NotificationTable = Table<"notifications">;
+export type NotificationPreferenceTable = Table<"notification_preferences">;
 export type ProjectTable = Table<"projects">;
 export type ProjectMemberTable = Table<"project_members">;
 export type TaskListTable = Table<"task_lists">;

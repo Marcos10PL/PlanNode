@@ -109,20 +109,40 @@ export async function inviteMemberAction(
     });
   }
 
-  try {
-    const { subject, html } = await renderLocalizedEmailTemplate(
-      EMAIL_TEMPLATES.WORKSPACE_INVITATION,
-      invitedProfile?.locale ?? "pl",
+  let emailEnabled = true;
+  if (invitedProfile) {
+    const { data, error: emailPrefError } = await supabase.rpc(
+      "get_email_notification_enabled",
       {
-        workspaceName: workspace.name,
-        invitedByName: callerProfile.full_name,
-        role,
-        inviteUrl: generateInvitationLink(token),
+        p_user_id: invitedProfile.id,
+        p_type: NOTIFICATION_TYPES.WORKSPACE_INVITATION,
       },
     );
-    await sendEmail(email, subject, html);
-  } catch (e) {
-    console.error("[invite-member] Email error:", e);
+    if (emailPrefError) {
+      console.error(
+        "[invite-member] Email preference check error:",
+        emailPrefError,
+      );
+    }
+    emailEnabled = data ?? true;
+  }
+
+  if (emailEnabled) {
+    try {
+      const { subject, html } = await renderLocalizedEmailTemplate(
+        EMAIL_TEMPLATES.WORKSPACE_INVITATION,
+        invitedProfile?.locale ?? "pl",
+        {
+          workspaceName: workspace.name,
+          invitedByName: callerProfile.full_name,
+          role,
+          inviteUrl: generateInvitationLink(token),
+        },
+      );
+      await sendEmail(email, subject, html);
+    } catch (e) {
+      console.error("[invite-member] Email error:", e);
+    }
   }
 
   revalidatePath(LINKS.TEAM);

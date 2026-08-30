@@ -106,18 +106,32 @@ export async function updateProjectMembersAction(
             }
 
             try {
-              const { subject, html } = await renderLocalizedEmailTemplate(
-                EMAIL_TEMPLATES.PROJECT_MEMBER_ADDED,
-                memberProfile.locale,
-                {
-                  projectName: project.name,
-                  addedByName: adderProfile.full_name,
-                  projectUrl: generateAbsoluteUrl(
-                    generateProjectRoute(projectId),
-                  ),
-                },
-              );
-              await sendEmail(memberProfile.email, subject, html);
+              const { data: emailEnabled, error: emailPrefError } =
+                await supabase.rpc("get_email_notification_enabled", {
+                  p_user_id: memberProfile.id,
+                  p_type: NOTIFICATION_TYPES.PROJECT_MEMBER_ADDED,
+                });
+              if (emailPrefError) {
+                console.error(
+                  "[update-project-members] Email preference check error:",
+                  emailPrefError,
+                );
+              }
+
+              if (emailEnabled ?? true) {
+                const { subject, html } = await renderLocalizedEmailTemplate(
+                  EMAIL_TEMPLATES.PROJECT_MEMBER_ADDED,
+                  memberProfile.locale,
+                  {
+                    projectName: project.name,
+                    addedByName: adderProfile.full_name,
+                    projectUrl: generateAbsoluteUrl(
+                      generateProjectRoute(projectId),
+                    ),
+                  },
+                );
+                await sendEmail(memberProfile.email, subject, html);
+              }
             } catch (e) {
               console.error("[update-project-members] Email error:", e);
             }
