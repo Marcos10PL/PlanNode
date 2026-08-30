@@ -1,8 +1,8 @@
 import { TASK_PRIORITIES, TASK_STATUSES, VALIDATION_MAX } from "@/const";
 import { Translations } from "@/types";
-import { isHtmlContentEmpty } from "@/utils/helpers";
+import { getHtmlTextLength, isHtmlContentEmpty } from "@/utils/helpers";
 import { z } from "zod";
-import { descriptionField, nameField } from "./defaults";
+import { htmlContentField, nameField } from "./defaults";
 
 export const createTaskListSchema = (t?: Translations) =>
   z.object({
@@ -12,7 +12,7 @@ export const createTaskListSchema = (t?: Translations) =>
 export const createTaskSchema = (t?: Translations) =>
   z.object({
     title: nameField(VALIDATION_MAX.TASK_TITLE, t),
-    description: descriptionField(VALIDATION_MAX.TASK_DESCRIPTION),
+    description: htmlContentField(VALIDATION_MAX.TASK_DESCRIPTION, t),
     status: z.enum(TASK_STATUSES),
     priority: z.enum(TASK_PRIORITIES),
     assigneeId: z.uuid().nullable(),
@@ -26,8 +26,11 @@ export const createTaskCommentSchema = (t?: Translations) =>
   z.object({
     content: z
       .string()
-      .max(VALIDATION_MAX.TASK_COMMENT)
-      .refine(val => !isHtmlContentEmpty(val), t?.("field_required")),
+      .refine(val => !isHtmlContentEmpty(val), t?.("field_required"))
+      .refine(
+        val => getHtmlTextLength(val) <= VALIDATION_MAX.TASK_COMMENT,
+        t?.("field_too_long"),
+      ),
   });
 
 export type CreateTaskListSchema = z.infer<

@@ -6,6 +6,7 @@ import { TooltipIconButton } from "@/components/ui/tooltip-icon-button";
 import { useTaskItemActions } from "@/hooks/use-task-item-actions";
 import { TaskItemProps } from "@/types/props";
 import { cn } from "@/utils";
+import { isHtmlContentEmpty } from "@/utils/helpers";
 import { History } from "lucide-react";
 import { InfoPopover } from "../ui/info-popover";
 import { AdvanceStatusButton } from "./advance-status-button";
@@ -141,7 +142,7 @@ export function TaskCard({
                 className="text-muted-foreground"
               />
             </div>
-            {task.description && (
+            {task.description && !isHtmlContentEmpty(task.description) && (
               <div onClick={stopPropagation} className="shrink-0">
                 <InfoPopover
                   label={t("common.description_hint")}

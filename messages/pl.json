@@ -98,7 +98,8 @@
       "password_too_short": "Hasło musi mieć co najmniej 6 znaków",
       "passwords_do_not_match": "Hasła nie są takie same",
       "full_name_required": "Imię i nazwisko jest wymagane",
-      "field_required": "To pole jest wymagane"
+      "field_required": "To pole jest wymagane",
+      "field_too_long": "Tekst jest za długi"
     }
   },
   "metadata": {
@@ -148,8 +149,7 @@
     "email_change_cancel_failed": "Nie udało się anulować zmiany maila",
     "password_update_success": "Hasło zostało zmienione",
     "password_update_failed": "Nie udało się zmienić hasła",
-    "password_same_as_old": "Nowe hasło musi różnić się od obecnego",
-    "cancel_email_change": "Anuluj zmianę emaila"
+    "password_same_as_old": "Nowe hasło musi różnić się od obecnego"
   },
   "landing": {
     "hero": {

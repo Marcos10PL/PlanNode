@@ -30,6 +30,7 @@ type Props = {
   disabled?: boolean;
   className?: string;
   editorClassName?: string;
+  autoFocus?: boolean;
 };
 
 export function RichTextEditor({
@@ -40,6 +41,7 @@ export function RichTextEditor({
   disabled,
   className,
   editorClassName = "min-h-24",
+  autoFocus = false,
 }: Props) {
   const t = useTranslations("common");
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -69,6 +71,7 @@ export function RichTextEditor({
     ],
     content: value,
     editable: !disabled,
+    autofocus: autoFocus ? "end" : false,
     immediatelyRender: false,
     onUpdate: ({ editor }) => onChange(editor.getHTML()),
     onTransaction: () => forceRerender(n => n + 1),
@@ -85,6 +88,12 @@ export function RichTextEditor({
   useEffect(() => {
     editor?.setEditable(!disabled);
   }, [disabled, editor]);
+
+  useEffect(() => {
+    if (!editor || editor.isFocused) return;
+    if (value === editor.getHTML()) return;
+    editor.commands.setContent(value, { emitUpdate: false });
+  }, [value, editor]);
 
   if (!editor) return null;
 

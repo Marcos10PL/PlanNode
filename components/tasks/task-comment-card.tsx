@@ -143,6 +143,7 @@ export function TaskCommentCard({
               maxLength={VALIDATION_MAX.TASK_COMMENT}
               editorClassName="min-h-0"
               className="border-0 rounded-none"
+              autoFocus
             />
           </div>
         ) : (

@@ -7,6 +7,7 @@ import { TooltipIconButton } from "@/components/ui/tooltip-icon-button";
 import { useTaskItemActions } from "@/hooks/use-task-item-actions";
 import { TaskItemProps } from "@/types/props";
 import { getPriorityLabel } from "@/utils";
+import { isHtmlContentEmpty } from "@/utils/helpers";
 import { History } from "lucide-react";
 import { AdvanceStatusButton } from "./advance-status-button";
 import { SubtaskList } from "./subtask-list";
@@ -83,7 +84,7 @@ export function TaskRow({
 
           <div className="flex flex-1 items-center gap-2 min-w-0">
             <p className="text-sm font-medium truncate min-w-0">{task.title}</p>
-            {task.description && (
+            {task.description && !isHtmlContentEmpty(task.description) && (
               <div onClick={stopPropagation} className="shrink-0">
                 <InfoPopover
                   label={t("common.description_hint")}
