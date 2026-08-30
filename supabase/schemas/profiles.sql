@@ -92,12 +92,27 @@ CREATE OR REPLACE TRIGGER set_profiles_updated_at
   BEFORE UPDATE ON public.profiles
   FOR EACH ROW EXECUTE PROCEDURE public.set_updated_at();
 
+-- RPC: cancel a pending email change
+CREATE OR REPLACE FUNCTION public.cancel_email_change()
+RETURNS void AS $$
+BEGIN
+  UPDATE auth.users
+  SET email_change = '',
+      email_change_token_new = '',
+      email_change_token_current = '',
+      email_change_confirm_status = 0,
+      email_change_sent_at = NULL
+  WHERE id = (SELECT auth.uid());
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
+
 -- Permissions
 REVOKE ALL ON public.profiles FROM anon;
 REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM anon;
 REVOKE EXECUTE ON FUNCTION public.handle_user_email_update() FROM anon;
 REVOKE EXECUTE ON FUNCTION public.set_updated_at() FROM anon;
 REVOKE EXECUTE ON FUNCTION public.is_admin() FROM anon;
+REVOKE EXECUTE ON FUNCTION public.cancel_email_change() FROM anon;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO authenticated;
 GRANT ALL ON public.profiles TO service_role;

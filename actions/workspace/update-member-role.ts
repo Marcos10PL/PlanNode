@@ -1,8 +1,19 @@
 ﻿"use server";
 
-import { ERRORS, LINKS, MANAGER_ROLES, WORKSPACE_ROLES } from "@/const";
+import {
+  EMAIL_TEMPLATES,
+  ERRORS,
+  LINKS,
+  MANAGER_ROLES,
+  NOTIFICATION_TYPES,
+  WORKSPACE_ROLES,
+} from "@/const";
 import { getUserContext } from "@/lib/supabase/server";
 import { updateMemberRoleSchema, UpdateMemberRoleSchema } from "@/schema";
+import { renderLocalizedEmailTemplate, sendEmail } from "@/utils/email";
+import { generateAbsoluteUrl } from "@/utils/helpers";
+import { getRoleLabel } from "@/utils/workspace";
+import { getTranslations } from "next-intl/server";
 import { revalidatePath } from "next/cache";
 
 export async function updateMemberRoleAction(
@@ -50,6 +61,54 @@ export async function updateMemberRoleAction(
     .eq("id", memberId);
 
   if (error) return { error: ERRORS.SERVER_ERROR };
+
+  if (memberId !== user.id) {
+    const [
+      { data: workspace },
+      { data: callerProfile },
+      { data: targetProfile },
+    ] = await Promise.all([
+      supabase.from("workspaces").select("name").eq("id", workspaceId).single(),
+      supabase.from("profiles").select("full_name").eq("id", user.id).single(),
+      supabase
+        .from("profiles")
+        .select("email, locale")
+        .eq("id", memberId)
+        .single(),
+    ]);
+
+    if (workspace && callerProfile) {
+      await supabase.rpc("create_notification", {
+        p_user_id: memberId,
+        p_type: NOTIFICATION_TYPES.WORKSPACE_ROLE_CHANGED,
+        p_metadata: {
+          workspaceName: workspace.name,
+          changedByName: callerProfile.full_name,
+          newRole: parsed.data.role,
+        },
+        p_link: LINKS.TEAM,
+      });
+
+      if (targetProfile) {
+        try {
+          const t = await getTranslations({ locale: targetProfile.locale });
+          const { subject, html } = await renderLocalizedEmailTemplate(
+            EMAIL_TEMPLATES.WORKSPACE_ROLE_CHANGED,
+            targetProfile.locale,
+            {
+              workspaceName: workspace.name,
+              changedByName: callerProfile.full_name,
+              newRole: getRoleLabel(parsed.data.role, t),
+              teamUrl: generateAbsoluteUrl(LINKS.TEAM),
+            },
+          );
+          await sendEmail(targetProfile.email, subject, html);
+        } catch (e) {
+          console.error("[update-member-role] Email error:", e);
+        }
+      }
+    }
+  }
 
   revalidatePath(LINKS.TEAM);
   return { success: true };

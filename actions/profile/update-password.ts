@@ -1,16 +1,26 @@
-﻿"use server";
+"use server";
 
-import { getUserContext } from "@/lib/supabase/server";
-import { updatePasswordSchema, UpdatePasswordSchema } from "@/schema";
 import { ERRORS } from "@/const";
+import { getUserContext } from "@/lib/supabase/server";
+import {
+  updatePasswordWithCurrentSchema,
+  UpdatePasswordWithCurrentSchema,
+} from "@/schema";
 
-export async function updatePasswordAction(data: UpdatePasswordSchema) {
-  const parsed = updatePasswordSchema().safeParse(data);
+export async function updatePasswordAction(
+  data: UpdatePasswordWithCurrentSchema,
+) {
+  const parsed = updatePasswordWithCurrentSchema().safeParse(data);
   if (!parsed.success) return { error: ERRORS.INVALID_DATA };
 
   const { supabase, user } = await getUserContext();
+  if (!user || !user.email) return { error: ERRORS.UNAUTHENTICATED };
 
-  if (!user) return { error: ERRORS.UNAUTHENTICATED };
+  const { error: signInError } = await supabase.auth.signInWithPassword({
+    email: user.email,
+    password: parsed.data.currentPassword,
+  });
+  if (signInError) return { error: ERRORS.INVALID_CREDENTIALS };
 
   const { error } = await supabase.auth.updateUser({
     password: parsed.data.password,

@@ -1,12 +1,13 @@
 "use client";
 
 import { deleteTaskAction } from "@/actions/task/delete-task";
-import { ERRORS, TASK_STATUSES } from "@/const";
+import { ERRORS, TASK_MODAL_TABS, TASK_STATUSES, TaskModalTab } from "@/const";
 import { TaskAssignee } from "@/types/dto";
 import { TaskPriority, TaskStatus } from "@/types/entities";
 import { TaskItemProps } from "@/types/props";
 import { isTaskOverdue } from "@/utils";
 import { useTranslations } from "next-intl";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -21,21 +22,49 @@ export function useTaskItemActions({
   onUpdateTask,
 }: Props) {
   const t = useTranslations();
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalTab, setModalTab] = useState<"details" | "activity">("details");
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [isPending, setIsPending] = useState(false);
   const [subtasksExpanded, setSubtasksExpanded] = useState(false);
 
-  const openDetails = () => {
-    setModalTab("details");
-    setModalOpen(true);
+  const [modalOpen, setModalOpenState] = useState(
+    () => searchParams.get("taskId") === task.id,
+  );
+  const [modalTab, setModalTabState] = useState<TaskModalTab>(() =>
+    searchParams.get("tab") === TASK_MODAL_TABS.ACTIVITY
+      ? TASK_MODAL_TABS.ACTIVITY
+      : TASK_MODAL_TABS.DETAILS,
+  );
+
+  const syncUrl = (open: boolean, tab: TaskModalTab) => {
+    const params = new URLSearchParams(searchParams);
+    if (open) {
+      params.set("taskId", task.id);
+      params.set("tab", tab);
+    } else {
+      if (searchParams.get("taskId") !== task.id) return;
+      params.delete("taskId");
+      params.delete("tab");
+    }
+    router.replace(params.size > 0 ? `?${params.toString()}` : "?", {
+      scroll: false,
+    });
   };
 
-  const openActivity = () => {
-    setModalTab("activity");
-    setModalOpen(true);
+  const setModalTab = (tab: TaskModalTab) => {
+    setModalTabState(tab);
+    setModalOpenState(true);
+    syncUrl(true, tab);
   };
+
+  const setModalOpen = (open: boolean) => {
+    setModalOpenState(open);
+    syncUrl(open, modalTab);
+  };
+
+  const openDetails = () => setModalTab(TASK_MODAL_TABS.DETAILS);
+  const openActivity = () => setModalTab(TASK_MODAL_TABS.ACTIVITY);
 
   const isSubtask = !!task.parentTaskId;
   const subtasksDone = subtasks.filter(
@@ -121,6 +150,7 @@ export function useTaskItemActions({
     subtasksExpanded,
 
     setModalOpen,
+    setModalTab,
     setDeleteOpen,
     setSubtasksExpanded,
     stopPropagation,

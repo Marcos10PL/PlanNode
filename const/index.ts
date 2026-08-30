@@ -100,12 +100,24 @@ export const INVITATION_STATUSES = {
 } as const satisfies Record<string, InvitationStatus>;
 
 export const EMAIL_TEMPLATES = {
+  SIGNUP_CONFIRMATION: "signup_confirmation",
+  PASSWORD_RECOVERY: "password_recovery",
+  EMAIL_CHANGE: "email_change",
+
+  // also notifications
   WORKSPACE_INVITATION: "workspace_invitation",
+  TASK_ASSIGNED: "task_assigned",
+  PROJECT_MEMBER_ADDED: "project_member_added",
+  TASK_COMMENT_ADDED: "task_comment_added",
+  WORKSPACE_ROLE_CHANGED: "workspace_role_changed",
 } as const;
 
 export const NOTIFICATION_TYPES = {
   WORKSPACE_INVITATION: "workspace_invitation",
   TASK_ASSIGNED: "task_assigned",
+  PROJECT_MEMBER_ADDED: "project_member_added",
+  TASK_COMMENT_ADDED: "task_comment_added",
+  WORKSPACE_ROLE_CHANGED: "workspace_role_changed",
 } as const;
 
 export const TASK_EVENT_TYPES = {
@@ -168,6 +180,14 @@ export const TASK_VIEWS = {
 } as const;
 
 export type TaskView = (typeof TASK_VIEWS)[keyof typeof TASK_VIEWS];
+
+export const TASK_MODAL_TABS = {
+  DETAILS: "details",
+  ACTIVITY: "activity",
+} as const;
+
+export type TaskModalTab =
+  (typeof TASK_MODAL_TABS)[keyof typeof TASK_MODAL_TABS];
 
 export const TASK_URGENCY_BUCKETS = {
   OVERDUE: "overdue",

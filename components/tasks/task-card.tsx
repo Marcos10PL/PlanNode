@@ -35,6 +35,7 @@ export function TaskCard({
     modalOpen,
     setModalOpen,
     modalTab,
+    setModalTab,
     deleteOpen,
     setDeleteOpen,
     isPending,
@@ -188,7 +189,8 @@ export function TaskCard({
         canManage={canManage}
         open={modalOpen}
         onOpenChange={setModalOpen}
-        initialTab={modalTab}
+        activeTab={modalTab}
+        onTabChange={setModalTab}
       />
 
       <ConfirmModal

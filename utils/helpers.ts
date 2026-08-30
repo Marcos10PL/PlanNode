@@ -14,8 +14,12 @@ export const generateListRoute = (projectId: string, listId: string) => {
   return `${generateProjectRoute(projectId)}/lists/${listId}`;
 };
 
+export const generateAbsoluteUrl = (path: string) => {
+  return `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}${path}`;
+};
+
 export const generateInvitationLink = (token: string) => {
-  return `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}${generateInvitationRoute(token)}`;
+  return generateAbsoluteUrl(generateInvitationRoute(token));
 };
 
 export const generateExpirationDate = (daysFromNow: number) => {
