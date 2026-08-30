@@ -10,7 +10,7 @@ import { cn, formatDate } from "@/utils";
 import { ExternalLink } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { ConfirmModal } from "../ui/confirm-modal";
 
@@ -25,7 +25,7 @@ export function NotificationItem({
   const router = useRouter();
   const locale = useLocale();
 
-  const [isPending, setIsPending] = useState(false);
+  const [isPending, startDeleteTransition] = useTransition();
   const [markReadPending, setMarkReadPending] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
@@ -50,16 +50,15 @@ export function NotificationItem({
     }
   };
 
-  const handleDelete = async () => {
-    setIsPending(true);
-    try {
-      await deleteNotificationAction({ id: notification.id });
-      toast.success(t("delete"));
-    } catch {
-      toast.error(tCommon("unexpected_error"));
-    } finally {
-      setIsPending(false);
-    }
+  const handleDelete = () => {
+    startDeleteTransition(async () => {
+      try {
+        await deleteNotificationAction({ id: notification.id });
+        toast.success(t("delete"));
+      } catch {
+        toast.error(tCommon("unexpected_error"));
+      }
+    });
   };
 
   return (

@@ -187,20 +187,27 @@ export async function updateTaskAction(taskId: string, data: UpdateTaskSchema) {
       }
 
       if (assigneeProfile) {
-        try {
-          const { subject, html } = await renderLocalizedEmailTemplate(
-            EMAIL_TEMPLATES.TASK_ASSIGNED,
-            assigneeProfile.locale,
-            {
-              taskTitle: title ?? existing.title,
-              projectName: project.name,
-              assignerName: assignerProfile.full_name,
-              taskUrl: generateAbsoluteUrl(taskPath),
-            },
-          );
-          await sendEmail(assigneeProfile.email, subject, html);
-        } catch (e) {
-          console.error("[update-task] Email error:", e);
+        const { data: emailEnabled } = await supabase.rpc(
+          "get_email_notification_enabled",
+          { p_user_id: assigneeId, p_type: NOTIFICATION_TYPES.TASK_ASSIGNED },
+        );
+
+        if (emailEnabled) {
+          try {
+            const { subject, html } = await renderLocalizedEmailTemplate(
+              EMAIL_TEMPLATES.TASK_ASSIGNED,
+              assigneeProfile.locale,
+              {
+                taskTitle: title ?? existing.title,
+                projectName: project.name,
+                assignerName: assignerProfile.full_name,
+                taskUrl: generateAbsoluteUrl(taskPath),
+              },
+            );
+            await sendEmail(assigneeProfile.email, subject, html);
+          } catch (e) {
+            console.error("[update-task] Email error:", e);
+          }
         }
       }
     }

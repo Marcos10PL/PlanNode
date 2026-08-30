@@ -1,8 +1,7 @@
+import { BadgeVariant } from "@/components/ui/badge";
 import { WORKSPACE_ROLES } from "@/const";
 import { Translations } from "@/types";
 import { WorkspaceRole } from "@/types/entities";
-
-type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
 
 const ROLE_LABEL_KEYS = {
   [WORKSPACE_ROLES.OWNER]: "team.role_owner",

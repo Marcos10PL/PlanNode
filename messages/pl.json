@@ -371,7 +371,29 @@
     "task_assigned_title": "{assignerName} przypisał(a) Ci zadanie „{taskTitle}” w „{projectName}”",
     "project_member_added_title": "{addedByName} dodał(a) Cię do projektu „{projectName}”",
     "task_comment_added_title": "{commenterName} skomentował(a) zadanie „{taskTitle}”",
-    "workspace_role_changed_title": "{changedByName} zmienił(a) Twoją rolę w „{workspaceName}”"
+    "workspace_role_changed_title": "{changedByName} zmienił(a) Twoją rolę w „{workspaceName}”",
+    "loading_more": "Ładowanie...",
+    "all_disabled_title": "Wszystkie powiadomienia są wyłączone",
+    "all_disabled_description": "Nie dostaniesz żadnych powiadomień mailowych ani w aplikacji. Możesz je włączyć z powrotem w ustawieniach powiadomień.",
+    "settings_button": "Ustawienia powiadomień",
+    "settings": {
+      "title": "Ustawienia powiadomień",
+      "description": "Wybierz, jak chcesz być powiadamiany o poszczególnych zdarzeniach.",
+      "email_label": "E-mail",
+      "in_app_label": "Aplikacja",
+      "workspace_invitation": "Zaproszenia do przestrzeni roboczych",
+      "task_assigned": "Przypisanie zadania",
+      "project_member_added": "Dodanie do projektu",
+      "task_comment_added": "Nowy komentarz do Twojego zadania",
+      "workspace_role_changed": "Zmiana Twojej roli",
+      "invitation_warning_title": "Wyłączyć powiadomienia o zaproszeniach do przestrzeni roboczych?",
+      "invitation_warning_description": "Jeśli wyłączysz jednocześnie mail i powiadomienie w aplikacji dla zaproszeń do przestrzeni roboczych, nie zobaczysz przyszłych zaproszeń i nie będziesz mógł do nich dołączyć.",
+      "invitation_disabled_hint": "Zaproszenia nie działają — nie zobaczysz ich ani nie dostaniesz o nich powiadomienia.",
+      "invitation_disabled_tooltip": "Kliknij, aby wyświetlić ostrzeżenie",
+      "cancel": "Anuluj",
+      "save": "Zapisz",
+      "saving": "Zapisywanie..."
+    }
   },
   "invite_page": {
     "title": "Zaproszenie do przestrzeni roboczej",

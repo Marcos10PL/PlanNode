@@ -186,8 +186,8 @@ export function ProjectModal({
               </FieldLabel>
             )}
           />
-          <div className="flex gap-2 justify-end">
-            {project && (
+          {project ? (
+            <div className="flex gap-2 justify-end">
               <Button
                 type="button"
                 variant="outline"
@@ -195,14 +195,18 @@ export function ProjectModal({
               >
                 {t("cancel")}
               </Button>
-            )}
-            <Button
-              type="submit"
-              disabled={form.formState.isSubmitting || !isChanged}
-            >
+              <Button
+                type="submit"
+                disabled={form.formState.isSubmitting || !isChanged}
+              >
+                {form.formState.isSubmitting ? t("submitting") : t("submit")}
+              </Button>
+            </div>
+          ) : (
+            <Button type="submit" disabled={form.formState.isSubmitting}>
               {form.formState.isSubmitting ? t("submitting") : t("submit")}
             </Button>
-          </div>
+          )}
         </form>
       </DialogContent>
     </Dialog>

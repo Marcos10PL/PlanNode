@@ -79,6 +79,27 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_preferences: {
+        Row: {
+          email_enabled: boolean
+          in_app_enabled: boolean
+          type: Database["public"]["Enums"]["notification_type"]
+          user_id: string
+        }
+        Insert: {
+          email_enabled?: boolean
+          in_app_enabled?: boolean
+          type: Database["public"]["Enums"]["notification_type"]
+          user_id: string
+        }
+        Update: {
+          email_enabled?: boolean
+          in_app_enabled?: boolean
+          type?: Database["public"]["Enums"]["notification_type"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string
@@ -606,6 +627,13 @@ export type Database = {
       delete_notification_by_invitation_id: {
         Args: { p_invitation_id: string }
         Returns: undefined
+      }
+      get_email_notification_enabled: {
+        Args: {
+          p_type: Database["public"]["Enums"]["notification_type"]
+          p_user_id: string
+        }
+        Returns: boolean
       }
       get_workspace_member_role: {
         Args: { p_user_id: string; p_workspace_id: string }

@@ -1,4 +1,5 @@
-﻿import type { ManageMenuItem } from "@/components/ui/manage-menu";
+﻿import { BadgeVariant } from "@/components/ui/badge";
+import type { ManageMenuItem } from "@/components/ui/manage-menu";
 import {
   TASK_PRIORITIES,
   TASK_STATUS_ORDER,
@@ -10,8 +11,6 @@ import { Translations } from "@/types";
 import { Task } from "@/types/dto";
 import { TaskPriority, TaskStatus } from "@/types/entities";
 import { Pencil, Trash2 } from "lucide-react";
-
-type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
 
 const STATUS_LABEL_KEYS = {
   [TASK_STATUSES.ON_HOLD]: "tasks.status_on_hold",

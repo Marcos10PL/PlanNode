@@ -371,7 +371,29 @@
     "task_assigned_title": "{assignerName} assigned you the task \"{taskTitle}\" in \"{projectName}\"",
     "project_member_added_title": "{addedByName} added you to the project \"{projectName}\"",
     "task_comment_added_title": "{commenterName} commented on the task \"{taskTitle}\"",
-    "workspace_role_changed_title": "{changedByName} changed your role in \"{workspaceName}\""
+    "workspace_role_changed_title": "{changedByName} changed your role in \"{workspaceName}\"",
+    "loading_more": "Loading more...",
+    "all_disabled_title": "All notifications are turned off",
+    "all_disabled_description": "You won't receive any email or in-app notifications. You can turn them back on in notification settings.",
+    "settings_button": "Notification settings",
+    "settings": {
+      "title": "Notification settings",
+      "description": "Choose how you want to be notified for each event type.",
+      "email_label": "Email",
+      "in_app_label": "In-app",
+      "workspace_invitation": "Workspace invitations",
+      "task_assigned": "Task assigned to you",
+      "project_member_added": "Added to a project",
+      "task_comment_added": "New comment on your task",
+      "workspace_role_changed": "Your role changed",
+      "invitation_warning_title": "Turn off workspace invitation notifications?",
+      "invitation_warning_description": "If you turn off both email and in-app notifications for workspace invitations, you won't see or be able to join future workspace invitations.",
+      "invitation_disabled_hint": "Invitations are disabled — you won't see or be notified about them.",
+      "invitation_disabled_tooltip": "Click to show the warning",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving..."
+    }
   },
   "invite_page": {
     "title": "Workspace invitation",

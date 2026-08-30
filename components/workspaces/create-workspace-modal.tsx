@@ -22,11 +22,16 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-type Step = "form" | "confirm-active";
+const STEPS = {
+  FORM: "form",
+  CONFIRM_ACTIVE: "confirm-active",
+} as const;
+
+type Step = (typeof STEPS)[keyof typeof STEPS];
 
 export function CreateWorkspaceModal() {
   const [open, setOpen] = useState(false);
-  const [step, setStep] = useState<Step>("form");
+  const [step, setStep] = useState<Step>(STEPS.FORM);
   const [created, setCreated] = useState<Workspace | null>(null);
   const t = useTranslations("workspace");
   const tProfile = useTranslations("profile_workspaces");
@@ -42,7 +47,7 @@ export function CreateWorkspaceModal() {
   const handleClose = () => setOpen(false);
 
   const resetState = () => {
-    setStep("form");
+    setStep(STEPS.FORM);
     setCreated(null);
     form.reset();
   };
@@ -67,7 +72,7 @@ export function CreateWorkspaceModal() {
         handleClose();
       } else {
         setCreated(result.workspace);
-        setStep("confirm-active");
+        setStep(STEPS.CONFIRM_ACTIVE);
       }
     } catch {
       toast.error(tCommon("unexpected_error"));
@@ -90,7 +95,7 @@ export function CreateWorkspaceModal() {
           if (!open) resetState();
         }}
       >
-        {step === "form" ? (
+        {step === STEPS.FORM ? (
           <>
             <DialogHeader>
               <DialogTitle>{t("create.title")}</DialogTitle>
