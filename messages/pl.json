@@ -10,7 +10,11 @@
     "insufficient_role": "Brak uprawnień do tej operacji",
     "no_due_date": "Brak terminu",
     "clear_date": "Wyczyść datę",
-    "sort_by": "Sortuj:"
+    "sort_by": "Sortuj:",
+    "editor_link_add": "Dodaj",
+    "editor_link_save": "Zapisz",
+    "editor_link_placeholder": "https://...",
+    "editor_link_invalid": "Nieprawidłowy adres URL"
   },
   "footer": {
     "all_rights_reserved": "PlanNode. Wszelkie prawa zastrzeżone."
@@ -94,7 +98,8 @@
       "password_too_short": "Hasło musi mieć co najmniej 6 znaków",
       "passwords_do_not_match": "Hasła nie są takie same",
       "full_name_required": "Imię i nazwisko jest wymagane",
-      "field_required": "To pole jest wymagane"
+      "field_required": "To pole jest wymagane",
+      "field_too_long": "Tekst jest za długi"
     }
   },
   "metadata": {
@@ -144,8 +149,7 @@
     "email_change_cancel_failed": "Nie udało się anulować zmiany maila",
     "password_update_success": "Hasło zostało zmienione",
     "password_update_failed": "Nie udało się zmienić hasła",
-    "password_same_as_old": "Nowe hasło musi różnić się od obecnego",
-    "cancel_email_change": "Anuluj zmianę emaila"
+    "password_same_as_old": "Nowe hasło musi różnić się od obecnego"
   },
   "landing": {
     "hero": {

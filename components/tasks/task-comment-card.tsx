@@ -7,14 +7,16 @@ import { Button } from "@/components/ui/button";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { DeleteButton } from "@/components/ui/delete-button";
 import { EditButton } from "@/components/ui/edit-button";
-import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import UserAvatar from "@/components/user-avatar";
 import { ERRORS, VALIDATION_MAX } from "@/const";
 import { TaskComment } from "@/types/dto";
 import { formatDate } from "@/utils";
+import { isHtmlContentEmpty } from "@/utils/helpers";
 import { useLocale, useTranslations } from "next-intl";
 import { RefObject, useLayoutEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { TaskDescriptionView } from "./task-description-view";
 import { TaskEventAuthor } from "./task-event-author";
 
 type Props = {
@@ -45,36 +47,26 @@ export function TaskCommentCard({
   const canDelete = isAuthor || canManageComments;
   const isEdited = comment.createdAt !== comment.updatedAt;
 
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
-
-  useLayoutEffect(() => {
-    if (isEditing && textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-    }
-  }, [isEditing, editText]);
-
-  useLayoutEffect(() => {
-    if (isEditing && textareaRef.current) {
-      const el = textareaRef.current;
-      el.focus({ preventScroll: true });
-      const length = el.value.length;
-      el.setSelectionRange(length, length);
-    }
-  }, [isEditing]);
 
   useLayoutEffect(() => {
     if (!isEditing || !cardRef.current || !scrollContainerRef.current) return;
 
-    const cardRect = cardRef.current.getBoundingClientRect();
-    const containerRect = scrollContainerRef.current.getBoundingClientRect();
-    const overflowBottom = cardRect.bottom - containerRect.bottom;
+    const adjust = () => {
+      if (!cardRef.current || !scrollContainerRef.current) return;
+      const cardRect = cardRef.current.getBoundingClientRect();
+      const containerRect = scrollContainerRef.current.getBoundingClientRect();
+      const overflowBottom = cardRect.bottom - containerRect.bottom;
+      if (overflowBottom > 0) {
+        scrollContainerRef.current.scrollTop += overflowBottom;
+      }
+    };
 
-    if (overflowBottom > 0) {
-      scrollContainerRef.current.scrollTop += overflowBottom;
-    }
-  }, [isEditing, editText, scrollContainerRef]);
+    adjust();
+    const observer = new ResizeObserver(adjust);
+    observer.observe(cardRef.current);
+    return () => observer.disconnect();
+  }, [isEditing, scrollContainerRef]);
 
   const startEdit = () => {
     setEditText(comment.content);
@@ -82,12 +74,13 @@ export function TaskCommentCard({
   };
 
   const handleSubmitEdit = async () => {
-    const content = editText.trim();
-    if (!content) return;
+    if (isHtmlContentEmpty(editText)) return;
 
     setEditSubmitting(true);
     try {
-      const result = await updateTaskCommentAction(comment.id, { content });
+      const result = await updateTaskCommentAction(comment.id, {
+        content: editText,
+      });
       if (result.error) {
         toast.error(
           result.error === ERRORS.INSUFFICIENT_ROLE
@@ -129,40 +122,46 @@ export function TaskCommentCard({
   return (
     <div ref={cardRef} className="flex gap-2">
       <div className="flex-1 min-w-0 rounded-lg border bg-muted/40 flex flex-col gap-1.5">
-        <div className="flex items-center gap-2 min-w-0 py-2 px-3">
-          <UserAvatar
-            name={comment.user?.fullName ?? t("unknown_user")}
-            userId={comment.user?.id}
-            className="h-7 w-7 shrink-0"
-          />
-          <div className="text-sm opacity-90 flex items-center gap-0.5 min-w-0">
-            <TaskEventAuthor user={comment.user} />
+        {!isEditing && (
+          <div className="flex items-center gap-2 min-w-0 pt-3 px-3">
+            <UserAvatar
+              name={comment.user?.fullName ?? t("unknown_user")}
+              userId={comment.user?.id}
+              className="h-7 w-7 shrink-0"
+            />
+            <div className="text-sm opacity-90 flex items-center gap-0.5 min-w-0">
+              <TaskEventAuthor user={comment.user} />
+            </div>
           </div>
-        </div>
+        )}
 
         {isEditing ? (
-          <div className="px-3 pb-2">
-            <Textarea
-              ref={textareaRef}
+          <div className="-mb-2">
+            <RichTextEditor
               value={editText}
-              onChange={e => setEditText(e.target.value)}
+              onChange={setEditText}
               maxLength={VALIDATION_MAX.TASK_COMMENT}
-              rows={1}
-              className="border-none bg-transparent shadow-none px-1.5 py-1 min-h-0 overflow-hidden focus-visible:ring-0 text-sm -mx-1 -mb-1"
+              editorClassName="min-h-0"
+              className="border-0 rounded-none"
+              autoFocus
             />
           </div>
         ) : (
-          <p className="text-sm whitespace-pre-wrap px-3.5 pb-2 pt-1">
-            {comment.content}
-          </p>
+          <div className="px-3 pt-[0.2rem]">
+            <TaskDescriptionView
+              html={comment.content}
+              className="max-h-64 overflow-y-auto"
+            />
+          </div>
         )}
 
         <div className="flex items-center justify-between gap-2 mt-0.5 border-t px-3 py-1.5">
           {isEditing ? (
-            <div className="flex gap-2 *:w-full md:*:w-auto md:justify-end w-full *:h-7">
+            <div className="flex gap-2 *:w-full md:*:w-auto md:justify-end w-full">
               <Button
                 variant="outline"
                 size="sm"
+                className="h-7"
                 disabled={editSubmitting}
                 onClick={() => setIsEditing(false)}
               >
@@ -170,7 +169,8 @@ export function TaskCommentCard({
               </Button>
               <Button
                 size="sm"
-                disabled={editSubmitting || !editText.trim()}
+                className="h-7"
+                disabled={editSubmitting || isHtmlContentEmpty(editText)}
                 onClick={handleSubmitEdit}
               >
                 {t("comment_save")}

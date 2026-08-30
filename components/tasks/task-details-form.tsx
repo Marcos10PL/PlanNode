@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { ControlledInputField } from "@/components/ui/controlled-input-field";
-import { ControlledTextareaField } from "@/components/ui/controlled-textarea-field";
+import { ControlledRichTextField } from "@/components/ui/controlled-rich-text-field";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { VALIDATION_MAX } from "@/const";
@@ -42,8 +42,11 @@ export function TaskDetailsForm({
         placeholder={t("title_placeholder")}
         maxLength={VALIDATION_MAX.TASK_TITLE}
         disabled={!canEdit}
+        className={
+          !canEdit ? "disabled:cursor-text disabled:opacity-100" : undefined
+        }
       />
-      <ControlledTextareaField
+      <ControlledRichTextField
         control={form.control}
         name="description"
         label={t("description_label")}

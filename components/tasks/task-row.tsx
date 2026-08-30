@@ -7,11 +7,13 @@ import { TooltipIconButton } from "@/components/ui/tooltip-icon-button";
 import { useTaskItemActions } from "@/hooks/use-task-item-actions";
 import { TaskItemProps } from "@/types/props";
 import { getPriorityLabel } from "@/utils";
+import { isHtmlContentEmpty } from "@/utils/helpers";
 import { History } from "lucide-react";
 import { AdvanceStatusButton } from "./advance-status-button";
 import { SubtaskList } from "./subtask-list";
 import { SubtaskToggle } from "./subtask-toggle";
 import { TaskAssigneePopover } from "./task-assignee-popover";
+import { TaskDescriptionView } from "./task-description-view";
 import { TaskDueDatePopover } from "./task-due-date-popover";
 import { TaskModal } from "./task-modal";
 import { TaskPrioritySelect } from "./task-priority-select";
@@ -82,14 +84,14 @@ export function TaskRow({
 
           <div className="flex flex-1 items-center gap-2 min-w-0">
             <p className="text-sm font-medium truncate min-w-0">{task.title}</p>
-            {task.description && (
+            {task.description && !isHtmlContentEmpty(task.description) && (
               <div onClick={stopPropagation} className="shrink-0">
                 <InfoPopover
                   label={t("common.description_hint")}
                   variant="ghost"
                   className="size-7 text-muted-foreground [&_svg]:size-4"
                 >
-                  {task.description}
+                  <TaskDescriptionView html={task.description} />
                 </InfoPopover>
               </div>
             )}

@@ -6,12 +6,14 @@ import { TooltipIconButton } from "@/components/ui/tooltip-icon-button";
 import { useTaskItemActions } from "@/hooks/use-task-item-actions";
 import { TaskItemProps } from "@/types/props";
 import { cn } from "@/utils";
+import { isHtmlContentEmpty } from "@/utils/helpers";
 import { History } from "lucide-react";
 import { InfoPopover } from "../ui/info-popover";
 import { AdvanceStatusButton } from "./advance-status-button";
 import { SubtaskCardList } from "./subtask-card-list";
 import { SubtaskToggle } from "./subtask-toggle";
 import { TaskAssigneePopover } from "./task-assignee-popover";
+import { TaskDescriptionView } from "./task-description-view";
 import { TaskDueDatePopover } from "./task-due-date-popover";
 import { TaskModal } from "./task-modal";
 import { TaskPrioritySelect } from "./task-priority-select";
@@ -140,14 +142,14 @@ export function TaskCard({
                 className="text-muted-foreground"
               />
             </div>
-            {task.description && (
+            {task.description && !isHtmlContentEmpty(task.description) && (
               <div onClick={stopPropagation} className="shrink-0">
                 <InfoPopover
                   label={t("common.description_hint")}
                   variant="ghost"
                   className="size-7 text-muted-foreground [&_svg]:size-4"
                 >
-                  {task.description}
+                  <TaskDescriptionView html={task.description} />
                 </InfoPopover>
               </div>
             )}

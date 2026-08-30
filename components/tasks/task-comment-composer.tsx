@@ -2,8 +2,9 @@
 
 import { createTaskCommentAction } from "@/actions/task/create-task-comment";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { ERRORS, VALIDATION_MAX } from "@/const";
+import { isHtmlContentEmpty } from "@/utils/helpers";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -21,12 +22,13 @@ export function TaskCommentComposer({ taskId, onChanged }: Props) {
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async () => {
-    const content = commentText.trim();
-    if (!content) return;
+    if (isHtmlContentEmpty(commentText)) return;
 
     setSubmitting(true);
     try {
-      const result = await createTaskCommentAction(taskId, { content });
+      const result = await createTaskCommentAction(taskId, {
+        content: commentText,
+      });
       if (result.error) {
         toast.error(
           result.error === ERRORS.INSUFFICIENT_ROLE
@@ -46,16 +48,16 @@ export function TaskCommentComposer({ taskId, onChanged }: Props) {
 
   return (
     <div className="flex flex-col items-end gap-2 pt-2 border-t">
-      <Textarea
+      <RichTextEditor
         value={commentText}
-        onChange={e => setCommentText(e.target.value)}
+        onChange={setCommentText}
         placeholder={t("comment_placeholder")}
         maxLength={VALIDATION_MAX.TASK_COMMENT}
-        rows={2}
+        className="w-full"
       />
       <Button
         size="sm"
-        disabled={submitting || !commentText.trim()}
+        disabled={submitting || isHtmlContentEmpty(commentText)}
         onClick={handleSubmit}
         className="shrink-0 w-full"
       >

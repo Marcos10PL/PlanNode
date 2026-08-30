@@ -211,3 +211,11 @@ html.dark [data-sonner-toast] {
     0 0 0 1px hsl(var(--border)),
     0 6px 6px -10px hsl(0 0% 100% / 0.12);
 }
+
+.tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  color: var(--color-muted-foreground);
+}

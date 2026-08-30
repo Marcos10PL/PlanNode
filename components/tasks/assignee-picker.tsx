@@ -60,6 +60,7 @@ export function AssigneePicker({
           disabled={disabled}
           className={cn(
             "w-full justify-between font-normal px-3 bg-transparent dark:bg-input/30 dark:hover:bg-input/50",
+            disabled && "disabled:opacity-100",
             className,
           )}
         >
@@ -79,7 +80,9 @@ export function AssigneePicker({
               </span>
             )}
           </span>
-          <ChevronDown className="ml-auto size-4 shrink-0 text-muted-foreground opacity-50" />
+          {!disabled && (
+            <ChevronDown className="ml-auto size-4 shrink-0 text-muted-foreground opacity-50" />
+          )}
         </Button>
       )}
     </PopoverTrigger>

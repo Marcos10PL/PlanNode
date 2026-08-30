@@ -1,5 +1,6 @@
 import { VALIDATION_MAX } from "@/const";
-import { Translations } from "@/types"
+import { Translations } from "@/types";
+import { getHtmlTextLength } from "@/utils/helpers";
 import z from "zod";
 
 export const emailField = (t?: Translations) => z.email(t?.("invalid_email"));
@@ -18,3 +19,8 @@ export const nameField = (max: number, t?: Translations) =>
   z.string().trim().min(1, t?.("field_required")).max(max);
 
 export const descriptionField = (max: number) => z.string().trim().max(max);
+
+export const htmlContentField = (max: number, t?: Translations) =>
+  z
+    .string()
+    .refine(val => getHtmlTextLength(val) <= max, t?.("field_too_long"));

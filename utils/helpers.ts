@@ -49,3 +49,11 @@ export const parseCookieValue = <T>(
     return fallback;
   }
 };
+
+export const isHtmlContentEmpty = (html: string) => {
+  return !html.replace(/<[^>]*>/g, "").trim();
+};
+
+export const getHtmlTextLength = (html: string) => {
+  return html.replace(/<[^>]*>/g, "").length;
+};

@@ -10,7 +10,11 @@
     "insufficient_role": "You don't have permission for this action",
     "no_due_date": "No due date",
     "clear_date": "Clear date",
-    "sort_by": "Sort by:"
+    "sort_by": "Sort by:",
+    "editor_link_add": "Add",
+    "editor_link_save": "Save",
+    "editor_link_placeholder": "https://...",
+    "editor_link_invalid": "Invalid URL"
   },
   "footer": {
     "all_rights_reserved": "PlanNode. All rights reserved."
@@ -94,7 +98,8 @@
       "password_too_short": "Password must be at least 6 characters",
       "passwords_do_not_match": "Passwords do not match",
       "full_name_required": "Full name is required",
-      "field_required": "This field is required"
+      "field_required": "This field is required",
+      "field_too_long": "Text is too long"
     }
   },
   "metadata": {
@@ -144,8 +149,7 @@
     "email_change_cancel_failed": "Could not cancel email change",
     "password_update_success": "Password updated successfully",
     "password_update_failed": "Could not update password",
-    "password_same_as_old": "New password must be different from the current one",
-    "cancel_email_change": "Cancel email change"
+    "password_same_as_old": "New password must be different from the current one"
   },
   "landing": {
     "hero": {
