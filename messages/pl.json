@@ -70,7 +70,8 @@
       "confirm_password": "Potwierdź hasło",
       "submit": "Zapisz nowe hasło",
       "submitting": "Zapisywanie...",
-      "error_generic": "Wystąpił błąd"
+      "error_generic": "Wystąpił błąd",
+      "password_same_as_old": "Nowe hasło musi różnić się od obecnego"
     },
     "sign_up_success": {
       "title": "Dziękujemy za rejestrację!",
@@ -120,10 +121,12 @@
     "id": "ID",
     "created_at": "Utworzono",
     "updated_at": "Zaktualizowano",
+    "current_password": "Obecne hasło",
     "new_password": "Nowe hasło",
     "password": "Hasło",
     "confirm_password": "Potwierdź hasło",
     "password_change_placeholder": "Uzupełnij, żeby zmienić",
+    "current_password_incorrect": "Nieprawidłowe obecne hasło",
     "submit": "Zapisz zmiany",
     "submitting": "Zapisywanie...",
     "update_email": "Zmień email",
@@ -135,6 +138,10 @@
     "email_update_success": "Zlecono zmianę emaila. Sprawdź skrzynkę.",
     "email_update_failed": "Nie udało się zmienić emaila",
     "pending_email_info": "Zmiana emaila na {pendingEmail} czeka na potwierdzenie. Do tego czasu loguj się obecnym emailem: {currentEmail}.",
+    "cancel_email_change": "Anuluj zmianę maila",
+    "cancelling_email_change": "Anulowanie...",
+    "email_change_cancelled": "Zmiana maila anulowana",
+    "email_change_cancel_failed": "Nie udało się anulować zmiany maila",
     "password_update_success": "Hasło zostało zmienione",
     "password_update_failed": "Nie udało się zmienić hasła",
     "password_same_as_old": "Nowe hasło musi różnić się od obecnego",
@@ -357,7 +364,10 @@
     "delete": "Usuń",
     "view": "Przejdź",
     "workspace_invitation_title": "{inviterName} zaprasza Cię do \"{workspaceName}\"",
-    "task_assigned_title": "{assignerName} przypisał(a) Ci zadanie „{taskTitle}” w „{projectName}”"
+    "task_assigned_title": "{assignerName} przypisał(a) Ci zadanie „{taskTitle}” w „{projectName}”",
+    "project_member_added_title": "{addedByName} dodał(a) Cię do projektu „{projectName}”",
+    "task_comment_added_title": "{commenterName} skomentował(a) zadanie „{taskTitle}”",
+    "workspace_role_changed_title": "{changedByName} zmienił(a) Twoją rolę w „{workspaceName}”"
   },
   "invite_page": {
     "title": "Zaproszenie do przestrzeni roboczej",

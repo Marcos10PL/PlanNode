@@ -3,6 +3,8 @@ import "server-only";
 import { EMAIL_TEMPLATES } from "@/const";
 import { createClient } from "@/lib/supabase/server";
 import { Profile } from "@/types/dto";
+import { Database } from "@/types/supabase";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import type { CreateEmailOptions } from "resend";
 import { Resend } from "resend";
 
@@ -17,7 +19,7 @@ export async function sendEmail(
 ) {
   const resend = new Resend(process.env.RESEND_API_KEY);
   const { error } = await resend.emails.send({
-    from: process.env.EMAIL_FROM ?? "no-reply@resend.dev",
+    from: process.env.RESEND_FROM_EMAIL ?? "no-reply@resend.dev",
     to,
     subject,
     html,
@@ -29,7 +31,7 @@ export async function sendEmail(
 export async function sendEmailBatch(emails: BatchEmailPayload[]) {
   if (emails.length === 0) return;
   const resend = new Resend(process.env.RESEND_API_KEY);
-  const from = process.env.EMAIL_FROM ?? "no-reply@resend.dev";
+  const from = process.env.RESEND_FROM_EMAIL ?? "no-reply@resend.dev";
   const { error } = await resend.batch.send(
     emails.map(e => ({ from, to: e.to, subject: e.subject, html: e.html })),
   );
@@ -40,15 +42,17 @@ export async function renderLocalizedEmailTemplate(
   name: (typeof EMAIL_TEMPLATES)[keyof typeof EMAIL_TEMPLATES],
   locale: Profile["locale"],
   variables: Record<string, string | null> = {},
+  client?: SupabaseClient<Database>,
 ) {
-  return renderEmailTemplate(`${name}_${locale}`, variables);
+  return renderEmailTemplate(`${name}_${locale}`, variables, client);
 }
 
 async function renderEmailTemplate(
   name: string,
   variables: Record<string, string | null> = {},
+  client?: SupabaseClient<Database>,
 ) {
-  const supabase = await createClient();
+  const supabase = client ?? (await createClient());
   const { data: template } = await supabase
     .from("email_templates")
     .select("subject, html")

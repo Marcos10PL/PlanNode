@@ -1,5 +1,11 @@
 -- Type
-CREATE TYPE public.notification_type AS ENUM ('workspace_invitation', 'task_assigned');
+CREATE TYPE public.notification_type AS ENUM (
+  'workspace_invitation',
+  'task_assigned',
+  'project_member_added',
+  'task_comment_added',
+  'workspace_role_changed'
+);
 
 -- Table
 CREATE TABLE public.notifications (

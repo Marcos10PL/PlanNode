@@ -43,13 +43,37 @@ export type TaskAssignedMetadata = {
   taskId: string;
 };
 
+export type ProjectMemberAddedMetadata = {
+  projectName: string;
+  addedByName: string;
+  projectId: string;
+};
+
+export type TaskCommentAddedMetadata = {
+  taskTitle: string;
+  commenterName: string;
+  taskId: string;
+};
+
+export type WorkspaceRoleChangedMetadata = {
+  workspaceName: string;
+  changedByName: string;
+  newRole: string;
+};
+
 export type Notification = ToCamelCase<
   Pick<
     NotificationTable,
     "id" | "type" | "metadata" | "link" | "read_at" | "created_at"
   >
 > & {
-  metadata: WorkspaceInvitationMetadata | TaskAssignedMetadata | null;
+  metadata:
+    | WorkspaceInvitationMetadata
+    | TaskAssignedMetadata
+    | ProjectMemberAddedMetadata
+    | TaskCommentAddedMetadata
+    | WorkspaceRoleChangedMetadata
+    | null;
 };
 
 export type WorkspaceInvitation = ToCamelCase<

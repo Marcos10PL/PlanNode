@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ControlledPasswordField } from "@/components/ui/controlled-password-field";
-import { LINKS } from "@/const";
+import { ERRORS, LINKS } from "@/const";
 import { updatePasswordSchema, type UpdatePasswordSchema } from "@/schema";
 import { cn } from "@/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -41,7 +41,11 @@ export function UpdatePasswordForm({
     try {
       const result = await updatePasswordAction(data);
       if (result.error) {
-        toast.error(t("error_generic"));
+        if (result.error === ERRORS.SAME_PASSWORD) {
+          toast.error(t("password_same_as_old"));
+        } else {
+          toast.error(t("error_generic"));
+        }
         return;
       }
       router.replace(LINKS.DASHBOARD);

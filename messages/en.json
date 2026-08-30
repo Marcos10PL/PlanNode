@@ -70,7 +70,8 @@
       "confirm_password": "Confirm password",
       "submit": "Save new password",
       "submitting": "Saving...",
-      "error_generic": "An error occurred"
+      "error_generic": "An error occurred",
+      "password_same_as_old": "New password must be different from the current one"
     },
     "sign_up_success": {
       "title": "Thank you for signing up!",
@@ -120,10 +121,12 @@
     "id": "ID",
     "created_at": "Created at",
     "updated_at": "Updated at",
+    "current_password": "Current password",
     "new_password": "New password",
     "password": "Password",
     "confirm_password": "Confirm password",
     "password_change_placeholder": "Fill in to change",
+    "current_password_incorrect": "Incorrect current password",
     "submit": "Save changes",
     "submitting": "Saving...",
     "update_email": "Change email",
@@ -135,6 +138,10 @@
     "email_update_success": "Email update requested. Check your inbox.",
     "email_update_failed": "Could not update email",
     "pending_email_info": "Email change to {pendingEmail} is waiting for confirmation. Until then, sign in using your current email: {currentEmail}.",
+    "cancel_email_change": "Cancel email change",
+    "cancelling_email_change": "Cancelling...",
+    "email_change_cancelled": "Email change cancelled",
+    "email_change_cancel_failed": "Could not cancel email change",
     "password_update_success": "Password updated successfully",
     "password_update_failed": "Could not update password",
     "password_same_as_old": "New password must be different from the current one",
@@ -357,7 +364,10 @@
     "delete": "Delete",
     "view": "View",
     "workspace_invitation_title": "{inviterName} invited you to \"{workspaceName}\"",
-    "task_assigned_title": "{assignerName} assigned you the task \"{taskTitle}\" in \"{projectName}\""
+    "task_assigned_title": "{assignerName} assigned you the task \"{taskTitle}\" in \"{projectName}\"",
+    "project_member_added_title": "{addedByName} added you to the project \"{projectName}\"",
+    "task_comment_added_title": "{commenterName} commented on the task \"{taskTitle}\"",
+    "workspace_role_changed_title": "{changedByName} changed your role in \"{workspaceName}\""
   },
   "invite_page": {
     "title": "Workspace invitation",

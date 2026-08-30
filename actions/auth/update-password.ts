@@ -14,6 +14,7 @@ export async function updatePasswordAction(data: UpdatePasswordSchema) {
     password: parsed.data.password,
   });
 
+  if (error?.code === "same_password") return { error: ERRORS.SAME_PASSWORD };
   if (error) return { error: ERRORS.SERVER_ERROR };
 
   return { success: true };

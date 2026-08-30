@@ -10,20 +10,24 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ERRORS, TASK_PRIORITIES, TASK_STATUSES } from "@/const";
+import {
+  ERRORS,
+  TASK_MODAL_TABS,
+  TASK_PRIORITIES,
+  TASK_STATUSES,
+  TaskModalTab,
+} from "@/const";
 import { useTaskTimeline } from "@/hooks/use-task-timeline";
 import { createTaskSchema, CreateTaskSchema } from "@/schema";
 import { Task, WorkspaceMember } from "@/types/dto";
 import { TaskStatus } from "@/types/entities";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { TaskActivityList } from "./task-activity-list";
 import { TaskDetailsForm } from "./task-details-form";
-
-type ModalTab = "details" | "activity";
 
 type Props = {
   listId: string;
@@ -35,7 +39,8 @@ type Props = {
   onOpenChange: (open: boolean) => void;
   selectedStatus?: TaskStatus;
   parentTaskId?: string;
-  initialTab?: ModalTab;
+  activeTab?: TaskModalTab;
+  onTabChange?: (tab: TaskModalTab) => void;
 };
 
 export function TaskModal({
@@ -48,14 +53,14 @@ export function TaskModal({
   onOpenChange,
   selectedStatus,
   parentTaskId,
-  initialTab = "details",
+  activeTab = TASK_MODAL_TABS.DETAILS,
+  onTabChange,
 }: Props) {
   const t = useTranslations(task ? "tasks.edit" : "tasks.create");
   const tErrors = useTranslations("fields.errors");
   const tCommon = useTranslations("common");
   const tTasks = useTranslations("tasks");
 
-  const [activeTab, setActiveTab] = useState<ModalTab>(initialTab);
   const {
     items: timeline,
     isLoading: timelineLoading,
@@ -77,11 +82,8 @@ export function TaskModal({
   });
 
   useEffect(() => {
-    if (open) {
-      form.reset(defaultValues);
-      setActiveTab(initialTab);
-    }
-  }, [open, task, initialTab]);
+    if (open) form.reset(defaultValues);
+  }, [open, task]);
 
   const onSubmit = async (data: CreateTaskSchema) => {
     try {
@@ -122,14 +124,16 @@ export function TaskModal({
     <Dialog open={open} onOpenChange={o => !o && onOpenChange(false)}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{task && !canEdit ? t("title_readonly") : t("title")}</DialogTitle>
+          <DialogTitle>
+            {task && !canEdit ? t("title_readonly") : t("title")}
+          </DialogTitle>
           {!task && <DialogDescription>{t("description")}</DialogDescription>}
         </DialogHeader>
 
         {task ? (
           <Tabs
             value={activeTab}
-            onValueChange={v => setActiveTab(v as ModalTab)}
+            onValueChange={v => onTabChange?.(v as TaskModalTab)}
           >
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="details">{t("tab_details")}</TabsTrigger>

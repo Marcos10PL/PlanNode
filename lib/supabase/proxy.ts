@@ -1,7 +1,7 @@
-﻿import { createServerClient } from "@supabase/ssr";
-import { NextResponse, type NextRequest } from "next/server";
+﻿import { LINKS } from "@/const";
 import { LOCALES } from "@/i18n/routing";
-import { LINKS } from "@/const";
+import { createServerClient } from "@supabase/ssr";
+import { NextResponse, type NextRequest } from "next/server";
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -45,15 +45,21 @@ export async function updateSession(request: NextRequest) {
     pathname.replace(new RegExp(`^/${locale}`), "") || "/";
 
   const protectedRoutes = [LINKS.APP];
-  const guestOnlyRoutes = [LINKS.HOME, LINKS.LOGIN, LINKS.SIGN_UP, LINKS.FORGOT_PASSWORD];
+  const guestOnlyRoutes = [
+    LINKS.HOME,
+    LINKS.LOGIN,
+    LINKS.SIGN_UP,
+    LINKS.SIGN_UP_SUCCESS,
+    LINKS.FORGOT_PASSWORD,
+  ];
 
   const isProtected = protectedRoutes.some(
     route =>
       pathWithoutLocale === route || pathWithoutLocale.startsWith(`${route}/`),
   );
-  const isGuestOnly =
-    guestOnlyRoutes.some(route => pathWithoutLocale === route) ||
-    pathWithoutLocale.startsWith("/auth/");
+  const isGuestOnly = guestOnlyRoutes.some(
+    route => pathWithoutLocale === route,
+  );
 
   if (isProtected && !user) {
     const url = request.nextUrl.clone();

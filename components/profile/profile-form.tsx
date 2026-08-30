@@ -1,5 +1,6 @@
 ﻿"use client";
 
+import { cancelEmailChangeAction } from "@/actions/profile/cancel-email-change";
 import { updateEmailAction } from "@/actions/profile/update-email";
 import { updatePasswordAction } from "@/actions/profile/update-password";
 import { updateProfileAction } from "@/actions/profile/update-profile";
@@ -23,6 +24,7 @@ export function ProfileForm() {
   const t = useTranslations("profile_settings");
   const locale = useLocale();
   const [pendingEmail, setPendingEmail] = useState(user.new_email ?? null);
+  const [isCancellingEmail, setIsCancellingEmail] = useState(false);
 
   const form = useForm<ProfileSettingsSchema>({
     resolver: zodResolver(
@@ -31,13 +33,34 @@ export function ProfileForm() {
     defaultValues: {
       full_name: profile.fullName ?? "",
       email: profile.email,
+      currentPassword: "",
       password: "",
       confirmPassword: "",
     },
   });
 
+  async function handleCancelEmailChange() {
+    setIsCancellingEmail(true);
+    try {
+      const result = await cancelEmailChangeAction();
+      if (result.error) {
+        toast.error(t("email_change_cancel_failed"));
+        return;
+      }
+      setPendingEmail(null);
+      form.setValue("email", profile.email);
+      toast.success(t("email_change_cancelled"));
+    } catch {
+      toast.error(t("email_change_cancel_failed"));
+    } finally {
+      setIsCancellingEmail(false);
+    }
+  }
+
   async function onSubmit(data: ProfileSettingsSchema) {
     const tasks: Promise<string | null>[] = [];
+    let fullNameSaved = data.full_name === profile.fullName;
+    let emailSaved = data.email === profile.email || Boolean(pendingEmail);
 
     if (data.full_name !== profile.fullName) {
       tasks.push(
@@ -46,7 +69,9 @@ export function ProfileForm() {
             const result = await updateProfileAction({
               full_name: data.full_name,
             });
-            return result.error ? t("save_failed") : null;
+            if (result.error) return t("save_failed");
+            fullNameSaved = true;
+            return null;
           } catch {
             return t("save_failed");
           }
@@ -61,6 +86,7 @@ export function ProfileForm() {
             const result = await updateEmailAction({ email: data.email });
             if (result.error) return t("email_update_failed");
             setPendingEmail(data.email);
+            emailSaved = true;
             return null;
           } catch {
             return t("email_update_failed");
@@ -74,12 +100,15 @@ export function ProfileForm() {
         (async () => {
           try {
             const result = await updatePasswordAction({
+              currentPassword: data.currentPassword,
               password: data.password,
               confirmPassword: data.confirmPassword,
             });
             if (!result.error) return null;
             if (result.error === ERRORS.SAME_PASSWORD)
               return t("password_same_as_old");
+            if (result.error === ERRORS.INVALID_CREDENTIALS)
+              return t("current_password_incorrect");
             return t("password_update_failed");
           } catch {
             return t("password_update_failed");
@@ -94,7 +123,13 @@ export function ProfileForm() {
     if (errors.length === 0 && tasks.length > 0)
       toast.success(t("saved_successfully"));
 
-    form.reset({ ...data, password: "", confirmPassword: "" });
+    form.reset({
+      full_name: fullNameSaved ? data.full_name : profile.fullName,
+      email: emailSaved ? data.email : profile.email,
+      currentPassword: "",
+      password: "",
+      confirmPassword: "",
+    });
   }
 
   return (
@@ -128,12 +163,26 @@ export function ProfileForm() {
             readOnly={Boolean(pendingEmail)}
           />
           {pendingEmail && (
-            <p className="text-sm text-muted-foreground">
-              {t("pending_email_info", {
-                pendingEmail,
-                currentEmail: profile.email,
-              })}
-            </p>
+            <div className="flex flex-col items-start gap-2">
+              <p className="text-sm text-muted-foreground">
+                {t("pending_email_info", {
+                  pendingEmail,
+                  currentEmail: profile.email,
+                })}
+              </p>
+              <Button
+                className="w-full md:w-auto md:ml-auto"
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={isCancellingEmail}
+                onClick={handleCancelEmailChange}
+              >
+                {isCancellingEmail
+                  ? t("cancelling_email_change")
+                  : t("cancel_email_change")}
+              </Button>
+            </div>
           )}
         </div>
 
@@ -143,6 +192,12 @@ export function ProfileForm() {
           <p className="text-sm text-muted-foreground">
             {t("password_change_placeholder")}
           </p>
+          <ControlledPasswordField
+            control={form.control}
+            name="currentPassword"
+            label={t("current_password")}
+            autoComplete="current-password"
+          />
           <ControlledPasswordField
             control={form.control}
             name="password"

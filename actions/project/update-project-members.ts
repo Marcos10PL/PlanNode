@@ -1,9 +1,13 @@
 "use server";
 
-import { ERRORS } from "@/const";
+import { EMAIL_TEMPLATES, ERRORS, NOTIFICATION_TYPES } from "@/const";
 import { getUserContext, isProjectManager } from "@/lib/supabase/server";
-import { updateProjectMembersSchema, UpdateProjectMembersSchema } from "@/schema";
-import { generateProjectRoute } from "@/utils/helpers";
+import {
+  updateProjectMembersSchema,
+  UpdateProjectMembersSchema,
+} from "@/schema";
+import { renderLocalizedEmailTemplate, sendEmail } from "@/utils/email";
+import { generateAbsoluteUrl, generateProjectRoute } from "@/utils/helpers";
 import { revalidatePath } from "next/cache";
 
 export async function updateProjectMembersAction(
@@ -53,6 +57,74 @@ export async function updateProjectMembersAction(
     );
 
     if (addError) return { error: ERRORS.SERVER_ERROR };
+
+    const notifiedIds = toAdd.filter(id => id !== user.id);
+
+    if (notifiedIds.length > 0) {
+      const [
+        { data: project },
+        { data: adderProfile },
+        { data: addedProfiles },
+      ] = await Promise.all([
+        supabase
+          .from("projects")
+          .select("name, is_private")
+          .eq("id", projectId)
+          .single(),
+        supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", user.id)
+          .single(),
+        supabase
+          .from("profiles")
+          .select("id, email, locale")
+          .in("id", notifiedIds),
+      ]);
+
+      if (project?.is_private && adderProfile) {
+        await Promise.all(
+          (addedProfiles ?? []).map(async memberProfile => {
+            const { error: notificationError } = await supabase.rpc(
+              "create_notification",
+              {
+                p_user_id: memberProfile.id,
+                p_type: NOTIFICATION_TYPES.PROJECT_MEMBER_ADDED,
+                p_metadata: {
+                  projectName: project.name,
+                  addedByName: adderProfile.full_name,
+                  projectId,
+                },
+                p_link: generateProjectRoute(projectId),
+              },
+            );
+            if (notificationError) {
+              console.error(
+                "[update-project-members] Notification error:",
+                notificationError,
+              );
+            }
+
+            try {
+              const { subject, html } = await renderLocalizedEmailTemplate(
+                EMAIL_TEMPLATES.PROJECT_MEMBER_ADDED,
+                memberProfile.locale,
+                {
+                  projectName: project.name,
+                  addedByName: adderProfile.full_name,
+                  projectUrl: generateAbsoluteUrl(
+                    generateProjectRoute(projectId),
+                  ),
+                },
+              );
+              await sendEmail(memberProfile.email, subject, html);
+            } catch (e) {
+              console.error("[update-project-members] Email error:", e);
+            }
+          }),
+        );
+      }
+    }
   }
 
   revalidatePath(generateProjectRoute(projectId));

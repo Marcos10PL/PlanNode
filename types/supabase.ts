@@ -585,6 +585,7 @@ export type Database = {
         Args: { p_project_id: string; p_user_id: string }
         Returns: boolean
       }
+      cancel_email_change: { Args: never; Returns: undefined }
       create_notification: {
         Args: {
           p_link?: string
@@ -628,7 +629,12 @@ export type Database = {
     Enums: {
       invitation_status: "pending" | "accepted" | "declined"
       locale: "pl" | "en"
-      notification_type: "workspace_invitation" | "task_assigned"
+      notification_type:
+        | "workspace_invitation"
+        | "task_assigned"
+        | "project_member_added"
+        | "task_comment_added"
+        | "workspace_role_changed"
       task_priority: "low" | "medium" | "high" | "urgent"
       task_status:
         | "on_hold"
@@ -772,7 +778,13 @@ export const Constants = {
     Enums: {
       invitation_status: ["pending", "accepted", "declined"],
       locale: ["pl", "en"],
-      notification_type: ["workspace_invitation", "task_assigned"],
+      notification_type: [
+        "workspace_invitation",
+        "task_assigned",
+        "project_member_added",
+        "task_comment_added",
+        "workspace_role_changed",
+      ],
       task_priority: ["low", "medium", "high", "urgent"],
       task_status: [
         "on_hold",

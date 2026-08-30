@@ -36,6 +36,7 @@ export function TaskRow({
     modalOpen,
     setModalOpen,
     modalTab,
+    setModalTab,
     deleteOpen,
     setDeleteOpen,
     isPending,
@@ -183,7 +184,8 @@ export function TaskRow({
         canManage={canManage}
         open={modalOpen}
         onOpenChange={setModalOpen}
-        initialTab={modalTab}
+        activeTab={modalTab}
+        onTabChange={setModalTab}
       />
 
       <ConfirmModal

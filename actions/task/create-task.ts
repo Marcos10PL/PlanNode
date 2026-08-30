@@ -1,9 +1,21 @@
 "use server";
 
-import { ERRORS, LINKS, NOTIFICATION_TYPES, TASK_EVENT_TYPES } from "@/const";
+import {
+  EMAIL_TEMPLATES,
+  ERRORS,
+  LINKS,
+  NOTIFICATION_TYPES,
+  TASK_EVENT_TYPES,
+  TASK_MODAL_TABS,
+} from "@/const";
 import { canEditProject, getUserContext } from "@/lib/supabase/server";
 import { createTaskSchema, CreateTaskSchema } from "@/schema";
-import { generateProjectRoute } from "@/utils/helpers";
+import { renderLocalizedEmailTemplate, sendEmail } from "@/utils/email";
+import {
+  generateAbsoluteUrl,
+  generateListRoute,
+  generateProjectRoute,
+} from "@/utils/helpers";
 import { revalidatePath } from "next/cache";
 
 export async function createTaskAction(
@@ -82,27 +94,62 @@ export async function createTaskAction(
   });
 
   if (assigneeId && assigneeId !== user.id) {
-    const [{ data: project }, { data: assignerProfile }] = await Promise.all([
+    const [
+      { data: project },
+      { data: assignerProfile },
+      { data: assigneeProfile },
+    ] = await Promise.all([
       supabase
         .from("projects")
         .select("name")
         .eq("id", list.project_id)
         .single(),
       supabase.from("profiles").select("full_name").eq("id", user.id).single(),
+      supabase
+        .from("profiles")
+        .select("email, locale")
+        .eq("id", assigneeId)
+        .single(),
     ]);
 
     if (project && assignerProfile) {
-      await supabase.rpc("create_notification", {
-        p_user_id: assigneeId,
-        p_type: NOTIFICATION_TYPES.TASK_ASSIGNED,
-        p_metadata: {
-          taskTitle: title,
-          projectName: project.name,
-          assignerName: assignerProfile.full_name,
-          taskId: task.id,
+      const taskPath = `${generateListRoute(list.project_id, listId)}?taskId=${task.id}&tab=${TASK_MODAL_TABS.DETAILS}`;
+
+      const { error: notificationError } = await supabase.rpc(
+        "create_notification",
+        {
+          p_user_id: assigneeId,
+          p_type: NOTIFICATION_TYPES.TASK_ASSIGNED,
+          p_metadata: {
+            taskTitle: title,
+            projectName: project.name,
+            assignerName: assignerProfile.full_name,
+            taskId: task.id,
+          },
+          p_link: taskPath,
         },
-        p_link: generateProjectRoute(list.project_id),
-      });
+      );
+      if (notificationError) {
+        console.error("[create-task] Notification error:", notificationError);
+      }
+
+      if (assigneeProfile) {
+        try {
+          const { subject, html } = await renderLocalizedEmailTemplate(
+            EMAIL_TEMPLATES.TASK_ASSIGNED,
+            assigneeProfile.locale,
+            {
+              taskTitle: title,
+              projectName: project.name,
+              assignerName: assignerProfile.full_name,
+              taskUrl: generateAbsoluteUrl(taskPath),
+            },
+          );
+          await sendEmail(assigneeProfile.email, subject, html);
+        } catch (e) {
+          console.error("[create-task] Email error:", e);
+        }
+      }
     }
   }
 
