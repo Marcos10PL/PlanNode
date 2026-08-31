@@ -129,7 +129,7 @@ export const getProjectColorBorderClass = (color: string) =>
   PROJECT_COLOR_BORDER_MAP[toProjectColor(color)];
 
 export const getProjectManageMenuItems = ({
-  canManage,
+  canEdit,
   isFavorite,
   onToggleFavorite,
   isCompleted,
@@ -138,7 +138,7 @@ export const getProjectManageMenuItems = ({
   onDelete,
   t,
 }: {
-  canManage: boolean;
+  canEdit: boolean;
   isFavorite: boolean;
   onToggleFavorite: () => void;
   isCompleted: boolean;
@@ -152,7 +152,7 @@ export const getProjectManageMenuItems = ({
     icon: Star,
     onClick: onToggleFavorite,
   },
-  ...(canManage
+  ...(canEdit
     ? [
         {
           label: t("edit.trigger"),

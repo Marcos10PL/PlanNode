@@ -1,5 +1,15 @@
 {
   "logo": "PlanNode",
+  "onboarding": {
+    "workspace_name": "My workspace",
+    "project_name": "Get to know PlanNode",
+    "project_description": "A sample project to help you see how everything works.",
+    "task1_title": "Start creating your own projects and tasks",
+    "task1_description": "<p>Got familiar with the app? Time to jump in — invite others, create, edit, and delete! Good luck!</p>",
+    "task2_title": "Get to know PlanNode",
+    "task2_description": "<p>PlanNode is a project manager for everyone — it lets you create workspaces you can invite others to, add projects with task lists, and choose between a filterable list view or a classic Kanban board.</p><p>It supports real-time collaboration, so you never need to reload the page to see other users' changes.</p><p>The workspace you're currently in was created as a sample — feel free to create, edit, or delete projects and tasks here. You can also just start using it for real right away. You can manage your workspaces anytime from settings.</p>",
+    "task3_title": "Sign up for PlanNode"
+  },
   "common": {
     "unexpected_error": "Something went wrong. Please try again.",
     "manage": "Manage",
@@ -14,7 +24,8 @@
     "editor_link_add": "Add",
     "editor_link_save": "Save",
     "editor_link_placeholder": "https://...",
-    "editor_link_invalid": "Invalid URL"
+    "editor_link_invalid": "Invalid URL",
+    "default_list_name": "List"
   },
   "footer": {
     "all_rights_reserved": "PlanNode. All rights reserved."

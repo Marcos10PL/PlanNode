@@ -261,7 +261,7 @@ export function TaskListSection({
 
   const { remove, isPending } = useDeleteTaskList();
   const listManageMenuItems = getListManageMenuItems({
-    canManage: canEdit,
+    canEdit,
     onRename: () => setRenameOpen(true),
     onDelete: () => setDeleteOpen(true),
     t,

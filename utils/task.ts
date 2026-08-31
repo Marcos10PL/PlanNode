@@ -194,17 +194,17 @@ export const getNextStatus = (
 };
 
 export const getListManageMenuItems = ({
-  canManage,
+  canEdit,
   onRename,
   onDelete,
   t,
 }: {
-  canManage: boolean;
+  canEdit: boolean;
   onRename: () => void;
   onDelete: () => void;
   t: Translations;
 }): ManageMenuItem[] => {
-  if (!canManage) return [];
+  if (!canEdit) return [];
 
   return [
     {

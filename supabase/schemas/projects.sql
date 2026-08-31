@@ -127,6 +127,14 @@ RETURNS boolean AS $$
   ) IN ('owner', 'admin');
 $$ LANGUAGE sql SECURITY DEFINER SET search_path = '';
 
+CREATE OR REPLACE FUNCTION public.is_project_creator(p_project_id uuid, p_user_id uuid)
+RETURNS boolean AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.projects p
+    WHERE p.id = p_project_id AND p.created_by = p_user_id
+  );
+$$ LANGUAGE sql SECURITY DEFINER SET search_path = '';
+
 -- Policies: projects
 CREATE POLICY "Members can see accessible projects"
 ON public.projects FOR SELECT
@@ -142,11 +150,20 @@ USING (
   )
 );
 
-CREATE POLICY "Non-guest members can create projects"
+CREATE POLICY "Create projects, private ones require manager role"
 ON public.projects FOR INSERT
 WITH CHECK (
-  public.get_workspace_member_role(workspace_id, (SELECT auth.uid())) IN ('owner', 'admin', 'member')
-  AND created_by = (SELECT auth.uid())
+  created_by = (SELECT auth.uid())
+  AND (
+    (
+      NOT is_private
+      AND public.get_workspace_member_role(workspace_id, (SELECT auth.uid())) IN ('owner', 'admin', 'member')
+    )
+    OR (
+      is_private
+      AND public.get_workspace_member_role(workspace_id, (SELECT auth.uid())) IN ('owner', 'admin')
+    )
+  )
 );
 
 CREATE POLICY "Non-guest members can update accessible projects"
@@ -183,9 +200,15 @@ CREATE POLICY "Users with project access can see project members"
 ON public.project_members FOR SELECT
 USING (public.can_access_project(project_id, (SELECT auth.uid())));
 
-CREATE POLICY "Admins/owners can add project members"
+CREATE POLICY "Admins/owners or creators can add project members"
 ON public.project_members FOR INSERT
-WITH CHECK (public.is_project_manager(project_id, (SELECT auth.uid())));
+WITH CHECK (
+  public.is_project_manager(project_id, (SELECT auth.uid()))
+  OR (
+    id = (SELECT auth.uid())
+    AND public.is_project_creator(project_id, (SELECT auth.uid()))
+  )
+);
 
 CREATE POLICY "Admins/owners can remove project members"
 ON public.project_members FOR DELETE
@@ -331,25 +354,117 @@ CREATE OR REPLACE TRIGGER validate_subtask_parent_trigger
   BEFORE INSERT OR UPDATE ON public.tasks
   FOR EACH ROW EXECUTE PROCEDURE public.validate_subtask_parent();
 
--- Trigger: add default task list and creator membership when project is created
-CREATE OR REPLACE FUNCTION public.add_default_task_list()
+-- Creates a project, its default task list and the creator's project_members
+-- row in a single transaction, so a project can never end up without a list.
+CREATE OR REPLACE FUNCTION public.create_project_with_default_list(
+  p_workspace_id uuid,
+  p_name         text,
+  p_description  text,
+  p_is_private   boolean,
+  p_icon         text,
+  p_color        text,
+  p_position     integer,
+  p_list_name    text
+)
+RETURNS uuid
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  v_project_id uuid;
+BEGIN
+  INSERT INTO public.projects (
+    workspace_id, name, description, is_private, icon, color, position, created_by
+  )
+  VALUES (
+    p_workspace_id, p_name, p_description, p_is_private, p_icon, p_color, p_position, auth.uid()
+  )
+  RETURNING id INTO v_project_id;
+
+  -- inserted before task_lists: for a private project, can_access_project()
+  -- (used by the task_lists INSERT policy) needs either a manager role or an
+  -- existing project_members row — the creator's own row must exist first
+  INSERT INTO public.project_members (project_id, id, added_by_id)
+  VALUES (v_project_id, auth.uid(), auth.uid());
+
+  INSERT INTO public.task_lists (project_id, name, position)
+  VALUES (v_project_id, p_list_name, 0);
+
+  RETURN v_project_id;
+END;
+$$;
+
+-- Seeds a new user's first workspace with one onboarding project (list + 3 example tasks across statuses)
+CREATE OR REPLACE FUNCTION public.create_onboarding_workspace(
+  p_workspace_name      text,
+  p_project_name        text,
+  p_project_description text,
+  p_list_name           text,
+  p_task1_title         text,
+  p_task1_description   text,
+  p_task2_title         text,
+  p_task2_description   text,
+  p_task3_title         text
+)
+RETURNS TABLE (project_id uuid, list_id uuid)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  v_workspace_id uuid;
+  v_project_id   uuid;
+  v_list_id      uuid;
+BEGIN
+  IF EXISTS (SELECT 1 FROM public.workspaces WHERE owner_id = auth.uid()) THEN
+    RETURN;
+  END IF;
+
+  INSERT INTO public.workspaces (owner_id, name)
+  VALUES (auth.uid(), p_workspace_name)
+  RETURNING id INTO v_workspace_id;
+
+  INSERT INTO public.projects (workspace_id, name, description, created_by)
+  VALUES (v_workspace_id, p_project_name, p_project_description, auth.uid())
+  RETURNING id INTO v_project_id;
+
+  INSERT INTO public.project_members (project_id, id, added_by_id)
+  VALUES (v_project_id, auth.uid(), auth.uid());
+
+  INSERT INTO public.task_lists (project_id, name, position)
+  VALUES (v_project_id, p_list_name, 0)
+  RETURNING id INTO v_list_id;
+
+  INSERT INTO public.tasks (project_id, list_id, title, description, status, position, created_by)
+  VALUES
+    (v_project_id, v_list_id, p_task1_title, p_task1_description, 'todo', 0, auth.uid()),
+    (v_project_id, v_list_id, p_task2_title, p_task2_description, 'in_progress', 1, auth.uid()),
+    (v_project_id, v_list_id, p_task3_title, NULL, 'done', 2, auth.uid());
+
+  RETURN QUERY SELECT v_project_id, v_list_id;
+END;
+$$;
+
+REVOKE EXECUTE ON FUNCTION public.create_onboarding_workspace(
+  text, text, text, text, text, text, text, text, text
+) FROM anon;
+
+-- Only workspace owners/admins may change an existing project's is_private
+-- flag (symmetric with the INSERT policy above). Other fields on a project
+-- a member can already edit stay editable — this only guards the one column.
+CREATE OR REPLACE FUNCTION public.enforce_private_project_change()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.task_lists (project_id, name, position)
-  VALUES (NEW.id, 'Tasks', 0);
-
-  IF NEW.created_by IS NOT NULL THEN
-    INSERT INTO public.project_members (project_id, id, added_by_id)
-    VALUES (NEW.id, NEW.created_by, NEW.created_by);
+  IF NEW.is_private IS DISTINCT FROM OLD.is_private THEN
+    IF public.get_workspace_member_role(NEW.workspace_id, auth.uid()) NOT IN ('owner', 'admin') THEN
+      RAISE EXCEPTION 'Only workspace owners and admins can change a project''s privacy setting';
+    END IF;
   END IF;
 
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
 
-CREATE OR REPLACE TRIGGER on_project_created
-  AFTER INSERT ON public.projects
-  FOR EACH ROW EXECUTE PROCEDURE public.add_default_task_list();
+CREATE OR REPLACE TRIGGER enforce_private_project_change_trigger
+  BEFORE UPDATE ON public.projects
+  FOR EACH ROW EXECUTE PROCEDURE public.enforce_private_project_change();
 
 -- Triggers: update updated_at
 CREATE OR REPLACE TRIGGER set_projects_updated_at
@@ -428,7 +543,10 @@ REVOKE ALL ON public.task_comments FROM anon;
 REVOKE EXECUTE ON FUNCTION public.can_access_project(uuid, uuid) FROM anon;
 REVOKE EXECUTE ON FUNCTION public.can_edit_project(uuid, uuid) FROM anon;
 REVOKE EXECUTE ON FUNCTION public.is_project_manager(uuid, uuid) FROM anon;
-REVOKE EXECUTE ON FUNCTION public.add_default_task_list() FROM anon;
+REVOKE EXECUTE ON FUNCTION public.is_project_creator(uuid, uuid) FROM anon;
+REVOKE EXECUTE ON FUNCTION public.create_project_with_default_list(
+  uuid, text, text, boolean, text, text, integer, text
+) FROM anon;
 REVOKE EXECUTE ON FUNCTION public.reorder_tasks(uuid, jsonb) FROM anon;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.projects TO authenticated;

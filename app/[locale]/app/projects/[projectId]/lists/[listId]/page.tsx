@@ -35,7 +35,7 @@ export default async function TaskListPage({ params }: Props) {
     !project ||
     !list ||
     list.projectId !== project.id ||
-    project.workspaceId !== activeWorkspaceId
+    (activeWorkspaceId && project.workspaceId !== activeWorkspaceId)
   ) {
     notFound();
   }

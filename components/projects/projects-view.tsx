@@ -37,7 +37,8 @@ const SORTERS = {
 
 type Props = {
   projects: ProjectWithProgress[];
-  canManage: boolean;
+  canEdit: boolean;
+  isWorkspaceManager?: boolean;
   canReorder: boolean;
   defaultSort: ProjectSort;
   sortCookieKey: string;
@@ -47,7 +48,8 @@ type Props = {
 
 export function ProjectsView({
   projects,
-  canManage,
+  canEdit,
+  isWorkspaceManager,
   canReorder,
   defaultSort,
   sortCookieKey,
@@ -84,7 +86,8 @@ export function ProjectsView({
 
       <ProjectList
         projects={sorted}
-        canManage={canManage}
+        canEdit={canEdit}
+        isWorkspaceManager={isWorkspaceManager}
         onReorder={onReorder}
         dragEnabled={dragEnabled}
       />

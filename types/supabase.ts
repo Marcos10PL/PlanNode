@@ -616,6 +616,36 @@ export type Database = {
         }
         Returns: undefined
       }
+      create_onboarding_workspace: {
+        Args: {
+          p_list_name: string
+          p_project_description: string
+          p_project_name: string
+          p_task1_description: string
+          p_task1_title: string
+          p_task2_description: string
+          p_task2_title: string
+          p_task3_title: string
+          p_workspace_name: string
+        }
+        Returns: {
+          list_id: string
+          project_id: string
+        }[]
+      }
+      create_project_with_default_list: {
+        Args: {
+          p_color: string
+          p_description: string
+          p_icon: string
+          p_is_private: boolean
+          p_list_name: string
+          p_name: string
+          p_position: number
+          p_workspace_id: string
+        }
+        Returns: string
+      }
       delete_invitation_notification: {
         Args: { p_invitation_id: string }
         Returns: undefined
@@ -641,6 +671,10 @@ export type Database = {
       }
       get_workspace_owner: { Args: { p_workspace_id: string }; Returns: string }
       is_admin: { Args: never; Returns: boolean }
+      is_project_creator: {
+        Args: { p_project_id: string; p_user_id: string }
+        Returns: boolean
+      }
       is_project_manager: {
         Args: { p_project_id: string; p_user_id: string }
         Returns: boolean

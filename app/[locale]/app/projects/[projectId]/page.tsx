@@ -38,7 +38,10 @@ export default async function ProjectPage({ params }: Props) {
 
   const project = await getProject(projectId);
 
-  if (!project || project.workspaceId !== activeWorkspaceId) {
+  if (
+    !project ||
+    (activeWorkspaceId && project.workspaceId !== activeWorkspaceId)
+  ) {
     notFound();
   }
 
@@ -71,7 +74,11 @@ export default async function ProjectPage({ params }: Props) {
                 {t("private_badge")}
               </Badge>
             )}
-            <ProjectActions project={project} canManage={canManage} />
+            <ProjectActions
+              project={project}
+              canEdit={canEdit}
+              isWorkspaceManager={canManage}
+            />
           </div>
           <div className="flex items-center gap-2 min-w-0">
             <ProjectIcon className={`${iconClassName} hidden md:block`} />

@@ -78,7 +78,7 @@ export function RichTextEditor({
     editorProps: {
       attributes: {
         class: cn(
-          "break-all tiptap max-h-64 overflow-y-auto px-3 py-2 text-sm focus:outline-none [&_p]:my-1 [&_p]:min-h-[1.25em] [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:text-primary [&_a]:underline",
+          "wrap-break-word tiptap max-h-64 overflow-y-auto px-3 py-2 text-sm focus:outline-none [&_p]:my-1 [&_p]:min-h-[1.25em] [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:text-primary [&_a]:underline",
           editorClassName,
         ),
       },
@@ -140,7 +140,7 @@ export function RichTextEditor({
     <div
       ref={wrapperRef}
       className={cn(
-        "rounded-md border border-input bg-transparent shadow-xs transition-[color,box-shadow] focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50 dark:bg-input/30",
+        "min-w-0 rounded-md border border-input bg-transparent shadow-xs transition-[color,box-shadow] focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50 dark:bg-input/30",
         className,
       )}
     >

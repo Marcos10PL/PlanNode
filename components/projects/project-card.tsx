@@ -21,11 +21,17 @@ import { ProjectModal } from "./project-modal";
 
 type Props = {
   project: ProjectWithProgress;
-  canManage: boolean;
+  canEdit: boolean;
+  isWorkspaceManager?: boolean;
   dragHandle?: React.ReactNode;
 };
 
-export function ProjectCard({ project, canManage, dragHandle }: Props) {
+export function ProjectCard({
+  project,
+  canEdit,
+  isWorkspaceManager,
+  dragHandle,
+}: Props) {
   const t = useTranslations("projects");
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -42,7 +48,7 @@ export function ProjectCard({ project, canManage, dragHandle }: Props) {
   );
 
   const items = getProjectManageMenuItems({
-    canManage,
+    canEdit,
     isFavorite,
     onToggleFavorite: toggleFavorite,
     isCompleted,
@@ -98,6 +104,7 @@ export function ProjectCard({ project, canManage, dragHandle }: Props) {
         project={project}
         open={editOpen}
         onOpenChange={setEditOpen}
+        isWorkspaceManager={isWorkspaceManager}
       />
 
       <ConfirmModal

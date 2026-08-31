@@ -10,7 +10,7 @@ export type ListTarget = {
 };
 
 export type ProjectSidebarActions = {
-  canManage: boolean;
+  canEdit: boolean;
   expandedIds: string[];
   toggleExpanded: (key: string, open: boolean) => void;
   isActive: (href: string) => string | false;

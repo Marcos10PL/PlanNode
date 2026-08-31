@@ -62,7 +62,7 @@ export function SidebarProjectItem({
   const tTasks = useTranslations("tasks");
   const pathname = usePathname();
   const {
-    canManage,
+    canEdit,
     isActive,
     onLinkClick,
     onCreateList,
@@ -82,7 +82,7 @@ export function SidebarProjectItem({
     project.isCompleted,
   );
   const items = getProjectManageMenuItems({
-    canManage,
+    canEdit,
     isFavorite,
     onToggleFavorite: toggleFavorite,
     isCompleted,
@@ -120,7 +120,7 @@ export function SidebarProjectItem({
           </Link>
         </SidebarMenuButton>
         <div className="absolute right-0.5 top-0.5 flex items-center">
-          {canManage && (
+          {canEdit && (
             <Tooltip>
               <TooltipTrigger asChild>
                 <SidebarMenuAction
@@ -165,7 +165,7 @@ export function SidebarProjectItem({
                     key={list.id}
                     id={list.id}
                     index={listIndex}
-                    disabled={!canManage}
+                    disabled={!canEdit}
                   >
                     <SidebarMenuSubButton
                       asChild
@@ -179,7 +179,7 @@ export function SidebarProjectItem({
                         </span>
                       </Link>
                     </SidebarMenuSubButton>
-                    {canManage && (
+                    {canEdit && (
                       <ManageMenu
                         align="start"
                         side="right"
@@ -189,7 +189,7 @@ export function SidebarProjectItem({
                           </SidebarMenuAction>
                         }
                         items={getListManageMenuItems({
-                          canManage,
+                          canEdit,
                           onRename: () =>
                             onRenameList({ projectId: project.id, list }),
                           onDelete: () =>
