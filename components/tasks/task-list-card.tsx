@@ -26,7 +26,7 @@ export function TaskListCard({ list, projectId, canEdit, dragHandle }: Props) {
   const { remove, isPending } = useDeleteTaskList();
 
   const items = getListManageMenuItems({
-    canManage: canEdit,
+    canEdit,
     onRename: () => setRenameOpen(true),
     onDelete: () => setDeleteOpen(true),
     t,

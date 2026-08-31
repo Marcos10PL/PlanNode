@@ -40,7 +40,7 @@ export function SidebarProjectSection({
   sectionKey,
   emptyMessage,
 }: Props) {
-  const { canManage, expandedIds, toggleExpanded, isActive, onLinkClick } =
+  const { canEdit, expandedIds, toggleExpanded, isActive, onLinkClick } =
     useProjectSidebarActions();
 
   const collapsedKey = `collapsed:${sectionKey}`;
@@ -84,7 +84,7 @@ export function SidebarProjectSection({
                     project={project}
                     index={index}
                     isExpanded={expandedIds.includes(keyFor(project.id))}
-                    dragEnabled={canManage}
+                    dragEnabled={canEdit}
                     onToggle={(id, open) => toggleExpanded(keyFor(id), open)}
                   />
                 ))}

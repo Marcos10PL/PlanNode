@@ -40,14 +40,16 @@ const completedKey = (projectId: string) => `done:${projectId}`;
 type Props = {
   projects: ProjectWithProgress[];
   workspaceId: string | null;
-  canManage: boolean;
+  canEdit: boolean;
+  isWorkspaceManager?: boolean;
   defaultExpandedProjectIds: string[];
 };
 
 export function SidebarProjects({
   projects,
   workspaceId,
-  canManage,
+  canEdit,
+  isWorkspaceManager,
   defaultExpandedProjectIds,
 }: Props) {
   const t = useTranslations();
@@ -304,7 +306,7 @@ export function SidebarProjects({
   return (
     <ProjectSidebarActionsProvider
       value={{
-        canManage,
+        canEdit,
         expandedIds,
         toggleExpanded: toggleProject,
         isActive,
@@ -323,7 +325,7 @@ export function SidebarProjects({
         </div>
       ) : (
         <>
-          {canManage && workspaceId && (
+          {canEdit && workspaceId && (
             <SidebarGroup className="-mt-4">
               <SidebarMenuButton
                 className="cursor-pointer text-nowrap"
@@ -391,7 +393,7 @@ export function SidebarProjects({
           project={editProject}
           open={!!editProject}
           onOpenChange={o => !o && setEditProject(null)}
-          canManage={canManage}
+          isWorkspaceManager={isWorkspaceManager}
         />
       )}
 
@@ -400,7 +402,7 @@ export function SidebarProjects({
           workspaceId={workspaceId}
           open={addProjectOpen}
           onOpenChange={setAddProjectOpen}
-          canManage={canManage}
+          isWorkspaceManager={isWorkspaceManager}
         />
       )}
 

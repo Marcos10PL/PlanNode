@@ -21,12 +21,7 @@ import {
   FieldTitle,
 } from "@/components/ui/field";
 import { Switch } from "@/components/ui/switch";
-import {
-  ERRORS,
-  PROJECT_COLORS,
-  PROJECT_ICONS,
-  VALIDATION_MAX,
-} from "@/const";
+import { ERRORS, PROJECT_COLORS, PROJECT_ICONS, VALIDATION_MAX } from "@/const";
 import { createProjectSchema, CreateProjectSchema } from "@/schema";
 import { Project } from "@/types/dto";
 import { toProjectColor, toProjectIcon } from "@/utils";
@@ -45,7 +40,7 @@ type Props = {
   trigger?: React.ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  canManage?: boolean;
+  isWorkspaceManager?: boolean;
 };
 
 export function ProjectModal({
@@ -54,7 +49,7 @@ export function ProjectModal({
   trigger,
   open,
   onOpenChange,
-  canManage = false,
+  isWorkspaceManager = false,
 }: Props) {
   const t = useTranslations(project ? "projects.edit" : "projects.create");
   const tErrors = useTranslations("fields.errors");
@@ -163,7 +158,7 @@ export function ProjectModal({
             placeholder={t("description_placeholder")}
             maxLength={VALIDATION_MAX.PROJECT_DESCRIPTION}
           />
-          {canManage && (
+          {isWorkspaceManager && (
             <Controller
               control={form.control}
               name="isPrivate"

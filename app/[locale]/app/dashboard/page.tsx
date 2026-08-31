@@ -1,15 +1,13 @@
 import { MyTasksSection } from "@/components/dashboard/my-tasks-section";
 import { SubHeader } from "@/components/sub-header";
 import { NoWorkspaceBanner } from "@/components/workspaces/no-workspace-banner";
+import { KANBAN_COLUMN_WIDTH, KANBAN_GAP, TASK_STATUS_ORDER } from "@/const";
 import {
-  COOKIES,
-  KANBAN_COLUMN_WIDTH,
-  KANBAN_GAP,
-  TASK_STATUS_ORDER,
-} from "@/const";
-import { getMyTasks, getWorkspaceContext } from "@/lib/data";
+  getActiveWorkspaceId,
+  getMyTasks,
+  getWorkspaceContext,
+} from "@/lib/data";
 import { getTranslations } from "next-intl/server";
-import { cookies } from "next/headers";
 
 const boardWidth =
   TASK_STATUS_ORDER.length * KANBAN_COLUMN_WIDTH +
@@ -18,8 +16,7 @@ const boardWidth =
 export default async function DashboardPage() {
   const t = await getTranslations();
 
-  const cookieStore = await cookies();
-  const activeWorkspaceId = cookieStore.get(COOKIES.ACTIVE_WORKSPACE_ID)?.value;
+  const activeWorkspaceId = await getActiveWorkspaceId();
 
   if (!activeWorkspaceId) {
     return (

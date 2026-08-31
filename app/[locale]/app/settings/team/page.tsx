@@ -9,17 +9,18 @@ import { NoWorkspaceBanner } from "@/components/workspaces/no-workspace-banner";
 import { InviteMemberForm } from "@/components/workspaces/team/elements/invite-member-form";
 import { MemberList } from "@/components/workspaces/team/member-list";
 import { PendingInvitationsList } from "@/components/workspaces/team/pending-invitations-list";
-import { COOKIES } from "@/const";
-import { getWorkspaceContext, getWorkspaceInvitations } from "@/lib/data";
+import {
+  getActiveWorkspaceId,
+  getWorkspaceContext,
+  getWorkspaceInvitations,
+} from "@/lib/data";
 import { cn } from "@/utils";
 import { getTranslations } from "next-intl/server";
-import { cookies } from "next/headers";
 
 export default async function TeamPage() {
   const t = await getTranslations("team");
 
-  const cookieStore = await cookies();
-  const activeWorkspaceId = cookieStore.get(COOKIES.ACTIVE_WORKSPACE_ID)?.value;
+  const activeWorkspaceId = await getActiveWorkspaceId();
 
   if (!activeWorkspaceId) {
     return (

@@ -7,14 +7,16 @@ import { ProjectCard } from "./project-card";
 type Props = {
   project: ProjectWithProgress;
   index: number;
-  canManage: boolean;
+  canEdit: boolean;
+  isWorkspaceManager?: boolean;
   dragEnabled: boolean;
 };
 
 export function SortableProjectCard({
   project,
   index,
-  canManage,
+  canEdit,
+  isWorkspaceManager,
   dragEnabled,
 }: Props) {
   return (
@@ -26,7 +28,8 @@ export function SortableProjectCard({
       {dragHandle => (
         <ProjectCard
           project={project}
-          canManage={canManage}
+          canEdit={canEdit}
+          isWorkspaceManager={isWorkspaceManager}
           dragHandle={dragHandle}
         />
       )}

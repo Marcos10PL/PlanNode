@@ -15,10 +15,15 @@ import { ProjectModal } from "./project-modal";
 
 type Props = {
   project: Project;
-  canManage: boolean;
+  canEdit: boolean;
+  isWorkspaceManager?: boolean;
 };
 
-export function ProjectActions({ project, canManage }: Props) {
+export function ProjectActions({
+  project,
+  canEdit,
+  isWorkspaceManager,
+}: Props) {
   const t = useTranslations();
   const tProjects = useTranslations("projects");
   const router = useRouter();
@@ -37,7 +42,7 @@ export function ProjectActions({ project, canManage }: Props) {
   );
 
   const items = getProjectManageMenuItems({
-    canManage,
+    canEdit,
     isFavorite,
     onToggleFavorite: toggleFavorite,
     isCompleted,
@@ -62,7 +67,7 @@ export function ProjectActions({ project, canManage }: Props) {
         project={project}
         open={editOpen}
         onOpenChange={setEditOpen}
-        canManage={canManage}
+        isWorkspaceManager={isWorkspaceManager}
       />
 
       <ConfirmModal

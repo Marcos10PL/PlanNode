@@ -10,6 +10,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { COOKIES, LINKS } from "@/const";
 import { routing } from "@/i18n/routing";
 import {
+  getActiveWorkspaceId,
   getAppConfig,
   getProfile,
   getProjects,
@@ -28,24 +29,19 @@ export async function DashboardShell({
   locale: string;
 }) {
   const cookieStore = await cookies();
-  const cookieWorkspaceId =
-    cookieStore.get(COOKIES.ACTIVE_WORKSPACE_ID)?.value ?? null;
   const sidebarOpen = cookieStore.get(COOKIES.SIDEBAR_STATE)?.value !== "false";
   const defaultExpandedProjectIds = parseCookieValue<string[]>(
     cookieStore.get(COOKIES.SIDEBAR_EXPANDED_PROJECTS)?.value,
     [],
   );
 
-  const [{ profile, user }, workspaces, appConfig] = await Promise.all([
-    getProfile(),
-    getWorkspaces(),
-    getAppConfig(),
-  ]);
-
-  const activeWorkspaceId =
-    workspaces.find(w => w.id === cookieWorkspaceId)?.id ??
-    workspaces[0]?.id ??
-    null;
+  const [{ profile, user }, workspaces, appConfig, activeWorkspaceId] =
+    await Promise.all([
+      getProfile(),
+      getWorkspaces(),
+      getAppConfig(),
+      getActiveWorkspaceId(),
+    ]);
 
   const [projects, workspaceContext] = activeWorkspaceId
     ? await Promise.all([
@@ -55,6 +51,7 @@ export async function DashboardShell({
     : [[], null];
 
   const canManageProjects = workspaceContext?.canEdit ?? false;
+  const isWorkspaceManager = workspaceContext?.canManage ?? false;
 
   if (
     profile &&
@@ -77,6 +74,7 @@ export async function DashboardShell({
                 projects={projects}
                 workspaceId={activeWorkspaceId}
                 canManageProjects={canManageProjects}
+                isWorkspaceManager={isWorkspaceManager}
                 defaultExpandedProjectIds={defaultExpandedProjectIds}
               />
 

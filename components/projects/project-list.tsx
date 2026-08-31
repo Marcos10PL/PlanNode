@@ -13,14 +13,16 @@ import { SortableProjectCard } from "./sortable-project-card";
 
 type Props = {
   projects: ProjectWithProgress[];
-  canManage: boolean;
+  canEdit: boolean;
+  isWorkspaceManager?: boolean;
   onReorder: ReorderAction;
   dragEnabled: boolean;
 };
 
 export function ProjectList({
   projects,
-  canManage,
+  canEdit,
+  isWorkspaceManager,
   onReorder,
   dragEnabled,
 }: Props) {
@@ -88,7 +90,8 @@ export function ProjectList({
             key={project.id}
             project={project}
             index={index}
-            canManage={canManage}
+            canEdit={canEdit}
+            isWorkspaceManager={isWorkspaceManager}
             dragEnabled={dragEnabled}
           />
         ))}

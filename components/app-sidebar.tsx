@@ -26,6 +26,7 @@ type Props = {
   projects: ProjectWithProgress[];
   workspaceId: string | null;
   canManageProjects: boolean;
+  isWorkspaceManager?: boolean;
   defaultExpandedProjectIds: string[];
 };
 
@@ -33,6 +34,7 @@ export function AppSidebar({
   projects,
   workspaceId,
   canManageProjects,
+  isWorkspaceManager,
   defaultExpandedProjectIds,
 }: Props) {
   const t = useTranslations();
@@ -67,7 +69,8 @@ export function AppSidebar({
         <SidebarProjects
           projects={projects}
           workspaceId={workspaceId}
-          canManage={canManageProjects}
+          canEdit={canManageProjects}
+          isWorkspaceManager={isWorkspaceManager}
           defaultExpandedProjectIds={defaultExpandedProjectIds}
         />
       </SidebarContent>
