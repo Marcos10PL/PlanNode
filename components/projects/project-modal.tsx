@@ -45,6 +45,7 @@ type Props = {
   trigger?: React.ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  canManage?: boolean;
 };
 
 export function ProjectModal({
@@ -53,6 +54,7 @@ export function ProjectModal({
   trigger,
   open,
   onOpenChange,
+  canManage = false,
 }: Props) {
   const t = useTranslations(project ? "projects.edit" : "projects.create");
   const tErrors = useTranslations("fields.errors");
@@ -161,31 +163,33 @@ export function ProjectModal({
             placeholder={t("description_placeholder")}
             maxLength={VALIDATION_MAX.PROJECT_DESCRIPTION}
           />
-          <Controller
-            control={form.control}
-            name="isPrivate"
-            render={({ field }) => (
-              <FieldLabel
-                htmlFor={project ? "editIsPrivate" : "isPrivate"}
-                className="has-data-[state=checked]:border-accent has-data-[state=checked]:bg-accent/50 dark:has-data-[state=checked]:bg-accent/50"
-              >
-                <Field orientation="horizontal">
-                  <FieldContent>
-                    <FieldTitle>{t("private_label")}</FieldTitle>
-                    <FieldDescription>
-                      {t("private_description")}
-                    </FieldDescription>
-                  </FieldContent>
-                  <Switch
-                    id={project ? "editIsPrivate" : "isPrivate"}
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                    className="data-[state=checked]:bg-foreground"
-                  />
-                </Field>
-              </FieldLabel>
-            )}
-          />
+          {canManage && (
+            <Controller
+              control={form.control}
+              name="isPrivate"
+              render={({ field }) => (
+                <FieldLabel
+                  htmlFor={project ? "editIsPrivate" : "isPrivate"}
+                  className="has-data-[state=checked]:border-accent has-data-[state=checked]:bg-accent/50 dark:has-data-[state=checked]:bg-accent/50"
+                >
+                  <Field orientation="horizontal">
+                    <FieldContent>
+                      <FieldTitle>{t("private_label")}</FieldTitle>
+                      <FieldDescription>
+                        {t("private_description")}
+                      </FieldDescription>
+                    </FieldContent>
+                    <Switch
+                      id={project ? "editIsPrivate" : "isPrivate"}
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      className="data-[state=checked]:bg-foreground"
+                    />
+                  </Field>
+                </FieldLabel>
+              )}
+            />
+          )}
           {project ? (
             <div className="flex gap-2 justify-end">
               <Button

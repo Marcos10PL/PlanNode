@@ -1,7 +1,11 @@
 "use server";
 
 import { ERRORS, LINKS } from "@/const";
-import { canEditProject, getUserContext } from "@/lib/supabase/server";
+import {
+  canEditProject,
+  getUserContext,
+  isProjectManager,
+} from "@/lib/supabase/server";
 import { updateProjectSchema, UpdateProjectSchema } from "@/schema";
 import { generateProjectRoute } from "@/utils/helpers";
 import { revalidatePath } from "next/cache";
@@ -21,6 +25,21 @@ export async function updateProjectAction(
     return { error: ERRORS.INSUFFICIENT_ROLE };
 
   const { name, description, isPrivate, icon, color } = parsed.data;
+
+  const { data: existing } = await supabase
+    .from("projects")
+    .select("is_private")
+    .eq("id", projectId)
+    .single();
+
+  if (!existing) return { error: ERRORS.SERVER_ERROR };
+
+  if (
+    isPrivate !== existing.is_private &&
+    !(await isProjectManager(supabase, projectId, user.id))
+  ) {
+    return { error: ERRORS.INSUFFICIENT_ROLE };
+  }
 
   const { error: updateError } = await supabase
     .from("projects")

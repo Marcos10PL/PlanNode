@@ -98,6 +98,7 @@ export function ProjectCard({ project, canManage, dragHandle }: Props) {
         project={project}
         open={editOpen}
         onOpenChange={setEditOpen}
+        canManage={canManage}
       />
 
       <ConfirmModal

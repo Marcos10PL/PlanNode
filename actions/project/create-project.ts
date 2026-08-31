@@ -1,6 +1,6 @@
 "use server";
 
-import { ERRORS, LINKS, WORKSPACE_ROLES } from "@/const";
+import { ERRORS, LINKS, MANAGER_ROLES, WORKSPACE_ROLES } from "@/const";
 import { getUserContext } from "@/lib/supabase/server";
 import { createProjectSchema, CreateProjectSchema } from "@/schema";
 import { getTranslations } from "next-intl/server";
@@ -26,6 +26,9 @@ export async function createProjectAction(
     return { error: ERRORS.INSUFFICIENT_ROLE };
 
   const { name, description, isPrivate, icon, color } = parsed.data;
+
+  if (isPrivate && !MANAGER_ROLES.includes(role))
+    return { error: ERRORS.INSUFFICIENT_ROLE };
 
   const { data: lastProject } = await supabase
     .from("projects")

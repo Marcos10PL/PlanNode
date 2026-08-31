@@ -150,11 +150,20 @@ USING (
   )
 );
 
-CREATE POLICY "Non-guest members can create projects"
+CREATE POLICY "Create projects, private ones require manager role"
 ON public.projects FOR INSERT
 WITH CHECK (
-  public.get_workspace_member_role(workspace_id, (SELECT auth.uid())) IN ('owner', 'admin', 'member')
-  AND created_by = (SELECT auth.uid())
+  created_by = (SELECT auth.uid())
+  AND (
+    (
+      NOT is_private
+      AND public.get_workspace_member_role(workspace_id, (SELECT auth.uid())) IN ('owner', 'admin', 'member')
+    )
+    OR (
+      is_private
+      AND public.get_workspace_member_role(workspace_id, (SELECT auth.uid())) IN ('owner', 'admin')
+    )
+  )
 );
 
 CREATE POLICY "Non-guest members can update accessible projects"
@@ -371,11 +380,14 @@ BEGIN
   )
   RETURNING id INTO v_project_id;
 
-  INSERT INTO public.task_lists (project_id, name, position)
-  VALUES (v_project_id, p_list_name, 0);
-
+  -- inserted before task_lists: for a private project, can_access_project()
+  -- (used by the task_lists INSERT policy) needs either a manager role or an
+  -- existing project_members row — the creator's own row must exist first
   INSERT INTO public.project_members (project_id, id, added_by_id)
   VALUES (v_project_id, auth.uid(), auth.uid());
+
+  INSERT INTO public.task_lists (project_id, name, position)
+  VALUES (v_project_id, p_list_name, 0);
 
   RETURN v_project_id;
 END;
@@ -413,12 +425,12 @@ BEGIN
   VALUES (v_workspace_id, p_project_name, p_project_description, auth.uid())
   RETURNING id INTO v_project_id;
 
+  INSERT INTO public.project_members (project_id, id, added_by_id)
+  VALUES (v_project_id, auth.uid(), auth.uid());
+
   INSERT INTO public.task_lists (project_id, name, position)
   VALUES (v_project_id, p_list_name, 0)
   RETURNING id INTO v_list_id;
-
-  INSERT INTO public.project_members (project_id, id, added_by_id)
-  VALUES (v_project_id, auth.uid(), auth.uid());
 
   INSERT INTO public.tasks (project_id, list_id, title, description, status, position, created_by)
   VALUES
@@ -433,6 +445,26 @@ $$;
 REVOKE EXECUTE ON FUNCTION public.create_onboarding_workspace(
   text, text, text, text, text, text, text, text, text
 ) FROM anon;
+
+-- Only workspace owners/admins may change an existing project's is_private
+-- flag (symmetric with the INSERT policy above). Other fields on a project
+-- a member can already edit stay editable — this only guards the one column.
+CREATE OR REPLACE FUNCTION public.enforce_private_project_change()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.is_private IS DISTINCT FROM OLD.is_private THEN
+    IF public.get_workspace_member_role(NEW.workspace_id, auth.uid()) NOT IN ('owner', 'admin') THEN
+      RAISE EXCEPTION 'Only workspace owners and admins can change a project''s privacy setting';
+    END IF;
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
+
+CREATE OR REPLACE TRIGGER enforce_private_project_change_trigger
+  BEFORE UPDATE ON public.projects
+  FOR EACH ROW EXECUTE PROCEDURE public.enforce_private_project_change();
 
 -- Triggers: update updated_at
 CREATE OR REPLACE TRIGGER set_projects_updated_at

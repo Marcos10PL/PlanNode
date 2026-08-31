@@ -391,6 +391,7 @@ export function SidebarProjects({
           project={editProject}
           open={!!editProject}
           onOpenChange={o => !o && setEditProject(null)}
+          canManage={canManage}
         />
       )}
 
@@ -399,6 +400,7 @@ export function SidebarProjects({
           workspaceId={workspaceId}
           open={addProjectOpen}
           onOpenChange={setAddProjectOpen}
+          canManage={canManage}
         />
       )}
 

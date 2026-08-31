@@ -62,6 +62,7 @@ export function ProjectActions({ project, canManage }: Props) {
         project={project}
         open={editOpen}
         onOpenChange={setEditOpen}
+        canManage={canManage}
       />
 
       <ConfirmModal
