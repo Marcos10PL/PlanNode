@@ -28,7 +28,7 @@ export async function DashboardShell({
   locale: string;
 }) {
   const cookieStore = await cookies();
-  const activeWorkspaceId =
+  const cookieWorkspaceId =
     cookieStore.get(COOKIES.ACTIVE_WORKSPACE_ID)?.value ?? null;
   const sidebarOpen = cookieStore.get(COOKIES.SIDEBAR_STATE)?.value !== "false";
   const defaultExpandedProjectIds = parseCookieValue<string[]>(
@@ -41,6 +41,11 @@ export async function DashboardShell({
     getWorkspaces(),
     getAppConfig(),
   ]);
+
+  const activeWorkspaceId =
+    workspaces.find(w => w.id === cookieWorkspaceId)?.id ??
+    workspaces[0]?.id ??
+    null;
 
   const [projects, workspaceContext] = activeWorkspaceId
     ? await Promise.all([

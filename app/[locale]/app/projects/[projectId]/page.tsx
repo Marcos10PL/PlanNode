@@ -38,7 +38,7 @@ export default async function ProjectPage({ params }: Props) {
 
   const project = await getProject(projectId);
 
-  if (!project || project.workspaceId !== activeWorkspaceId) {
+  if (!project || (activeWorkspaceId && project.workspaceId !== activeWorkspaceId)) {
     notFound();
   }
 

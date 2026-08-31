@@ -3,6 +3,7 @@
 import { ERRORS, LINKS, WORKSPACE_ROLES } from "@/const";
 import { getUserContext } from "@/lib/supabase/server";
 import { createProjectSchema, CreateProjectSchema } from "@/schema";
+import { getTranslations } from "next-intl/server";
 import { revalidatePath } from "next/cache";
 
 export async function createProjectAction(
@@ -34,23 +35,27 @@ export async function createProjectAction(
     .limit(1)
     .maybeSingle();
 
-  const { data: project, error: insertError } = await supabase
-    .from("projects")
-    .insert({
-      workspace_id: workspaceId,
-      name,
-      description: description || null,
-      is_private: isPrivate,
-      icon,
-      color,
-      position: (lastProject?.position ?? -1) + 1,
-      created_by: user.id,
-    })
-    .select("id")
-    .single();
+  const t = await getTranslations("common");
 
-  if (insertError || !project) return { error: ERRORS.SERVER_ERROR };
+  const { data: projectId, error: insertError } = await supabase.rpc(
+    "create_project_with_default_list",
+    {
+      p_workspace_id: workspaceId,
+      p_name: name,
+      p_description: description ?? null,
+      p_is_private: isPrivate,
+      p_icon: icon,
+      p_color: color,
+      p_position: (lastProject?.position ?? -1) + 1,
+      p_list_name: t("default_list_name"),
+    },
+  );
+
+  if (insertError || !projectId) {
+    console.error("[create-project] RPC error:", insertError);
+    return { error: ERRORS.SERVER_ERROR };
+  }
 
   revalidatePath(LINKS.PROJECTS);
-  return { success: true, projectId: project.id };
+  return { success: true, projectId };
 }

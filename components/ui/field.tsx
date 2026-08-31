@@ -54,10 +54,10 @@ function FieldGroup({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-const fieldVariants = cva("group/field flex w-full gap-2", {
+const fieldVariants = cva("group/field flex w-full min-w-0 gap-2", {
   variants: {
     orientation: {
-      vertical: ["flex-col [&>*]:w-full [&>.sr-only]:w-auto"],
+      vertical: ["flex-col [&>*]:w-full [&>*]:min-w-0 [&>.sr-only]:w-auto"],
       horizontal: [
         "flex-row items-center",
         "[&>[data-slot=field-label]]:flex-auto",

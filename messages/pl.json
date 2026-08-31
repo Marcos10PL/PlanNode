@@ -1,5 +1,15 @@
 {
   "logo": "PlanNode",
+  "onboarding": {
+    "workspace_name": "Mój workspace",
+    "project_name": "Poznaj PlanNode",
+    "project_description": "Przykładowy projekt, żeby zobaczyć jak wszystko działa.",
+    "task1_title": "Zacznij tworzyć własne projekty i zadania",
+    "task1_description": "<p>Zapoznałeś się z aplikacją? Ruszaj do akcji — zapraszaj innych, twórz, edytuj i usuwaj! Powodzenia!</p>",
+    "task2_title": "Zapoznaj się z PlanNode",
+    "task2_description": "<p>PlanNode to menedżer projektów dla każdego — pozwala tworzyć przestrzenie robocze, do których możesz zapraszać innych, udostępnia dodawanie projektów z listami zadań, oferuje filtrowany widok listy czy klasyczny Kanban.</p><p>Umożliwia pracę w czasie rzeczywistym, dzięki czemu nie musisz przeładowywać strony, żeby zobaczyć zmiany innych użytkowników.</p><p>Przestrzeń robocza, w której aktualnie się znajdujesz, została utworzona w ramach przykładu — czuj się swobodnie, tworząc, edytując czy usuwając tutaj projekty i zadania. Możesz też oczywiście zacząć już pracę na poważnie. Swoimi przestrzeniami roboczymi zarządzasz w dowolnej chwili z poziomu ustawień.</p>",
+    "task3_title": "Załóż konto w PlanNode"
+  },
   "common": {
     "unexpected_error": "Coś poszło nie tak. Spróbuj ponownie.",
     "manage": "Zarządzaj",
@@ -14,7 +24,8 @@
     "editor_link_add": "Dodaj",
     "editor_link_save": "Zapisz",
     "editor_link_placeholder": "https://...",
-    "editor_link_invalid": "Nieprawidłowy adres URL"
+    "editor_link_invalid": "Nieprawidłowy adres URL",
+    "default_list_name": "Lista"
   },
   "footer": {
     "all_rights_reserved": "PlanNode. Wszelkie prawa zastrzeżone."

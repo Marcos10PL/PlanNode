@@ -12,7 +12,7 @@ export function TaskDescriptionView({ html, className }: Props) {
   return (
     <div
       className={cn(
-        "break-all text-sm [&_a]:text-primary [&_a]:underline [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:my-1 [&_p]:min-h-[1.25em] [&_ul]:list-disc [&_ul]:pl-5",
+        "wrap-break-word text-sm [&_a]:text-primary [&_a]:underline [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:my-1 [&_p]:min-h-[1.25em] [&_ul]:list-disc [&_ul]:pl-5",
         className,
       )}
       dangerouslySetInnerHTML={{ __html: sanitizeHtml(html) }}
