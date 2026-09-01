@@ -3,7 +3,7 @@
 import { createClient } from "@/lib/supabase/client";
 import { TableName } from "@/types/entities";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 const TABLES = [
   "tasks",
@@ -11,14 +11,30 @@ const TABLES = [
   "notifications",
 ] as const satisfies readonly TableName[];
 
+const REFRESH_DEBOUNCE_MS = 400;
+
 export function RealtimeRefresher() {
   const router = useRouter();
+  const routerRef = useRef(router);
+
+  useEffect(() => {
+    routerRef.current = router;
+  }, [router]);
 
   useEffect(() => {
     const supabase = createClient();
     let channel: ReturnType<typeof supabase.channel> | null = null;
     let retryTimeout: ReturnType<typeof setTimeout> | null = null;
+    let refreshTimeout: ReturnType<typeof setTimeout> | null = null;
     let disposed = false;
+
+    const scheduleRefresh = () => {
+      if (refreshTimeout) clearTimeout(refreshTimeout);
+      refreshTimeout = setTimeout(() => {
+        refreshTimeout = null;
+        routerRef.current.refresh();
+      }, REFRESH_DEBOUNCE_MS);
+    };
 
     const subscribe = () => {
       channel = supabase.channel("app-changes");
@@ -27,7 +43,7 @@ export function RealtimeRefresher() {
         channel = channel.on(
           "postgres_changes",
           { event: "*", schema: "public", table },
-          () => router.refresh(),
+          scheduleRefresh,
         );
       }
 
@@ -64,9 +80,10 @@ export function RealtimeRefresher() {
     return () => {
       disposed = true;
       if (retryTimeout) clearTimeout(retryTimeout);
+      if (refreshTimeout) clearTimeout(refreshTimeout);
       if (channel) supabase.removeChannel(channel);
     };
-  }, [router]);
+  }, []);
 
   useEffect(() => {
     const handleFocus = () => router.refresh();

@@ -3,8 +3,6 @@
 import { ERRORS } from "@/const";
 import { canEditProject, getUserContext } from "@/lib/supabase/server";
 import { TaskStatus } from "@/types/entities";
-import { generateProjectRoute } from "@/utils/helpers";
-import { revalidatePath } from "next/cache";
 
 type TaskPositionChange = {
   id: string;
@@ -38,6 +36,5 @@ export async function reorderTasksAction(
 
   if (reorderError) return { error: ERRORS.SERVER_ERROR };
 
-  revalidatePath(generateProjectRoute(list.project_id));
   return { success: true };
 }
