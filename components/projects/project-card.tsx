@@ -20,7 +20,7 @@ import {
 import { Lock } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { createElement, useState } from "react";
 import { ProjectModal } from "./project-modal";
 
 type Props = {
@@ -64,7 +64,7 @@ export function ProjectCard({
     t,
   });
 
-  const ProjectIcon = getProjectIcon(project.icon);
+  const icon = getProjectIcon(project.icon);
 
   const handleDelete = async () => {
     await remove(project.id);
@@ -77,11 +77,9 @@ export function ProjectCard({
         href={generateProjectRoute(project.id)}
         title={project.name}
         dragHandle={dragHandle}
-        icon={
-          <ProjectIcon
-            className={`h-4 w-4 shrink-0 ${getProjectColorTextClass(project.color)}`}
-          />
-        }
+        icon={createElement(icon, {
+          className: `h-4 w-4 shrink-0 ${getProjectColorTextClass(project.color)}`,
+        })}
         badge={
           project.isPrivate ? (
             <Badge variant="outline" className="shrink-0 pointer-events-none">

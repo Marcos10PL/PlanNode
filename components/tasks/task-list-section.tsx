@@ -42,7 +42,7 @@ import { isSortable } from "@dnd-kit/react/sortable";
 import { ChevronDown } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AddRowButton } from "./add-row-button";
 import { TaskListModal } from "./create-task-list-modal";
@@ -107,10 +107,12 @@ export function TaskListSection({
   );
 
   const [tasks, setTasks] = useState<Task[]>(list.tasks);
+  const [prevListTasks, setPrevListTasks] = useState(list.tasks);
 
-  useEffect(() => {
+  if (list.tasks !== prevListTasks) {
+    setPrevListTasks(list.tasks);
     setTasks(list.tasks);
-  }, [list.tasks]);
+  }
 
   const topLevelTasks = useMemo(
     () => tasks.filter(task => !task.parentTaskId),

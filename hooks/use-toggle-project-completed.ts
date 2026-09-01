@@ -4,7 +4,7 @@ import { toggleProjectCompletedAction } from "@/actions/project/toggle-completed
 import { ERRORS } from "@/const";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 export function useToggleProjectCompleted(
@@ -14,10 +14,13 @@ export function useToggleProjectCompleted(
   const t = useTranslations("common");
   const router = useRouter();
   const [isCompleted, setIsCompleted] = useState(initialIsCompleted);
+  const [prevInitialIsCompleted, setPrevInitialIsCompleted] =
+    useState(initialIsCompleted);
 
-  useEffect(() => {
+  if (initialIsCompleted !== prevInitialIsCompleted) {
+    setPrevInitialIsCompleted(initialIsCompleted);
     setIsCompleted(initialIsCompleted);
-  }, [initialIsCompleted]);
+  }
 
   const toggle = async () => {
     const next = !isCompleted;

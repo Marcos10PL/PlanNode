@@ -41,7 +41,7 @@ import { ChevronRight, MoreHorizontal, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Ref } from "react";
+import { createElement, Ref } from "react";
 import { useProjectSidebarActions } from "./project-sidebar-context";
 import { SortableTaskListItem } from "./sortable-task-list-item";
 
@@ -100,7 +100,7 @@ export function SidebarProjectItem({
   });
 
   const projectRoute = generateProjectRoute(project.id);
-  const ProjectIcon = getProjectIcon(project.icon);
+  const icon = getProjectIcon(project.icon);
 
   return (
     <Collapsible
@@ -120,9 +120,9 @@ export function SidebarProjectItem({
             )}
             onClick={onLinkClick}
           >
-            <ProjectIcon
-              className={`mr-1 ${getProjectColorTextClass(project.color)}`}
-            />
+            {createElement(icon, {
+              className: `mr-1 ${getProjectColorTextClass(project.color)}`,
+            })}
             <span className="truncate">{project.name}</span>
           </Link>
         </SidebarMenuButton>

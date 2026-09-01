@@ -5,6 +5,7 @@ import { Workspace } from "@/types/dto";
 
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useState,
@@ -29,18 +30,32 @@ export function WorkspaceProvider({
   activeWorkspaceId: string | null;
   children: React.ReactNode;
 }) {
-  const resolve = () =>
-    workspaces.find(w => w.id === activeWorkspaceId) ?? workspaces[0] ?? null;
+  const resolve = useCallback(
+    () =>
+      workspaces.find(w => w.id === activeWorkspaceId) ?? workspaces[0] ?? null,
+    [workspaces, activeWorkspaceId],
+  );
 
   const [activeWorkspace, setActive] = useState<Workspace | null>(resolve);
 
+  const [prevActiveWorkspaceId, setPrevActiveWorkspaceId] =
+    useState(activeWorkspaceId);
+  const [prevWorkspaces, setPrevWorkspaces] = useState(workspaces);
+
+  if (
+    activeWorkspaceId !== prevActiveWorkspaceId ||
+    workspaces !== prevWorkspaces
+  ) {
+    setPrevActiveWorkspaceId(activeWorkspaceId);
+    setPrevWorkspaces(workspaces);
+    setActive(resolve());
+  }
+
   useEffect(() => {
     const resolved = resolve();
-    setActive(resolved);
-
     if (resolved && resolved.id !== activeWorkspaceId)
       setActiveWorkspaceAction(resolved.id);
-  }, [activeWorkspaceId, workspaces]);
+  }, [resolve, activeWorkspaceId]);
 
   const [isPending, startTransition] = useTransition();
 

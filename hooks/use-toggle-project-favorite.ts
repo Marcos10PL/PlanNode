@@ -3,7 +3,7 @@
 import { toggleProjectFavoriteAction } from "@/actions/project/toggle-favorite";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 export function useToggleProjectFavorite(
@@ -13,10 +13,13 @@ export function useToggleProjectFavorite(
   const t = useTranslations("common");
   const router = useRouter();
   const [isFavorite, setIsFavorite] = useState(initialIsFavorite);
+  const [prevInitialIsFavorite, setPrevInitialIsFavorite] =
+    useState(initialIsFavorite);
 
-  useEffect(() => {
+  if (initialIsFavorite !== prevInitialIsFavorite) {
+    setPrevInitialIsFavorite(initialIsFavorite);
     setIsFavorite(initialIsFavorite);
-  }, [initialIsFavorite]);
+  }
 
   const toggle = async () => {
     const next = !isFavorite;

@@ -29,7 +29,7 @@ import { generateProjectRoute } from "@/utils/helpers";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { ProjectAppearancePicker } from "./project-appearance-picker";
@@ -61,13 +61,16 @@ export function ProjectModal({
   const isOpen = isControlled ? open : internalOpen;
   const setOpen = isControlled ? (onOpenChange ?? (() => {})) : setInternalOpen;
 
-  const defaultValues = (): CreateProjectSchema => ({
-    name: project?.name ?? "",
-    description: project?.description ?? "",
-    isPrivate: project?.isPrivate ?? false,
-    icon: toProjectIcon(project?.icon ?? PROJECT_ICONS.FOLDER_KANBAN),
-    color: toProjectColor(project?.color ?? PROJECT_COLORS.NEUTRAL),
-  });
+  const defaultValues = useCallback(
+    (): CreateProjectSchema => ({
+      name: project?.name ?? "",
+      description: project?.description ?? "",
+      isPrivate: project?.isPrivate ?? false,
+      icon: toProjectIcon(project?.icon ?? PROJECT_ICONS.FOLDER_KANBAN),
+      color: toProjectColor(project?.color ?? PROJECT_COLORS.NEUTRAL),
+    }),
+    [project],
+  );
 
   const form = useForm<CreateProjectSchema>({
     resolver: zodResolver(createProjectSchema(tErrors)),
@@ -76,7 +79,7 @@ export function ProjectModal({
 
   useEffect(() => {
     if (isOpen) form.reset(defaultValues());
-  }, [isOpen, project]);
+  }, [isOpen, defaultValues, form]);
 
   const onSubmit = async (data: CreateProjectSchema) => {
     try {

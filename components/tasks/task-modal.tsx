@@ -23,7 +23,7 @@ import { Task, WorkspaceMember } from "@/types/dto";
 import { TaskStatus } from "@/types/entities";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
-import { useEffect } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { TaskActivityList } from "./task-activity-list";
@@ -67,23 +67,31 @@ export function TaskModal({
     refetch: loadTimeline,
   } = useTaskTimeline(task?.id, open);
 
-  const defaultValues: CreateTaskSchema = {
-    title: task?.title ?? "",
-    description: task?.description ?? "",
-    status: selectedStatus ?? task?.status ?? TASK_STATUSES.TODO,
-    priority: task?.priority ?? TASK_PRIORITIES.MEDIUM,
-    assigneeId: task?.assigneeId ?? null,
-    dueDate: task?.dueDate ?? null,
-  };
+  const defaultValues = useMemo<CreateTaskSchema>(
+    () => ({
+      title: task?.title ?? "",
+      description: task?.description ?? "",
+      status: selectedStatus ?? task?.status ?? TASK_STATUSES.TODO,
+      priority: task?.priority ?? TASK_PRIORITIES.MEDIUM,
+      assigneeId: task?.assigneeId ?? null,
+      dueDate: task?.dueDate ?? null,
+    }),
+    [task, selectedStatus],
+  );
 
   const form = useForm<CreateTaskSchema>({
     resolver: zodResolver(createTaskSchema(tErrors)),
     defaultValues,
   });
 
+  const defaultValuesRef = useRef(defaultValues);
   useEffect(() => {
-    if (open) form.reset(defaultValues);
-  }, [open, task]);
+    defaultValuesRef.current = defaultValues;
+  }, [defaultValues]);
+
+  useEffect(() => {
+    if (open) form.reset(defaultValuesRef.current);
+  }, [open, form]);
 
   const onSubmit = async (data: CreateTaskSchema) => {
     try {

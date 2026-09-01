@@ -8,7 +8,7 @@ import { MyTask, WorkspaceMember } from "@/types/dto";
 import { cn, getTaskUrgencyBucket, getTaskUrgencyBucketLabel } from "@/utils";
 import { ChevronDown } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 type Props = {
   tasks: MyTask[];
@@ -28,10 +28,12 @@ export function MyTasksSection({
 
   const [tasks, setTasks] = useState<MyTask[]>(initialTasks);
   const [collapsed, setCollapsed] = useState<Set<TaskUrgencyBucket>>(new Set());
+  const [prevInitialTasks, setPrevInitialTasks] = useState(initialTasks);
 
-  useEffect(() => {
+  if (initialTasks !== prevInitialTasks) {
+    setPrevInitialTasks(initialTasks);
     setTasks(initialTasks);
-  }, [initialTasks]);
+  }
 
   const updateTaskField = useOptimisticTaskUpdate(tasks, setTasks);
 

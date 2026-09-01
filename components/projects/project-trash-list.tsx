@@ -46,6 +46,9 @@ export function ProjectTrashList({
   );
   const [projects, setProjects] = useState(initialProjects);
   const [hasMore, setHasMore] = useState(initialHasMore);
+  const [prevInitialProjects, setPrevInitialProjects] =
+    useState(initialProjects);
+  const [prevInitialHasMore, setPrevInitialHasMore] = useState(initialHasMore);
   const [isLoading, setIsLoading] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef(false);
@@ -59,10 +62,15 @@ export function ProjectTrashList({
   const { restore, isPending: isRestorePending } = useRestoreProject();
   const { remove, isPending: isDeletePending } = usePermanentlyDeleteProject();
 
-  useEffect(() => {
+  if (
+    initialProjects !== prevInitialProjects ||
+    initialHasMore !== prevInitialHasMore
+  ) {
+    setPrevInitialProjects(initialProjects);
+    setPrevInitialHasMore(initialHasMore);
     setProjects(initialProjects);
     setHasMore(initialHasMore);
-  }, [initialProjects, initialHasMore]);
+  }
 
   const handleSortChange = async (next: TrashSort) => {
     setSort(next);

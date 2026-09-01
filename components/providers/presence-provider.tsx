@@ -18,7 +18,6 @@ export function PresenceProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!activeWorkspace) {
-      setOnlineUserIds(new Set());
       return;
     }
 
@@ -76,6 +75,7 @@ export function PresenceProvider({ children }: { children: React.ReactNode }) {
       if (retryTimeout) clearTimeout(retryTimeout);
       if (channel) supabase.removeChannel(channel);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeWorkspace?.id, user.id]);
 
   const isOnline = (userId: string) => onlineUserIds.has(userId);

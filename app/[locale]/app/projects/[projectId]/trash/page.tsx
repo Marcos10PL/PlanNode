@@ -11,6 +11,7 @@ import { parseCookieValue } from "@/utils/helpers";
 import { getTranslations } from "next-intl/server";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
+import { createElement } from "react";
 
 type Props = {
   params: Promise<{ projectId: string }>;
@@ -51,7 +52,7 @@ export default async function ProjectTrashPage({ params }: Props) {
     getWorkspaceContext(project.workspaceId),
   ]);
 
-  const ProjectIcon = getProjectIcon(project.icon);
+  const icon = getProjectIcon(project.icon);
 
   return (
     <ProjectTrashPanel
@@ -60,9 +61,9 @@ export default async function ProjectTrashPage({ params }: Props) {
         <>
           <span className="shrink-0">{t("title_prefix")}</span>
           <span className="text-muted-foreground shrink-0">—</span>
-          <ProjectIcon
-            className={`h-5 w-5 shrink-0 ${getProjectColorTextClass(project.color)}`}
-          />
+          {createElement(icon, {
+            className: `h-5 w-5 shrink-0 ${getProjectColorTextClass(project.color)}`,
+          })}
           <span className="truncate min-w-0">{project.name}</span>
         </>
       }

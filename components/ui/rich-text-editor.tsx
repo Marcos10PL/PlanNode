@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Popover as PopoverPrimitive } from "radix-ui";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "./button";
 import { Input } from "./input";
 import { Toggle } from "./toggle";
@@ -44,7 +44,7 @@ export function RichTextEditor({
   autoFocus = false,
 }: Props) {
   const t = useTranslations("common");
-  const wrapperRef = useRef<HTMLDivElement>(null);
+  const [wrapperEl, setWrapperEl] = useState<HTMLDivElement | null>(null);
   const [, forceRerender] = useState(0);
   const [linkPopoverOpen, setLinkPopoverOpen] = useState(false);
   const [linkValue, setLinkValue] = useState("");
@@ -138,7 +138,7 @@ export function RichTextEditor({
 
   return (
     <div
-      ref={wrapperRef}
+      ref={setWrapperEl}
       className={cn(
         "min-w-0 rounded-md border border-input bg-transparent shadow-xs transition-[color,box-shadow] focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50 dark:bg-input/30",
         className,
@@ -208,7 +208,7 @@ export function RichTextEditor({
                 <LinkIcon />
               </Toggle>
             </PopoverPrimitive.Trigger>
-            <PopoverPrimitive.Portal container={wrapperRef.current}>
+            <PopoverPrimitive.Portal container={wrapperEl}>
               <PopoverPrimitive.Content
                 align="start"
                 sideOffset={4}

@@ -7,7 +7,7 @@ import { move } from "@dnd-kit/helpers";
 import { DragDropProvider, type DragEndEvent } from "@dnd-kit/react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { SortableTaskListCard } from "./sortable-task-list-card";
 
@@ -21,10 +21,12 @@ export function TaskListsGrid({ lists, projectId, canEdit }: Props) {
   const t = useTranslations("common");
   const router = useRouter();
   const [localLists, setLocalLists] = useState(lists);
+  const [prevLists, setPrevLists] = useState(lists);
 
-  useEffect(() => {
+  if (lists !== prevLists) {
+    setPrevLists(lists);
     setLocalLists(lists);
-  }, [lists]);
+  }
 
   const handleDragEnd = (event: DragEndEvent) => {
     if (event.canceled) return;

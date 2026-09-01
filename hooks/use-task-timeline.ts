@@ -32,16 +32,20 @@ export function useTaskTimeline(taskId: string | undefined, open: boolean) {
 
   useEffect(() => {
     if (!open || !taskId) {
-      setItems([]);
       return;
     }
 
     let disposed = false;
 
-    setIsLoading(true);
-    refetchRef.current().finally(() => {
-      if (!disposed) setIsLoading(false);
-    });
+    const load = async () => {
+      setIsLoading(true);
+      try {
+        await refetchRef.current();
+      } finally {
+        if (!disposed) setIsLoading(false);
+      }
+    };
+    load();
 
     const supabase = createClient();
     let channel: ReturnType<typeof supabase.channel> | null = null;

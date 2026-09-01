@@ -25,7 +25,7 @@ import { CheckCircle2, FolderOpenDot, Plus, Star, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { useWorkspaces } from "../providers/workspace-provider";
 import { SectionSeparator } from "../ui/section-separator";
@@ -83,10 +83,12 @@ export function SidebarProjects({
   );
 
   const [localProjects, setLocalProjects] = useState(projects);
+  const [prevProjects, setPrevProjects] = useState(projects);
 
-  useEffect(() => {
+  if (projects !== prevProjects) {
+    setPrevProjects(projects);
     setLocalProjects(projects);
-  }, [projects]);
+  }
 
   const handleListDragEnd = (projectId: string) => (event: DragEndEvent) => {
     if (event.canceled) return;

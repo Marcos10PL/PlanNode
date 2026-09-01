@@ -20,7 +20,7 @@ import {
   getProjectIcon,
 } from "@/utils";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { createElement, useState } from "react";
 import { Control, Controller, useWatch } from "react-hook-form";
 
 type Props = {
@@ -34,7 +34,7 @@ export function ProjectAppearancePicker({ control }: Props) {
   const color = useWatch({ control, name: "color" });
   const icon = useWatch({ control, name: "icon" });
 
-  const SelectedIcon = getProjectIcon(icon);
+  const selectedIcon = getProjectIcon(icon);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -48,9 +48,9 @@ export function ProjectAppearancePicker({ control }: Props) {
               className="shrink-0"
               aria-label={t("trigger_label")}
             >
-              <SelectedIcon
-                className={cn("h-4 w-4", getProjectColorTextClass(color))}
-              />
+              {createElement(selectedIcon, {
+                className: cn("h-4 w-4", getProjectColorTextClass(color)),
+              })}
             </Button>
           </PopoverTrigger>
         </TooltipTrigger>
@@ -93,7 +93,7 @@ export function ProjectAppearancePicker({ control }: Props) {
           render={({ field }) => (
             <div className="mt-2 grid grid-cols-8 gap-1 border-t pt-2">
               {Object.values(PROJECT_ICONS).map(i => {
-                const Icon = getProjectIcon(i);
+                const optionIcon = getProjectIcon(i);
 
                 return (
                   <Button
@@ -108,9 +108,9 @@ export function ProjectAppearancePicker({ control }: Props) {
                     )}
                     aria-label={i}
                   >
-                    <Icon
-                      className={cn("h-4 w-4", getProjectColorTextClass(color))}
-                    />
+                    {createElement(optionIcon, {
+                      className: cn("h-4 w-4", getProjectColorTextClass(color)),
+                    })}
                   </Button>
                 );
               })}

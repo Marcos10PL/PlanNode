@@ -16,7 +16,7 @@ import { NOTIFICATION_TYPES } from "@/const";
 import { NotificationPreference } from "@/types/dto";
 import { NotificationType } from "@/types/entities";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 const CHANNELS = {
@@ -49,9 +49,13 @@ export function NotificationPreferencesModal({
     checked: boolean;
   } | null>(null);
 
-  useEffect(() => {
+  const [prevOpen, setPrevOpen] = useState(open);
+  if (open !== prevOpen) {
+    setPrevOpen(open);
     if (open) setValues(preferences);
-  }, [open, preferences]);
+  }
+
+  const resetValues = () => setValues(preferences);
 
   const getPref = (type: NotificationType, source = values) =>
     source.find(v => v.type === type) ?? {
@@ -144,6 +148,9 @@ export function NotificationPreferencesModal({
         <DialogContent
           className="sm:max-w-md"
           onOpenAutoFocus={e => e.preventDefault()}
+          onAnimationEnd={() => {
+            if (!open) resetValues();
+          }}
         >
           <DialogHeader>
             <DialogTitle>{t("settings.title")}</DialogTitle>

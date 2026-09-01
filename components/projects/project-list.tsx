@@ -7,7 +7,7 @@ import { move } from "@dnd-kit/helpers";
 import { DragDropProvider, type DragEndEvent } from "@dnd-kit/react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { SortableProjectCard } from "./sortable-project-card";
 
@@ -29,10 +29,12 @@ export function ProjectList({
   const t = useTranslations();
   const router = useRouter();
   const [localProjects, setLocalProjects] = useState(projects);
+  const [prevProjects, setPrevProjects] = useState(projects);
 
-  useEffect(() => {
+  if (projects !== prevProjects) {
+    setPrevProjects(projects);
     setLocalProjects(projects);
-  }, [projects]);
+  }
 
   const handleDragEnd = (event: DragEndEvent) => {
     if (event.canceled) return;

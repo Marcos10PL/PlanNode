@@ -13,7 +13,7 @@ import { MemberSelectList } from "@/components/ui/member-select-list";
 import { ERRORS, MANAGER_ROLES } from "@/const";
 import { WorkspaceMember } from "@/types/dto";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 type Props = {
@@ -36,13 +36,17 @@ export function ManageProjectMembersModal({
   const [selected, setSelected] = useState<string[]>(memberIds);
   const [isPending, setIsPending] = useState(false);
 
+  const [prevOpen, setPrevOpen] = useState(open);
+  if (open !== prevOpen) {
+    setPrevOpen(open);
+    if (open) setSelected(memberIds);
+  }
+
   const assignableMembers = members.filter(
     m => !MANAGER_ROLES.includes(m.role),
   );
 
-  useEffect(() => {
-    if (open) setSelected(memberIds);
-  }, [open, memberIds]);
+  const resetSelected = () => setSelected(memberIds);
 
   const toggle = (id: string) => {
     setSelected(prev =>
@@ -81,7 +85,11 @@ export function ManageProjectMembersModal({
 
   return (
     <Dialog open={open} onOpenChange={o => !o && onOpenChange(false)}>
-      <DialogContent>
+      <DialogContent
+        onAnimationEnd={() => {
+          if (!open) resetSelected();
+        }}
+      >
         <DialogHeader>
           <DialogTitle>{t("title")}</DialogTitle>
           <DialogDescription>{t("description")}</DialogDescription>

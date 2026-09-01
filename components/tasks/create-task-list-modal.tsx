@@ -39,7 +39,7 @@ export function TaskListModal({ projectId, list, open, onOpenChange }: Props) {
 
   useEffect(() => {
     if (open) form.reset({ name: list?.name ?? "" });
-  }, [open, list]);
+  }, [open, list, form]);
 
   const isChanged = list ? form.watch("name") !== list.name : true;
 

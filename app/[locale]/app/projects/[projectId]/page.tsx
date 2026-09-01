@@ -23,6 +23,7 @@ import { List, Lock, Play } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
+import { createElement } from "react";
 
 type Props = {
   params: Promise<{ projectId: string }>;
@@ -55,7 +56,7 @@ export default async function ProjectPage({ params }: Props) {
   const projectWithProgress = projects.find(p => p.id === project.id);
   const lists = projectWithProgress?.lists ?? [];
 
-  const ProjectIcon = getProjectIcon(project.icon);
+  const icon = getProjectIcon(project.icon);
 
   const iconClassName = cn(
     "h-5 w-5 shrink-0",
@@ -67,7 +68,9 @@ export default async function ProjectPage({ params }: Props) {
       <div className="flex flex-col gap-2 mt-4 mb-6">
         <div className="flex flex-col md:flex-row-reverse md:items-center md:justify-end gap-x-2 min-w-0 max-w-full">
           <div className="flex items-center gap-2 min-w-0 self-end w-full md:w-fit">
-            <ProjectIcon className={`${iconClassName} md:hidden mr-auto`} />
+            {createElement(icon, {
+              className: `${iconClassName} md:hidden mr-auto`,
+            })}
             {project.isPrivate && (
               <Badge variant="outline" className="shrink-0 pointer-events-none">
                 <Lock className="h-3 w-3 mr-1" />
@@ -81,7 +84,9 @@ export default async function ProjectPage({ params }: Props) {
             />
           </div>
           <div className="flex items-center gap-2 min-w-0">
-            <ProjectIcon className={`${iconClassName} hidden md:block`} />
+            {createElement(icon, {
+              className: `${iconClassName} hidden md:block`,
+            })}
             <h1 className="min-w-0 truncate">{project.name}</h1>
           </div>
         </div>

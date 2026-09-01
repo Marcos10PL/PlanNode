@@ -46,7 +46,7 @@ export function EditWorkspaceModal({ workspace, open, onOpenChange }: Props) {
         description: workspace.description ?? "",
       });
     }
-  }, [open, workspace]);
+  }, [open, workspace, form]);
 
   const onSubmit = async (data: UpdateWorkspaceSchema) => {
     try {

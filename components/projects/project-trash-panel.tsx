@@ -67,6 +67,9 @@ export function ProjectTrashPanel({
   );
   const [lists, setLists] = useState(initialLists);
   const [listsHasMore, setListsHasMore] = useState(initialListsHasMore);
+  const [prevInitialLists, setPrevInitialLists] = useState(initialLists);
+  const [prevInitialListsHasMore, setPrevInitialListsHasMore] =
+    useState(initialListsHasMore);
   const [isListsLoading, setIsListsLoading] = useState(false);
   const listsSentinelRef = useRef<HTMLDivElement>(null);
   const listsLoadingRef = useRef(false);
@@ -77,19 +80,32 @@ export function ProjectTrashPanel({
   );
   const [tasks, setTasks] = useState(initialTasks);
   const [tasksHasMore, setTasksHasMore] = useState(initialTasksHasMore);
+  const [prevInitialTasks, setPrevInitialTasks] = useState(initialTasks);
+  const [prevInitialTasksHasMore, setPrevInitialTasksHasMore] =
+    useState(initialTasksHasMore);
   const [isTasksLoading, setIsTasksLoading] = useState(false);
   const tasksSentinelRef = useRef<HTMLDivElement>(null);
   const tasksLoadingRef = useRef(false);
 
-  useEffect(() => {
+  if (
+    initialLists !== prevInitialLists ||
+    initialListsHasMore !== prevInitialListsHasMore
+  ) {
+    setPrevInitialLists(initialLists);
+    setPrevInitialListsHasMore(initialListsHasMore);
     setLists(initialLists);
     setListsHasMore(initialListsHasMore);
-  }, [initialLists, initialListsHasMore]);
+  }
 
-  useEffect(() => {
+  if (
+    initialTasks !== prevInitialTasks ||
+    initialTasksHasMore !== prevInitialTasksHasMore
+  ) {
+    setPrevInitialTasks(initialTasks);
+    setPrevInitialTasksHasMore(initialTasksHasMore);
     setTasks(initialTasks);
     setTasksHasMore(initialTasksHasMore);
-  }, [initialTasks, initialTasksHasMore]);
+  }
 
   const [deleteListTarget, setDeleteListTarget] =
     useState<TrashedTaskList | null>(null);
