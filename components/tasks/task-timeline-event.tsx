@@ -52,22 +52,25 @@ export function TaskTimelineEvent({ event }: Props) {
         });
       }
       case TASK_EVENT_TYPES.ASSIGNEE_CHANGED: {
-        const { fromName, fromEmail, toName, toEmail } =
+        const { fromId, fromName, fromEmail, toId, toName, toEmail } =
           event.metadata as AssigneeChangedMetadata;
 
+        const describeAssignee = (id: string | null, name?: string | null) =>
+          id === null ? tTasks("no_assignee") : (name ?? t("unknown_user"));
+
         return t.rich("assignee_changed", {
-          from: fromName ?? tTasks("no_assignee"),
-          to: toName ?? tTasks("no_assignee"),
+          from: describeAssignee(fromId, fromName),
+          to: describeAssignee(toId, toName),
           fromInfo: chunks => (
             <span className="inline-flex items-center gap-0.5">
               {chunks}
-              {renderEmailInfo(fromEmail)}
+              {renderEmailInfo(fromEmail ?? null)}
             </span>
           ),
           toInfo: chunks => (
             <span className="inline-flex items-center gap-0.5">
               {chunks}
-              {renderEmailInfo(toEmail)}
+              {renderEmailInfo(toEmail ?? null)}
             </span>
           ),
         });

@@ -100,30 +100,11 @@ export async function updateTaskAction(taskId: string, data: UpdateTaskSchema) {
     assigneeId !== undefined && assigneeId !== existing.assignee_id;
 
   if (assigneeIdChanged) {
-    const idsToFetch = [existing.assignee_id, assigneeId].filter(
-      (id): id is string => !!id,
-    );
-
-    const { data: assigneeProfiles } = idsToFetch.length
-      ? await supabase
-          .from("profiles")
-          .select("id, full_name, email")
-          .in("id", idsToFetch)
-      : { data: [] };
-
-    const profileById = new Map((assigneeProfiles ?? []).map(p => [p.id, p]));
-    const fromProfile = existing.assignee_id
-      ? profileById.get(existing.assignee_id)
-      : undefined;
-    const toProfile = assigneeId ? profileById.get(assigneeId) : undefined;
-
     events.push({
       type: TASK_EVENT_TYPES.ASSIGNEE_CHANGED,
       metadata: {
-        fromName: fromProfile?.full_name ?? null,
-        fromEmail: fromProfile?.email ?? null,
-        toName: toProfile?.full_name ?? null,
-        toEmail: toProfile?.email ?? null,
+        fromId: existing.assignee_id ?? null,
+        toId: assigneeId ?? null,
       },
     });
   }
@@ -176,7 +157,7 @@ export async function updateTaskAction(taskId: string, data: UpdateTaskSchema) {
           p_metadata: {
             taskTitle: title ?? existing.title,
             projectName: project.name,
-            assignerName: assignerProfile.full_name,
+            assignerId: user.id,
             taskId,
           },
           p_link: taskPath,

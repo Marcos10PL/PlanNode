@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Alert } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Workspace } from "@/types/dto"
@@ -77,6 +78,13 @@ export function DeleteWorkspaceModal({ workspace, open, onOpenChange }: Props) {
             {t("description", { name: workspace.name })}
           </DialogDescription>
         </DialogHeader>
+        {workspace.memberCount > 1 && (
+          <Alert
+            description={t("other_members_warning", {
+              count: workspace.memberCount - 1,
+            })}
+          />
+        )}
         <div className="grid gap-3">
           <Label htmlFor="confirm-name">{t("confirm_label")}</Label>
           <Input

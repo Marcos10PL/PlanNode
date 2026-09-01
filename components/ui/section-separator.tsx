@@ -3,9 +3,14 @@ import { cn } from "@/utils";
 type Props = {
   title?: string;
   className?: string;
+  labelClassName?: string;
 };
 
-export function SectionSeparator({ title, className }: Props) {
+export function SectionSeparator({
+  title,
+  className,
+  labelClassName = "bg-sidebar",
+}: Props) {
   return (
     <div
       className={cn(
@@ -13,7 +18,12 @@ export function SectionSeparator({ title, className }: Props) {
         className,
       )}
     >
-      <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 group-data-[collapsible=icon]:hidden bg-sidebar px-2 text-muted-foreground">
+      <div
+        className={cn(
+          "absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 group-data-[collapsible=icon]:hidden px-2 text-muted-foreground",
+          labelClassName,
+        )}
+      >
         {title}
       </div>
     </div>

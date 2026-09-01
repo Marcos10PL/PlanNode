@@ -124,11 +124,13 @@ export function TaskCommentCard({
       <div className="flex-1 min-w-0 rounded-lg border bg-muted/40 flex flex-col gap-1.5">
         {!isEditing && (
           <div className="flex items-center gap-2 min-w-0 pt-3 px-3">
-            <UserAvatar
-              name={comment.user?.fullName ?? t("unknown_user")}
-              userId={comment.user?.id}
-              className="h-7 w-7 shrink-0"
-            />
+            {comment.user && (
+              <UserAvatar
+                name={comment.user.fullName}
+                userId={comment.user.id}
+                className="h-7 w-7 shrink-0"
+              />
+            )}
             <div className="text-sm opacity-90 flex items-center gap-0.5 min-w-0">
               <TaskEventAuthor user={comment.user} />
             </div>

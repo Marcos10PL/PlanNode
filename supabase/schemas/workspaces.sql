@@ -69,6 +69,11 @@ RETURNS uuid AS $$
   SELECT owner_id FROM public.workspaces WHERE id = p_workspace_id;
 $$ LANGUAGE sql SECURITY DEFINER SET search_path = '';
 
+CREATE OR REPLACE FUNCTION public.get_owned_workspace_count(p_user_id uuid)
+RETURNS integer AS $$
+  SELECT count(*)::integer FROM public.workspaces WHERE owner_id = p_user_id;
+$$ LANGUAGE sql SECURITY DEFINER SET search_path = '';
+
 -- Policies: workspaces
 CREATE POLICY "Users can see workspaces they are members of"
 ON public.workspaces FOR SELECT
@@ -192,6 +197,49 @@ CREATE OR REPLACE TRIGGER on_workspace_created
   AFTER INSERT ON public.workspaces
   FOR EACH ROW EXECUTE PROCEDURE public.add_workspace_owner();
 
+-- Atomically transfers ownership. Only the current owner may call this. The
+-- target must already be a member (any role). Previous owner becomes 'admin'.
+CREATE OR REPLACE FUNCTION public.transfer_workspace_ownership(
+  p_workspace_id uuid,
+  p_new_owner_id uuid
+)
+RETURNS void
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  IF public.get_workspace_member_role(p_workspace_id, auth.uid()) IS DISTINCT FROM 'owner'::public.workspace_role THEN
+    RAISE EXCEPTION 'Only the workspace owner can transfer ownership';
+  END IF;
+
+  IF p_new_owner_id = auth.uid() THEN
+    RAISE EXCEPTION 'Cannot transfer ownership to yourself';
+  END IF;
+
+  IF NOT public.is_workspace_member(p_workspace_id, p_new_owner_id) THEN
+    RAISE EXCEPTION 'Target user is not a member of this workspace';
+  END IF;
+
+  IF public.get_owned_workspace_count(p_new_owner_id) >= COALESCE(
+    (SELECT (value #>> '{}')::integer FROM public.app_config WHERE key = 'max_workspaces_per_user'),
+    15
+  ) THEN
+    RAISE EXCEPTION 'workspace_limit_reached';
+  END IF;
+
+  UPDATE public.workspaces
+  SET owner_id = p_new_owner_id
+  WHERE id = p_workspace_id;
+
+  UPDATE public.workspace_members
+  SET role = 'owner'
+  WHERE workspace_id = p_workspace_id AND id = p_new_owner_id;
+
+  UPDATE public.workspace_members
+  SET role = 'admin'
+  WHERE workspace_id = p_workspace_id AND id = auth.uid();
+END;
+$$;
+
 -- Trigger: update updated_at on workspace/member changes
 CREATE OR REPLACE FUNCTION public.set_workspaces_updated_at()
 RETURNS TRIGGER AS $$
@@ -225,8 +273,10 @@ REVOKE ALL ON public.workspace_invitations FROM anon;
 REVOKE EXECUTE ON FUNCTION public.is_workspace_member(uuid, uuid) FROM anon;
 REVOKE EXECUTE ON FUNCTION public.get_workspace_member_role(uuid, uuid) FROM anon;
 REVOKE EXECUTE ON FUNCTION public.get_workspace_owner(uuid) FROM anon;
+REVOKE EXECUTE ON FUNCTION public.get_owned_workspace_count(uuid) FROM anon;
 REVOKE EXECUTE ON FUNCTION public.add_workspace_owner() FROM anon;
 REVOKE EXECUTE ON FUNCTION public.set_workspaces_updated_at() FROM anon;
+REVOKE EXECUTE ON FUNCTION public.transfer_workspace_ownership(uuid, uuid) FROM anon;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.workspaces TO authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.workspace_members TO authenticated;

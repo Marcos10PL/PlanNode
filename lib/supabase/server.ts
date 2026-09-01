@@ -71,3 +71,20 @@ export async function isProjectManager(
 
   return !!data;
 }
+
+export async function resolveProfilesByIds(
+  supabase: Client,
+  ids: (string | null | undefined)[],
+) {
+  const uniqueIds = [...new Set(ids.filter((id): id is string => !!id))];
+  if (uniqueIds.length === 0) {
+    return new Map<string, { full_name: string; email: string }>();
+  }
+
+  const { data } = await supabase
+    .from("profiles")
+    .select("id, full_name, email")
+    .in("id", uniqueIds);
+
+  return new Map((data ?? []).map(p => [p.id, p]));
+}

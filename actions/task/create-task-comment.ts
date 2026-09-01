@@ -72,7 +72,7 @@ export async function createTaskCommentAction(
               p_type: NOTIFICATION_TYPES.TASK_COMMENT_ADDED,
               p_metadata: {
                 taskTitle: task.title,
-                commenterName: commenterProfile.full_name,
+                commenterId: user.id,
                 taskId,
               },
               p_link: taskPath,

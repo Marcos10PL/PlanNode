@@ -163,7 +163,20 @@
     "email_change_cancel_failed": "Could not cancel email change",
     "password_update_success": "Password updated successfully",
     "password_update_failed": "Could not update password",
-    "password_same_as_old": "New password must be different from the current one"
+    "password_same_as_old": "New password must be different from the current one",
+    "danger_zone_title": "Danger zone",
+    "danger_zone_description": "Deleting your account is permanent and cannot be undone.",
+    "delete_account": "Delete account",
+    "delete_account_title": "Delete account",
+    "delete_account_description": "This will permanently delete your account. Enter your password to confirm.",
+    "delete_account_confirm_label": "Password",
+    "delete_account_cancel": "Cancel",
+    "delete_account_submit": "Delete account",
+    "delete_account_submitting": "Deleting...",
+    "delete_account_error": "Could not delete account",
+    "delete_account_blocked_error": "You are the sole owner of a workspace with other members",
+    "delete_account_blocked_description": "You are the sole owner of the following workspace(s) with other members. Transfer ownership or delete the workspace before deleting your account:",
+    "delete_account_blocked_delete_link": "Go to workspaces"
   },
   "landing": {
     "hero": {
@@ -290,7 +303,8 @@
       "submitting": "Deleting...",
       "success": "Workspace deleted",
       "error": "Could not delete workspace",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "other_members_warning": "This workspace has {count} other member(s) who will lose access. If you want to keep the workspace, transfer ownership instead."
     }
   },
   "settings": {
@@ -367,7 +381,19 @@
     "role_info_label": "Click to see role information",
     "role_admin_description": "Can invite members, change roles, and manage content. Cannot delete the workspace.",
     "role_member_description": "Standard access to workspace content. Cannot manage members.",
-    "role_guest_description": "Limited access to selected resources only."
+    "role_guest_description": "Limited access to selected resources only.",
+    "transfer_ownership": "Change owner",
+    "transfer_ownership_confirm_title": "Transfer ownership",
+    "transfer_ownership_confirm_description": "Are you sure you want to make {name} the owner of this workspace? You will become an admin.",
+    "transfer_ownership_success": "Ownership transferred",
+    "transfer_ownership_error": "Could not transfer ownership",
+    "transfer_ownership_limit_reached": "This member already owns the maximum number of workspaces",
+    "transfer_ownership_description": "Choose a member of \"{name}\" to become the new owner. You will become an admin.",
+    "transfer_ownership_loading": "Loading members...",
+    "transfer_ownership_no_other_members": "This workspace has no other members to transfer ownership to.",
+    "transfer_ownership_cancel": "Cancel",
+    "transfer_ownership_submit": "Transfer ownership",
+    "transfer_ownership_submitting": "Transferring..."
   },
   "notifications": {
     "title": "Notifications",
@@ -381,11 +407,12 @@
     "new_badge": "New",
     "delete": "Delete",
     "view": "View",
-    "workspace_invitation_title": "{inviterName} invited you to \"{workspaceName}\"",
-    "task_assigned_title": "{assignerName} assigned you the task \"{taskTitle}\" in \"{projectName}\"",
-    "project_member_added_title": "{addedByName} added you to the project \"{projectName}\"",
-    "task_comment_added_title": "{commenterName} commented on the task \"{taskTitle}\"",
-    "workspace_role_changed_title": "{changedByName} changed your role in \"{workspaceName}\"",
+    "workspace_invitation_title": "<actor>{inviterName}</actor> invited you to \"{workspaceName}\"",
+    "task_assigned_title": "<actor>{assignerName}</actor> assigned you the task \"{taskTitle}\" in \"{projectName}\"",
+    "project_member_added_title": "<actor>{addedByName}</actor> added you to the project \"{projectName}\"",
+    "task_comment_added_title": "<actor>{commenterName}</actor> commented on the task \"{taskTitle}\"",
+    "workspace_role_changed_title": "<actor>{changedByName}</actor> changed your role in \"{workspaceName}\"",
+    "show_email": "Click to see the email",
     "loading_more": "Loading more...",
     "all_disabled_title": "All notifications are turned off",
     "all_disabled_description": "You won't receive any email or in-app notifications. You can turn them back on in notification settings.",
@@ -708,7 +735,7 @@
     "activity": {
       "loading": "Loading...",
       "empty": "No activity yet",
-      "unknown_user": "Unknown user",
+      "unknown_user": "Deleted account",
       "you": "You",
       "task_created": "Task created",
       "status_changed": "Status changed from \"{from}\" to \"{to}\"",

@@ -123,7 +123,7 @@ export async function createTaskAction(
           p_metadata: {
             taskTitle: title,
             projectName: project.name,
-            assignerName: assignerProfile.full_name,
+            assignerId: user.id,
             taskId: task.id,
           },
           p_link: taskPath,

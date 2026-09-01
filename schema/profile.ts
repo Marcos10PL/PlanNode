@@ -35,6 +35,11 @@ export const updatePasswordWithCurrentSchema = (t?: Translations) =>
       path: ["confirmPassword"],
     });
 
+export const deleteAccountSchema = (t?: Translations) =>
+  z.object({
+    password: z.string().min(1, t?.("field_required")),
+  });
+
 export const profileSettingsSchema = (t?: Translations) =>
   z
     .object({
@@ -65,4 +70,7 @@ export type UpdatePasswordWithCurrentSchema = z.infer<
 >;
 export type ProfileSettingsSchema = z.infer<
   ReturnType<typeof profileSettingsSchema>
+>;
+export type DeleteAccountSchema = z.infer<
+  ReturnType<typeof deleteAccountSchema>
 >;
