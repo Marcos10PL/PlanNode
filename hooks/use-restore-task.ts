@@ -18,7 +18,9 @@ export function useRestoreTask() {
         toast.error(
           result.error === ERRORS.INSUFFICIENT_ROLE
             ? t("common.insufficient_role")
-            : t("tasks.trash.restore_error"),
+            : result.error === ERRORS.CANNOT_RESTORE_WHILE_ANCESTOR_TRASHED
+              ? t("tasks.trash.restore_ancestor_trashed_error")
+              : t("tasks.trash.restore_error"),
         );
         return false;
       }

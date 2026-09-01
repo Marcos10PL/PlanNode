@@ -326,15 +326,40 @@ USING (
   )
 );
 
--- RPC: bulk-update task positions (and optionally status) in a single UPDATE
+-- RPC: bulk-update task positions (and optionally status) in a single UPDATE,
+-- logging a status_changed task_event for any row whose status actually
+-- changed (mirrors what update-task.ts does for status changes made via the
+-- task modal, so a Kanban drag is not silently missing from the activity log)
 CREATE OR REPLACE FUNCTION public.reorder_tasks(p_list_id uuid, p_changes jsonb)
 RETURNS void AS $$
-  UPDATE public.tasks t
-  SET position = c.position,
-      status = COALESCE(c.status, t.status)
-  FROM jsonb_to_recordset(p_changes) AS c(id uuid, position integer, status public.task_status)
-  WHERE t.id = c.id
-    AND t.list_id = p_list_id;
+  WITH changes AS (
+    SELECT * FROM jsonb_to_recordset(p_changes) AS c(id uuid, position integer, status public.task_status)
+  ),
+  before AS (
+    SELECT t.id, t.status AS old_status
+    FROM public.tasks t
+    JOIN changes c ON c.id = t.id
+    WHERE t.list_id = p_list_id
+  ),
+  updated AS (
+    UPDATE public.tasks t
+    SET position = c.position,
+        status = COALESCE(c.status, t.status)
+    FROM changes c
+    WHERE t.id = c.id
+      AND t.list_id = p_list_id
+    RETURNING t.id, t.status AS new_status
+  ),
+  logged AS (
+    INSERT INTO public.task_events (task_id, user_id, type, metadata)
+    SELECT u.id, auth.uid(), 'status_changed',
+           jsonb_build_object('from', b.old_status, 'to', u.new_status)
+    FROM updated u
+    JOIN before b ON b.id = u.id
+    WHERE b.old_status IS DISTINCT FROM u.new_status
+    RETURNING 1
+  )
+  SELECT count(*) FROM logged;
 $$ LANGUAGE sql SET search_path = '';
 
 -- Trigger: subtasks are limited to one level of nesting and must stay
@@ -558,6 +583,10 @@ REVOKE EXECUTE ON FUNCTION public.create_project_with_default_list(
   uuid, text, text, boolean, text, text, integer, text
 ) FROM anon;
 REVOKE EXECUTE ON FUNCTION public.reorder_tasks(uuid, jsonb) FROM anon;
+REVOKE EXECUTE ON FUNCTION public.validate_subtask_parent() FROM anon;
+REVOKE EXECUTE ON FUNCTION public.enforce_private_project_change() FROM anon;
+REVOKE EXECUTE ON FUNCTION public.clear_assignee_on_project_member_removed() FROM anon;
+REVOKE EXECUTE ON FUNCTION public.clear_assignee_on_workspace_member_removed() FROM anon;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.projects TO authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.project_favorites TO authenticated;

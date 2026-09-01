@@ -1,6 +1,6 @@
-import Footer from "@/components/app-footer";
-import LanguageSwitcher from "@/components/language-switcher";
-import Logo from "@/components/app-logo";
+import { AppFooter } from "@/components/app-footer";
+import { AppLogo } from "@/components/app-logo";
+import { LanguageSwitcher } from "@/components/language-switcher";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { routing } from "@/i18n/routing";
 import { hasLocale } from "next-intl";
@@ -30,7 +30,7 @@ export default async function AuthLayout({
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-sm">
         <div className="flex justify-between items-center mb-4 px-2">
-          <Logo />
+          <AppLogo />
           <div className="flex items-center gap-2">
             <LanguageSwitcher />
             <ThemeSwitcher />
@@ -39,7 +39,7 @@ export default async function AuthLayout({
 
         {children}
 
-        <Footer withoutLogo />
+        <AppFooter withoutLogo />
       </div>
     </div>
   );

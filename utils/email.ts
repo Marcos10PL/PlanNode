@@ -47,6 +47,14 @@ export async function renderLocalizedEmailTemplate(
   return renderEmailTemplate(`${name}_${locale}`, variables, client);
 }
 
+const escapeHtml = (str: string) =>
+  str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+
 async function renderEmailTemplate(
   name: string,
   variables: Record<string, string | null> = {},
@@ -62,7 +70,7 @@ async function renderEmailTemplate(
   if (!template) throw new Error(`Email template "${name}" not found`);
 
   const render = (str: string) =>
-    str.replace(/\{\{(\w+)\}\}/g, (_, key) => variables[key] ?? "");
+    str.replace(/\{\{(\w+)\}\}/g, (_, key) => escapeHtml(variables[key] ?? ""));
 
   return { subject: render(template.subject), html: render(template.html) };
 }

@@ -1,9 +1,9 @@
 ﻿import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import Container from "@/components/ui/container";
-import { Link } from "@/i18n/navigation";
+import { Container } from "@/components/ui/container";
 import { LINKS } from "@/const";
-import { Globe, ArrowRight } from "lucide-react";
+import { Link } from "@/i18n/navigation";
+import { ArrowRight, Globe } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 export function HeroSection() {

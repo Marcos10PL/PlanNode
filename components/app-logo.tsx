@@ -19,7 +19,7 @@ const mainSizeMap: Record<Sizes, string> = {
   "5xl": "text-5xl",
 } as const;
 
-export default function AppLogo({ size = "xl", className }: Props) {
+export function AppLogo({ size = "xl", className }: Props) {
   return (
     <Link
       href="/"

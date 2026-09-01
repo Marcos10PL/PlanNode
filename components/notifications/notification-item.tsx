@@ -4,9 +4,10 @@ import { deleteNotificationAction } from "@/actions/notifications/delete-notific
 import { markNotificationReadAction } from "@/actions/notifications/mark-read";
 import { Badge } from "@/components/ui/badge";
 import { DeleteButton } from "@/components/ui/delete-button";
+import { FormattedDate } from "@/components/ui/formatted-date";
 import { TooltipIconButton } from "@/components/ui/tooltip-icon-button";
 import { Notification } from "@/types/dto";
-import { cn, formatDate } from "@/utils";
+import { cn } from "@/utils";
 import { ExternalLink } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -112,7 +113,7 @@ export function NotificationItem({
           )}
         </div>
         <p className="text-xs text-muted-foreground mt-1">
-          {formatDate(notification.createdAt, locale)}
+          <FormattedDate value={notification.createdAt} locale={locale} />
         </p>
       </div>
 

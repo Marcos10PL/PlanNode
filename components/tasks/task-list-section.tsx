@@ -108,8 +108,9 @@ export function TaskListSection({
 
   const [tasks, setTasks] = useState<Task[]>(list.tasks);
   const [prevListTasks, setPrevListTasks] = useState(list.tasks);
+  const [pendingReorderCount, setPendingReorderCount] = useState(0);
 
-  if (list.tasks !== prevListTasks) {
+  if (list.tasks !== prevListTasks && pendingReorderCount === 0) {
     setPrevListTasks(list.tasks);
     setTasks(list.tasks);
   }
@@ -185,6 +186,7 @@ export function TaskListSection({
 
     const previousTasks = tasks;
 
+    setPendingReorderCount(n => n + 1);
     setTimeout(async () => {
       const positionById = new Map(changes.map(c => [c.id, c.position]));
       setTasks(prev =>
@@ -210,6 +212,8 @@ export function TaskListSection({
         setTasks(previousTasks);
         toast.error(tRoot("common.unexpected_error"));
         router.refresh();
+      } finally {
+        setPendingReorderCount(n => n - 1);
       }
     }, 0);
   };
@@ -234,6 +238,7 @@ export function TaskListSection({
 
       const previousTasks = tasks;
 
+      setPendingReorderCount(n => n + 1);
       setTimeout(async () => {
         const positionById = new Map(changes.map(c => [c.id, c.position]));
         setTasks(prev =>
@@ -255,6 +260,8 @@ export function TaskListSection({
           setTasks(previousTasks);
           toast.error(tRoot("common.unexpected_error"));
           router.refresh();
+        } finally {
+          setPendingReorderCount(n => n - 1);
         }
       }, 0);
     };
@@ -303,8 +310,8 @@ export function TaskListSection({
   ).length;
 
   const handleDelete = async () => {
-    await remove(list.id);
-    setDeleteOpen(false);
+    const ok = await remove(list.id);
+    if (ok) setDeleteOpen(false);
   };
 
   const openCreateTask = (status?: TaskStatus) => {

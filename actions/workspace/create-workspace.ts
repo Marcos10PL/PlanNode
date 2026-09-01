@@ -33,7 +33,9 @@ export async function createWorkspaceAction(data: CreateWorkspaceSchema) {
   if (countError) return { error: ERRORS.SERVER_ERROR };
 
   const limit =
-    Number(configRow?.value ?? 0) ?? MAX_WORKSPACES_PER_USER_FALLBACK;
+    configRow?.value != null
+      ? Number(configRow.value)
+      : MAX_WORKSPACES_PER_USER_FALLBACK;
 
   if ((count ?? 0) >= limit) return { error: ERRORS.WORKSPACE_LIMIT_REACHED };
 

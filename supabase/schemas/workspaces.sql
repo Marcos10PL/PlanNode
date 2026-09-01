@@ -114,10 +114,16 @@ CREATE POLICY "Members can see other members in same workspace"
 ON public.workspace_members FOR SELECT
 USING (public.is_workspace_member(workspace_id, (SELECT auth.uid())));
 
+-- 'owner' is intentionally excluded from every member-facing INSERT/UPDATE
+-- check below: the only two legitimate ways to hold that role are the
+-- add_workspace_owner trigger (workspace creation) and
+-- transfer_workspace_ownership() (both SECURITY DEFINER, both bypass RLS as
+-- the table owner). No direct client-facing write path may ever set it.
 CREATE POLICY "Admins/owners can add members"
 ON public.workspace_members FOR INSERT
 WITH CHECK (
   public.get_workspace_member_role(workspace_id, (SELECT auth.uid())) IN ('owner', 'admin')
+  AND role != 'owner'::public.workspace_role
 );
 
 -- Allows invited users to accept their invitation by inserting their own membership
@@ -125,6 +131,7 @@ CREATE POLICY "Invited users can join workspace"
 ON public.workspace_members FOR INSERT
 WITH CHECK (
   id = (SELECT auth.uid())
+  AND role != 'owner'::public.workspace_role
   AND EXISTS (
     SELECT 1 FROM public.workspace_invitations wi
     JOIN public.profiles p ON p.email = wi.email
@@ -139,12 +146,16 @@ CREATE POLICY "Admins/owners can update members"
 ON public.workspace_members FOR UPDATE
 USING (
   public.get_workspace_member_role(workspace_id, (SELECT auth.uid())) IN ('owner', 'admin')
+)
+WITH CHECK (
+  role != 'owner'::public.workspace_role
 );
 
 CREATE POLICY "Admins/owners can remove members"
 ON public.workspace_members FOR DELETE
 USING (
   public.get_workspace_member_role(workspace_id, (SELECT auth.uid())) IN ('owner', 'admin')
+  AND role != 'owner'::public.workspace_role
 );
 
 CREATE POLICY "Members can leave workspace"
@@ -166,6 +177,7 @@ CREATE POLICY "Admins/owners can create invitations"
 ON public.workspace_invitations FOR INSERT
 WITH CHECK (
   public.get_workspace_member_role(workspace_id, (SELECT auth.uid())) IN ('owner', 'admin')
+  AND role != 'owner'::public.workspace_role
 );
 
 CREATE POLICY "Invited users can update their invitation status"
@@ -207,7 +219,7 @@ RETURNS void
 LANGUAGE plpgsql
 AS $$
 BEGIN
-  IF public.get_workspace_member_role(p_workspace_id, auth.uid()) IS DISTINCT FROM 'owner'::public.workspace_role THEN
+  IF public.get_workspace_owner(p_workspace_id) IS DISTINCT FROM auth.uid() THEN
     RAISE EXCEPTION 'Only the workspace owner can transfer ownership';
   END IF;
 

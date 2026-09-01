@@ -15,7 +15,7 @@ export async function restoreTaskAction(taskId: string) {
 
   const { data: task, error: fetchError } = await supabase
     .from("tasks")
-    .select("project_id")
+    .select("project_id, task_lists(deleted_at), projects(deleted_at)")
     .eq("id", taskId)
     .single();
 
@@ -23,6 +23,10 @@ export async function restoreTaskAction(taskId: string) {
 
   if (!(await canEditProject(supabase, task.project_id, user.id)))
     return { error: ERRORS.INSUFFICIENT_ROLE };
+
+  if (task.task_lists?.deleted_at || task.projects?.deleted_at) {
+    return { error: ERRORS.CANNOT_RESTORE_WHILE_ANCESTOR_TRASHED };
+  }
 
   const { data: subtasks } = await supabase
     .from("tasks")

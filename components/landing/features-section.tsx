@@ -1,5 +1,5 @@
-import Container from "@/components/ui/container";
-import { LayoutDashboard, Clock, Users, Globe } from "lucide-react";
+import { Container } from "@/components/ui/container";
+import { Clock, Globe, LayoutDashboard, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 const featureIcons: Record<string, React.ReactNode> = {

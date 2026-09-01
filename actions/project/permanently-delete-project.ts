@@ -15,7 +15,8 @@ export async function permanentlyDeleteProjectAction(projectId: string) {
   const { error: deleteError } = await supabase
     .from("projects")
     .delete()
-    .eq("id", projectId);
+    .eq("id", projectId)
+    .not("deleted_at", "is", null);
 
   if (deleteError) return { error: ERRORS.SERVER_ERROR };
 

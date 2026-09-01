@@ -6,7 +6,7 @@ import { descriptionField, nameField } from "./defaults";
 export const createProjectSchema = (t?: Translations) =>
   z.object({
     name: nameField(VALIDATION_MAX.PROJECT_NAME, t),
-    description: descriptionField(VALIDATION_MAX.PROJECT_DESCRIPTION),
+    description: descriptionField(VALIDATION_MAX.PROJECT_DESCRIPTION, t),
     isPrivate: z.boolean(),
     icon: z.enum(PROJECT_ICONS),
     color: z.enum(PROJECT_COLORS),

@@ -31,7 +31,8 @@ export function NotificationsActions({
   const handleDeleteAll = () => {
     startDeleteAllTransition(async () => {
       try {
-        await deleteNotificationAction({ deleteAll: true });
+        const result = await deleteNotificationAction({ deleteAll: true });
+        if (result?.error) toast.error(tCommon("unexpected_error"));
       } catch {
         toast.error(tCommon("unexpected_error"));
       }
@@ -41,7 +42,8 @@ export function NotificationsActions({
   const handleMarkAllRead = () => {
     startMarkAllReadTransition(async () => {
       try {
-        await markNotificationReadAction({ markAll: true });
+        const result = await markNotificationReadAction({ markAll: true });
+        if (result?.error) toast.error(tCommon("unexpected_error"));
       } catch {
         toast.error(tCommon("unexpected_error"));
       }

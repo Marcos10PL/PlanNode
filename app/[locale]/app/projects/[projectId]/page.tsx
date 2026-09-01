@@ -4,6 +4,7 @@ import { ProjectMembersSection } from "@/components/projects/project-members-sec
 import { AddTaskListButton } from "@/components/tasks/add-task-list-button";
 import { TaskListsGrid } from "@/components/tasks/task-lists-grid";
 import { Badge } from "@/components/ui/badge";
+import { FormattedDate } from "@/components/ui/formatted-date";
 import { TaskProgress } from "@/components/ui/task-progress";
 import { COOKIES } from "@/const";
 import {
@@ -14,7 +15,6 @@ import {
 } from "@/lib/data";
 import {
   cn,
-  formatDate,
   getProjectColorBorderClass,
   getProjectColorTextClass,
   getProjectIcon,
@@ -146,7 +146,11 @@ export default async function ProjectPage({ params }: Props) {
           <div className="text-xs text-muted-foreground italic">
             <ArrowRight color={project.color} className="mt-0.5" />
             <p className="h-3">
-              {t("created_at", { date: formatDate(project.createdAt, locale) })}
+              {t.rich("created_at", {
+                date: () => (
+                  <FormattedDate value={project.createdAt} locale={locale} />
+                ),
+              })}
             </p>
           </div>
         </div>

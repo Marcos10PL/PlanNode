@@ -16,7 +16,7 @@ import { createTaskListSchema, CreateTaskListSchema } from "@/schema";
 import { TaskListWithTasks } from "@/types/dto";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -37,9 +37,14 @@ export function TaskListModal({ projectId, list, open, onOpenChange }: Props) {
     defaultValues: { name: list?.name ?? "" },
   });
 
+  const nameRef = useRef(list?.name ?? "");
   useEffect(() => {
-    if (open) form.reset({ name: list?.name ?? "" });
-  }, [open, list, form]);
+    nameRef.current = list?.name ?? "";
+  }, [list]);
+
+  useEffect(() => {
+    if (open) form.reset({ name: nameRef.current });
+  }, [open, form]);
 
   const isChanged = list ? form.watch("name") !== list.name : true;
 

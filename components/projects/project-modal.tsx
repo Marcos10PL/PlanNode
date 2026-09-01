@@ -29,7 +29,7 @@ import { generateProjectRoute } from "@/utils/helpers";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { ProjectAppearancePicker } from "./project-appearance-picker";
@@ -77,9 +77,14 @@ export function ProjectModal({
     defaultValues: defaultValues(),
   });
 
+  const defaultValuesRef = useRef(defaultValues);
   useEffect(() => {
-    if (isOpen) form.reset(defaultValues());
-  }, [isOpen, defaultValues, form]);
+    defaultValuesRef.current = defaultValues;
+  }, [defaultValues]);
+
+  useEffect(() => {
+    if (isOpen) form.reset(defaultValuesRef.current());
+  }, [isOpen, form]);
 
   const onSubmit = async (data: CreateProjectSchema) => {
     try {

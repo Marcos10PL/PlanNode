@@ -20,7 +20,7 @@ type Props = {
   iconOnly?: boolean;
 };
 
-export default function LanguageSwitcher({ iconOnly = false }: Props) {
+export function LanguageSwitcher({ iconOnly = false }: Props) {
   const currentLocale = useLocale();
   const pathname = usePathname();
   const router = useRouter();

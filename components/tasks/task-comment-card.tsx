@@ -7,11 +7,11 @@ import { Button } from "@/components/ui/button";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { DeleteButton } from "@/components/ui/delete-button";
 import { EditButton } from "@/components/ui/edit-button";
+import { FormattedDate } from "@/components/ui/formatted-date";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
-import UserAvatar from "@/components/user-avatar";
+import { UserAvatar } from "@/components/user-avatar";
 import { ERRORS, VALIDATION_MAX } from "@/const";
 import { TaskComment } from "@/types/dto";
-import { formatDate } from "@/utils";
 import { isHtmlContentEmpty } from "@/utils/helpers";
 import { useLocale, useTranslations } from "next-intl";
 import { RefObject, useLayoutEffect, useRef, useState } from "react";
@@ -181,7 +181,7 @@ export function TaskCommentCard({
           ) : (
             <>
               <span className="text-xs text-muted-foreground">
-                {formatDate(comment.createdAt, locale)}
+                <FormattedDate value={comment.createdAt} locale={locale} />
                 {isEdited && ` (${t("comment_edited")})`}
               </span>
               <div className="flex items-center gap-0.5 shrink-0">

@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import UserAvatar from "@/components/user-avatar";
+import { UserAvatar } from "@/components/user-avatar";
 import { WorkspaceRole } from "@/types/entities";
 import { cn, getRoleLabel, getRoleVariant } from "@/utils";
 import { useTranslations } from "next-intl";

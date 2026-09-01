@@ -61,7 +61,9 @@ export function WorkspaceProvider({
 
   const setActiveWorkspace = (workspace: Workspace) => {
     setActive(workspace);
-    startTransition(() => setActiveWorkspaceAction(workspace.id));
+    startTransition(() => {
+      void setActiveWorkspaceAction(workspace.id);
+    });
   };
 
   return (

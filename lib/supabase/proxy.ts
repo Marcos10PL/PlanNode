@@ -64,13 +64,21 @@ export async function updateSession(request: NextRequest) {
   if (isProtected && !user) {
     const url = request.nextUrl.clone();
     url.pathname = `/${locale}${LINKS.LOGIN}`;
-    return NextResponse.redirect(url);
+    const redirectResponse = NextResponse.redirect(url);
+    supabaseResponse.cookies
+      .getAll()
+      .forEach(cookie => redirectResponse.cookies.set(cookie));
+    return redirectResponse;
   }
 
   if (isGuestOnly && user) {
     const url = request.nextUrl.clone();
     url.pathname = `/${locale}${LINKS.DASHBOARD}`;
-    return NextResponse.redirect(url);
+    const redirectResponse = NextResponse.redirect(url);
+    supabaseResponse.cookies
+      .getAll()
+      .forEach(cookie => redirectResponse.cookies.set(cookie));
+    return redirectResponse;
   }
 
   return supabaseResponse;

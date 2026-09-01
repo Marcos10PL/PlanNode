@@ -1,17 +1,20 @@
 import { LINKS } from "@/const";
 import { Bell } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 type Props = {
   count: number;
 };
 
-export function NotificationLink({ count }: Props) {
+export async function NotificationLink({ count }: Props) {
+  const t = await getTranslations("notifications");
+
   return (
     <Link
       href={LINKS.NOTIFICATIONS}
       className="relative inline-flex items-center justify-center h-8 w-8 rounded-md hover:bg-accent transition-colors"
-      aria-label="Notifications"
+      aria-label={t("title")}
     >
       <Bell className="h-4 w-4" />
       {count > 0 && (

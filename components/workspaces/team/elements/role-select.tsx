@@ -8,7 +8,7 @@ import { WorkspaceRole } from "@/types/entities";
 import { getRoleLabel } from "@/utils";
 
 import { useTranslations } from "next-intl";
-import { FieldValues } from "react-hook-form";
+import { Control, FieldValues, Path } from "react-hook-form";
 
 const ROLE_DESCRIPTION_KEYS: Record<Exclude<WorkspaceRole, "owner">, string> = {
   admin: "team.role_admin_description",
@@ -16,13 +16,15 @@ const ROLE_DESCRIPTION_KEYS: Record<Exclude<WorkspaceRole, "owner">, string> = {
   guest: "team.role_guest_description",
 } as const;
 
-type Props = {
+type Props<TFieldValues extends FieldValues & { role: WorkspaceRole }> = {
   pending?: boolean;
-  control: FieldValues["control"];
+  control: Control<TFieldValues>;
   noLabel?: boolean;
 };
 
-export function RoleSelect({ pending, control, noLabel }: Props) {
+export function RoleSelect<
+  TFieldValues extends FieldValues & { role: WorkspaceRole },
+>({ pending, control, noLabel }: Props<TFieldValues>) {
   const t = useTranslations();
 
   const roleOptions = INVITABLE_ROLES.map(r => ({
@@ -34,7 +36,7 @@ export function RoleSelect({ pending, control, noLabel }: Props) {
     <div className="flex items-center gap-2">
       <ControlledSelectField
         control={control}
-        name="role"
+        name={"role" as Path<TFieldValues>}
         label={noLabel ? undefined : t("team.invite_role_label")}
         options={roleOptions}
         disabled={pending}

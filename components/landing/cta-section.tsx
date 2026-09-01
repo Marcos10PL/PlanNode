@@ -1,9 +1,9 @@
 ﻿import { Button } from "@/components/ui/button";
-import Container from "@/components/ui/container";
-import { Link } from "@/i18n/navigation";
+import { Container } from "@/components/ui/container";
 import { LINKS } from "@/const";
-import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { ArrowRight } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 export async function CtaSection() {
   const t = await getTranslations("landing.cta");

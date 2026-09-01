@@ -13,20 +13,21 @@ export async function markNotificationReadAction(
 
   const readAt = new Date().toISOString();
 
-  if ("markAll" in opts) {
-    await supabase
-      .from("notifications")
-      .update({ read_at: readAt })
-      .eq("user_id", user.id)
-      .is("read_at", null);
-  } else {
-    await supabase
-      .from("notifications")
-      .update({ read_at: readAt })
-      .eq("id", opts.id)
-      .eq("user_id", user.id)
-      .is("read_at", null);
-  }
+  const { error } =
+    "markAll" in opts
+      ? await supabase
+          .from("notifications")
+          .update({ read_at: readAt })
+          .eq("user_id", user.id)
+          .is("read_at", null)
+      : await supabase
+          .from("notifications")
+          .update({ read_at: readAt })
+          .eq("id", opts.id)
+          .eq("user_id", user.id)
+          .is("read_at", null);
+
+  if (error) return { error: ERRORS.SERVER_ERROR };
 
   revalidatePath(LINKS.NOTIFICATIONS);
   return { success: true };

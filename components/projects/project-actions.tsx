@@ -56,8 +56,10 @@ export function ProjectActions({
 
   const handleDelete = async () => {
     const deleted = await remove(project.id);
-    if (deleted) router.push(LINKS.PROJECTS);
-    setDeleteOpen(false);
+    if (deleted) {
+      router.push(LINKS.PROJECTS);
+      setDeleteOpen(false);
+    }
   };
 
   return (

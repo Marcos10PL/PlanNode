@@ -24,7 +24,7 @@ export function SortableTaskCard({
   const { ref, handleRef, isDragging } = useSortable({
     id: task.id,
     index,
-    group: task.status,
+    group: task.parentTaskId ?? task.status,
     disabled: !dragEnabled,
   });
 

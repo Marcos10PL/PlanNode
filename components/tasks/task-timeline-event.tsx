@@ -1,5 +1,6 @@
 "use client";
 
+import { FormattedDate } from "@/components/ui/formatted-date";
 import { InfoPopover } from "@/components/ui/info-popover";
 import { TASK_EVENT_TYPES } from "@/const";
 import {
@@ -101,7 +102,9 @@ export function TaskTimelineEvent({ event }: Props) {
       <div className="opacity-90">{describeEvent()}</div>
       <div className="text-muted-foreground mt-0.5 flex items-center gap-0.5">
         <TaskEventAuthor user={event.user} />
-        <span>· {formatDate(event.createdAt, locale)}</span>
+        <span>
+          · <FormattedDate value={event.createdAt} locale={locale} />
+        </span>
       </div>
     </div>
   );

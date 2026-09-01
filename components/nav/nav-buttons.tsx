@@ -1,10 +1,10 @@
 import { Suspense } from "react";
-import LanguageSwitcher from "../language-switcher";
+import { AuthButton } from "../auth/auth-button";
+import { LanguageSwitcher } from "../language-switcher";
 import { ThemeSwitcher } from "../theme-switcher";
 import { Separator } from "../ui/separator";
-import { AuthButton } from "../auth/auth-button";
 
-export default function NavButtons() {
+export function NavButtons() {
   return (
     <div className="flex items-center gap-2 h-full">
       <ThemeSwitcher />

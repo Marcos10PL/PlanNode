@@ -23,11 +23,16 @@
     "sort_by": "Sort by:",
     "loading_more": "Loading more...",
     "restore": "Restore",
-    "deleted_at": "Deleted {date}",
+    "deleted_at": "Deleted <date></date>",
     "editor_link_add": "Add",
     "editor_link_save": "Save",
     "editor_link_placeholder": "https://...",
     "editor_link_invalid": "Invalid URL",
+    "editor_bold": "Bold",
+    "editor_italic": "Italic",
+    "editor_bullet_list": "Bullet list",
+    "editor_ordered_list": "Ordered list",
+    "editor_link": "Link",
     "default_list_name": "List"
   },
   "footer": {
@@ -449,6 +454,7 @@
     "error_email_mismatch": "This invitation was sent to a different email address."
   },
   "sidebar": {
+    "dashboard": "Dashboard",
     "projects": "Projects",
     "all_projects": "Active",
     "favorites": "Favorites",
@@ -491,7 +497,7 @@
     "back_to_projects": "Back to projects",
     "show_more": "Show more",
     "show_less": "Show less",
-    "created_at": "Created {date}",
+    "created_at": "Created <date></date>",
     "sort": {
       "custom": "Default",
       "newest": "Newest",
@@ -710,6 +716,7 @@
       "no_tasks": "No deleted tasks",
       "restore_success": "Restored",
       "restore_error": "Could not restore",
+      "restore_ancestor_trashed_error": "Restore the list or project first",
       "subtask_of": "subtask of \"{title}\"",
       "in_list": "in list: {name}",
       "sort": {

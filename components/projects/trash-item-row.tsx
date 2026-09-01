@@ -1,8 +1,8 @@
 "use client";
 
 import { DeleteButton } from "@/components/ui/delete-button";
+import { FormattedDate } from "@/components/ui/formatted-date";
 import { TooltipIconButton } from "@/components/ui/tooltip-icon-button";
-import { formatDate } from "@/utils/formatters";
 import { RotateCcw } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
@@ -49,7 +49,9 @@ export function TrashItemRow({
           </p>
         )}
         <p className="text-xs text-muted-foreground">
-          {t("deleted_at", { date: formatDate(deletedAt, locale) })}
+          {t.rich("deleted_at", {
+            date: () => <FormattedDate value={deletedAt} locale={locale} />,
+          })}
           {postfix && <> {postfix}</>}
         </p>
       </div>

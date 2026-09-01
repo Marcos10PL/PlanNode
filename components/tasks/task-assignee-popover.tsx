@@ -6,7 +6,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import UserAvatar from "@/components/user-avatar";
+import { UserAvatar } from "@/components/user-avatar";
 import { TaskAssignee, WorkspaceMember } from "@/types/dto";
 import { UserRoundPlus } from "lucide-react";
 import { useTranslations } from "next-intl";

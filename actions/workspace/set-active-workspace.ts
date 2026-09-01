@@ -1,6 +1,6 @@
 ﻿"use server";
 
-import { COOKIES } from "@/const";
+import { COOKIES, ERRORS } from "@/const";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 
@@ -12,7 +12,17 @@ export async function setActiveWorkspaceAction(workspaceId: string) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) return;
+  if (!user) return { error: ERRORS.UNAUTHENTICATED };
+
+  const { data: member, error } = await supabase
+    .from("workspace_members")
+    .select("id")
+    .eq("workspace_id", workspaceId)
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (error) return { error: ERRORS.SERVER_ERROR };
+  if (!member) return { error: ERRORS.UNAUTHORIZED };
 
   const cookieStore = await cookies();
 
@@ -22,4 +32,6 @@ export async function setActiveWorkspaceAction(workspaceId: string) {
     path: "/",
     maxAge: MAX_AGE,
   });
+
+  return { success: true };
 }

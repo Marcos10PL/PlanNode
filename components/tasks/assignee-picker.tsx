@@ -12,7 +12,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import UserAvatar from "@/components/user-avatar";
+import { UserAvatar } from "@/components/user-avatar";
 import { WorkspaceMember } from "@/types/dto";
 import { cn } from "@/utils";
 import { ChevronDown } from "lucide-react";

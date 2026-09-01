@@ -1,4 +1,4 @@
-import Container from "@/components/ui/container";
+import { Container } from "@/components/ui/container";
 import { useTranslations } from "next-intl";
 
 type FaqItem = { question: string; answer: string };

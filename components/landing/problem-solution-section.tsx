@@ -1,6 +1,6 @@
-import Container from "@/components/ui/container";
+import { Container } from "@/components/ui/container";
+import { CheckCircle2, XCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { XCircle, CheckCircle2 } from "lucide-react";
 
 export function ProblemSolutionSection() {
   const t = useTranslations("landing.problem_solution");

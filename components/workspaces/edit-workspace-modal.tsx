@@ -16,7 +16,7 @@ import { updateWorkspaceSchema, UpdateWorkspaceSchema } from "@/schema";
 import { Workspace } from "@/types/dto";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -31,22 +31,27 @@ export function EditWorkspaceModal({ workspace, open, onOpenChange }: Props) {
   const tErrors = useTranslations("fields.errors");
   const tCommon = useTranslations("common");
 
-  const form = useForm<UpdateWorkspaceSchema>({
-    resolver: zodResolver(updateWorkspaceSchema(tErrors)),
-    defaultValues: {
+  const defaultValues = useCallback(
+    (): UpdateWorkspaceSchema => ({
       name: workspace.name,
       description: workspace.description ?? "",
-    },
+    }),
+    [workspace],
+  );
+
+  const form = useForm<UpdateWorkspaceSchema>({
+    resolver: zodResolver(updateWorkspaceSchema(tErrors)),
+    defaultValues: defaultValues(),
   });
 
+  const defaultValuesRef = useRef(defaultValues);
   useEffect(() => {
-    if (open) {
-      form.reset({
-        name: workspace.name,
-        description: workspace.description ?? "",
-      });
-    }
-  }, [open, workspace, form]);
+    defaultValuesRef.current = defaultValues;
+  }, [defaultValues]);
+
+  useEffect(() => {
+    if (open) form.reset(defaultValuesRef.current());
+  }, [open, form]);
 
   const onSubmit = async (data: UpdateWorkspaceSchema) => {
     try {

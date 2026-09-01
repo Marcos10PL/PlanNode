@@ -8,11 +8,11 @@ import { useUser } from "@/components/providers/user-provider";
 import { Button } from "@/components/ui/button";
 import { ControlledInputField } from "@/components/ui/controlled-input-field";
 import { ControlledPasswordField } from "@/components/ui/controlled-password-field";
+import { FormattedDate } from "@/components/ui/formatted-date";
 import { Link } from "@/components/ui/link";
 import { Separator } from "@/components/ui/separator";
 import { ERRORS, LINKS, VALIDATION_MAX } from "@/const";
 import { profileSettingsSchema, ProfileSettingsSchema } from "@/schema";
-import { formatDate } from "@/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
@@ -224,10 +224,12 @@ export function ProfileForm({ blockingWorkspaces }: Props) {
         <div className="flex flex-col-reverse md:flex-row gap-6 md:items-end justify-between">
           <div className="space-y-1 text-xs text-muted-foreground">
             <p>
-              {t("created_at")}: {formatDate(profile.createdAt, locale)}
+              {t("created_at")}:{" "}
+              <FormattedDate value={profile.createdAt} locale={locale} />
             </p>
             <p>
-              {t("updated_at")}: {formatDate(profile.updatedAt, locale)}
+              {t("updated_at")}:{" "}
+              <FormattedDate value={profile.updatedAt} locale={locale} />
             </p>
           </div>
           <Button

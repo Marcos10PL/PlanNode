@@ -13,12 +13,17 @@ export const fullNameField = (t?: Translations) =>
     .string()
     .trim()
     .min(1, t?.("full_name_required"))
-    .max(VALIDATION_MAX.FULL_NAME);
+    .max(VALIDATION_MAX.FULL_NAME, t?.("field_too_long"));
 
 export const nameField = (max: number, t?: Translations) =>
-  z.string().trim().min(1, t?.("field_required")).max(max);
+  z
+    .string()
+    .trim()
+    .min(1, t?.("field_required"))
+    .max(max, t?.("field_too_long"));
 
-export const descriptionField = (max: number) => z.string().trim().max(max);
+export const descriptionField = (max: number, t?: Translations) =>
+  z.string().trim().max(max, t?.("field_too_long"));
 
 export const htmlContentField = (max: number, t?: Translations) =>
   z

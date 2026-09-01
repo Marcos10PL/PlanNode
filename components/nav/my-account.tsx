@@ -18,7 +18,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { useUser } from "../providers/user-provider";
-import UserAvatar from "../user-avatar";
+import { UserAvatar } from "../user-avatar";
 
 export function MyAccount() {
   const router = useRouter();

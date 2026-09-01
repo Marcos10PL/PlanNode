@@ -27,7 +27,8 @@ export async function permanentlyDeleteTaskListAction(listId: string) {
   const { error: deleteError } = await supabase
     .from("task_lists")
     .delete()
-    .eq("id", listId);
+    .eq("id", listId)
+    .not("deleted_at", "is", null);
 
   if (deleteError) return { error: ERRORS.SERVER_ERROR };
 

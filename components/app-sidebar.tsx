@@ -17,7 +17,7 @@ import { cn, isActivePath } from "@/utils";
 import { LayoutDashboard } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import LanguageSwitcher from "./language-switcher";
+import { LanguageSwitcher } from "./language-switcher";
 import { SidebarProjects } from "./nav/sidebar-projects";
 import { ThemeSwitcher } from "./theme-switcher";
 import { WorkspaceSwitcher } from "./workspaces/workspace-switcher";
@@ -52,14 +52,14 @@ export function AppSidebar({
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarMenuButton asChild tooltip="Dashboard">
+          <SidebarMenuButton asChild tooltip={t("sidebar.dashboard")}>
             <Link
               href={LINKS.DASHBOARD}
               className={cn(isActive(LINKS.DASHBOARD))}
               onClick={() => setOpenMobile(false)}
             >
               <LayoutDashboard className="mr-1" />
-              Dashboard
+              {t("sidebar.dashboard")}
             </Link>
           </SidebarMenuButton>
         </SidebarGroup>

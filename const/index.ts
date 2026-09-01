@@ -54,6 +54,8 @@ export const ERRORS = {
   PROJECT_NOT_FOUND: "project_not_found",
   INVALID_ASSIGNEE: "invalid_assignee",
   CANNOT_DELETE_LAST_LIST: "cannot_delete_last_list",
+  CANNOT_RESTORE_WHILE_ANCESTOR_TRASHED:
+    "cannot_restore_while_ancestor_trashed",
 } as const;
 
 export const VALIDATION_MAX = {

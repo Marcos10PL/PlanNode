@@ -76,7 +76,25 @@ SET search_path = ''
 AS $$
   INSERT INTO public.notifications (user_id, type, metadata, link)
   SELECT p_user_id, p_type, p_metadata, p_link
-  WHERE COALESCE(
+  WHERE (
+    auth.uid() = p_user_id
+    OR EXISTS (
+      SELECT 1 FROM public.workspace_members caller
+      JOIN public.workspace_members target ON target.workspace_id = caller.workspace_id
+      WHERE caller.id = auth.uid() AND target.id = p_user_id
+    )
+    OR (
+      p_type = 'workspace_invitation'
+      AND EXISTS (
+        SELECT 1 FROM public.workspace_invitations wi
+        JOIN public.profiles p ON p.email = wi.email
+        WHERE p.id = p_user_id
+          AND wi.id = (p_metadata->>'invitationId')::uuid
+          AND public.get_workspace_member_role(wi.workspace_id, auth.uid()) IN ('owner', 'admin')
+      )
+    )
+  )
+  AND COALESCE(
     (SELECT in_app_enabled FROM public.notification_preferences
      WHERE user_id = p_user_id AND type = p_type),
     true
@@ -111,17 +129,25 @@ REVOKE INSERT ON public.notifications FROM authenticated;
 GRANT SELECT, UPDATE, DELETE ON public.notifications TO authenticated;
 GRANT ALL ON public.notifications TO service_role;
 
-CREATE OR REPLACE FUNCTION public.delete_invitation_notification(p_invitation_id uuid)
+-- p_workspace_id is required so the caller's manager rights can be checked
+-- even after the invitation row itself has already been deleted (revoking
+-- an invitation deletes the invitation row before cleaning up its notification).
+CREATE OR REPLACE FUNCTION public.delete_invitation_notification(
+  p_invitation_id uuid,
+  p_workspace_id  uuid
+)
 RETURNS void
 LANGUAGE sql
 SECURITY DEFINER
 SET search_path = ''
 AS $$
-  DELETE FROM public.notifications WHERE metadata->>'invitationId' = p_invitation_id::text;
+  DELETE FROM public.notifications
+  WHERE metadata->>'invitationId' = p_invitation_id::text
+    AND public.get_workspace_member_role(p_workspace_id, auth.uid()) IN ('owner', 'admin');
 $$;
 
-GRANT EXECUTE ON FUNCTION public.delete_invitation_notification(uuid) TO authenticated;
-REVOKE EXECUTE ON FUNCTION public.delete_invitation_notification(uuid) FROM anon;
+GRANT EXECUTE ON FUNCTION public.delete_invitation_notification(uuid, uuid) TO authenticated;
+REVOKE EXECUTE ON FUNCTION public.delete_invitation_notification(uuid, uuid) FROM anon;
 
 ALTER publication supabase_realtime
 ADD TABLE public.notifications;

@@ -6,7 +6,7 @@ interface ContainerProps {
   as?: "div" | "section" | "main" | "article" | "header" | "footer";
 }
 
-export default function Container({
+export function Container({
   children,
   className,
   as: Component = "div",

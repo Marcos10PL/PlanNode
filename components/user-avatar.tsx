@@ -7,7 +7,7 @@ type Props = {
   className?: string;
 };
 
-export default function UserAvatar({ name, userId, className }: Props) {
+export function UserAvatar({ name, userId, className }: Props) {
   const { isOnline } = usePresence();
   const online = !!userId && isOnline(userId);
 

@@ -12,6 +12,12 @@ export function useTaskTimeline(taskId: string | undefined, open: boolean) {
   const [items, setItems] = useState<TaskTimelineItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  const [prevTaskId, setPrevTaskId] = useState(taskId);
+  if (taskId !== prevTaskId) {
+    setPrevTaskId(taskId);
+    setItems([]);
+  }
+
   const refetch = useCallback(async () => {
     if (!taskId) return;
     try {

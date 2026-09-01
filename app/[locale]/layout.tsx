@@ -6,6 +6,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ThemeProvider } from "next-themes";
 import { Geist } from "next/font/google";
 import { notFound } from "next/navigation";
+import NextTopLoader from "nextjs-toploader";
 import "../globals.css";
 
 const OG_LOCALES: Record<string, string> = {
@@ -78,6 +79,7 @@ export default async function RootLayout({ children, params }: Props) {
   return (
     <html lang={locale} suppressHydrationWarning data-scroll-behavior="smooth">
       <body className={`${geistSans.className} antialiased`}>
+        <NextTopLoader color="hsl(169, 100%, 42.2%)" showSpinner={false} />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

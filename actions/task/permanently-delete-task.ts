@@ -28,7 +28,8 @@ export async function permanentlyDeleteTaskAction(taskId: string) {
   const { error: deleteError } = await supabase
     .from("tasks")
     .delete()
-    .eq("id", taskId);
+    .eq("id", taskId)
+    .not("deleted_at", "is", null);
 
   if (deleteError) return { error: ERRORS.SERVER_ERROR };
 

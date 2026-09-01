@@ -13,7 +13,7 @@ export const getWorkspaceMembers = cache(async (workspaceId: string) => {
     .eq("workspace_id", workspaceId)
     .order("joined_at", { ascending: true });
 
-  if (!members?.some(m => m.id === user.id)) redirect(LINKS.LOGIN);
+  if (!members?.some(m => m.id === user.id)) redirect(LINKS.DASHBOARD);
 
   const { data: profiles } = await supabase
     .from("profiles")
@@ -33,7 +33,7 @@ export const getWorkspaceMembers = cache(async (workspaceId: string) => {
           role: m.role,
           fullName: profileMap.get(m.id)!.full_name,
           email: profileMap.get(m.id)!.email,
-        }) as WorkspaceMember,
+        }) satisfies WorkspaceMember,
     ) ?? []
   );
 });

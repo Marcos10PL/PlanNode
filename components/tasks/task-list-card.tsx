@@ -33,8 +33,8 @@ export function TaskListCard({ list, projectId, canEdit, dragHandle }: Props) {
   });
 
   const handleDelete = async () => {
-    await remove(list.id);
-    setDeleteOpen(false);
+    const ok = await remove(list.id);
+    if (ok) setDeleteOpen(false);
   };
 
   return (

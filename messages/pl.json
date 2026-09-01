@@ -23,11 +23,16 @@
     "sort_by": "Sortuj:",
     "loading_more": "Ładowanie...",
     "restore": "Przywróć",
-    "deleted_at": "Usunięto {date}",
+    "deleted_at": "Usunięto <date></date>",
     "editor_link_add": "Dodaj",
     "editor_link_save": "Zapisz",
     "editor_link_placeholder": "https://...",
     "editor_link_invalid": "Nieprawidłowy adres URL",
+    "editor_bold": "Pogrubienie",
+    "editor_italic": "Kursywa",
+    "editor_bullet_list": "Lista punktowana",
+    "editor_ordered_list": "Lista numerowana",
+    "editor_link": "Link",
     "default_list_name": "Lista"
   },
   "footer": {
@@ -449,6 +454,7 @@
     "error_email_mismatch": "To zaproszenie zostało wysłane na inny adres e-mail."
   },
   "sidebar": {
+    "dashboard": "Panel",
     "projects": "Projekty",
     "all_projects": "Aktywne",
     "favorites": "Ulubione",
@@ -491,7 +497,7 @@
     "back_to_projects": "Wróć do projektów",
     "show_more": "Pokaż więcej",
     "show_less": "Pokaż mniej",
-    "created_at": "Utworzono {date}",
+    "created_at": "Utworzono <date></date>",
     "sort": {
       "custom": "Domyślne",
       "newest": "Najnowsze",
@@ -710,6 +716,7 @@
       "no_tasks": "Brak usuniętych zadań",
       "restore_success": "Przywrócono",
       "restore_error": "Nie udało się przywrócić",
+      "restore_ancestor_trashed_error": "Najpierw przywróć listę lub projekt",
       "subtask_of": "podzadanie \"{title}\"",
       "in_list": "w liście: {name}",
       "sort": {

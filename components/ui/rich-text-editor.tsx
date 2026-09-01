@@ -152,7 +152,7 @@ export function RichTextEditor({
             pressed={editor.isActive("bold")}
             onPressedChange={() => editor.chain().focus().toggleBold().run()}
             disabled={disabled}
-            aria-label="Bold"
+            aria-label={t("editor_bold")}
           >
             <Bold />
           </Toggle>
@@ -162,7 +162,7 @@ export function RichTextEditor({
             pressed={editor.isActive("italic")}
             onPressedChange={() => editor.chain().focus().toggleItalic().run()}
             disabled={disabled}
-            aria-label="Italic"
+            aria-label={t("editor_italic")}
           >
             <Italic />
           </Toggle>
@@ -174,7 +174,7 @@ export function RichTextEditor({
               editor.chain().focus().toggleBulletList().run()
             }
             disabled={disabled}
-            aria-label="Bullet list"
+            aria-label={t("editor_bullet_list")}
           >
             <List />
           </Toggle>
@@ -186,7 +186,7 @@ export function RichTextEditor({
               editor.chain().focus().toggleOrderedList().run()
             }
             disabled={disabled}
-            aria-label="Ordered list"
+            aria-label={t("editor_ordered_list")}
           >
             <ListOrdered />
           </Toggle>
@@ -203,7 +203,7 @@ export function RichTextEditor({
                 size="sm"
                 pressed={editor.isActive("link") || linkPopoverOpen}
                 disabled={disabled}
-                aria-label="Link"
+                aria-label={t("editor_link")}
               >
                 <LinkIcon />
               </Toggle>

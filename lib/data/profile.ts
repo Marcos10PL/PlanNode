@@ -13,7 +13,8 @@ export const getProfile = cache(async () => {
     .eq("id", user.id)
     .single();
 
-  if (!profile || error) redirect(LINKS.LOGIN);
+  if (!profile || error)
+    redirect(`${LINKS.AUTH_ERROR}?error=profile_not_found`);
 
   return {
     profile: {

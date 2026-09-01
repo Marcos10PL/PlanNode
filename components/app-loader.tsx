@@ -1,4 +1,4 @@
-import AppLogo from "./app-logo";
+import { AppLogo } from "./app-logo";
 
 const spinnerArcClass =
   "absolute inset-0 rounded-full border-4 border-l-transparent border-r-transparent border-b-transparent opacity-90 will-change-transform [animation:spin_950ms_cubic-bezier(0.45,0.15,0.1,0.9)_infinite] drop-shadow-[0_0_4px_currentColor]";

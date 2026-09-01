@@ -67,8 +67,8 @@ export function ProjectCard({
   const icon = getProjectIcon(project.icon);
 
   const handleDelete = async () => {
-    await remove(project.id);
-    setDeleteOpen(false);
+    const ok = await remove(project.id);
+    if (ok) setDeleteOpen(false);
   };
 
   return (

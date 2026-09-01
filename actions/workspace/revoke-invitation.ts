@@ -41,6 +41,7 @@ export async function revokeInvitationAction(invitationId: string) {
 
   await supabase.rpc("delete_invitation_notification", {
     p_invitation_id: invitationId,
+    p_workspace_id: invitation.workspace_id,
   });
 
   revalidatePath(LINKS.TEAM);

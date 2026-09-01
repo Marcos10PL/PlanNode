@@ -125,13 +125,14 @@ export const getFavoriteProjects = cache(async (workspaceId: string) => {
     .eq("workspace_id", workspaceId)
     .is("deleted_at", null)
     .eq("project_favorites.user_id", user.id)
-    .order("position", {
-      referencedTable: "project_favorites",
-      ascending: true,
-    })
     .order("position", { referencedTable: "task_lists", ascending: true });
 
-  return data?.map(mapProjectWithProgress) ?? [];
+  return (
+    data
+      ?.map(mapProjectWithProgress)
+      .sort((a, b) => (a.favoritePosition ?? 0) - (b.favoritePosition ?? 0)) ??
+    []
+  );
 });
 
 export const getTrashedProjects = cache(
