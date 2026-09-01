@@ -12,7 +12,7 @@ import { cache } from "react";
 import { Client, requireUserContext } from "../supabase/server";
 
 const TASK_SELECT =
-  "id, project_id, list_id, parent_task_id, title, description, status, priority, assignee_id, due_date, position, created_by, assignee:profiles!tasks_assignee_id_fkey(id, full_name, email)";
+  "id, project_id, list_id, parent_task_id, title, description, status, priority, assignee_id, due_date, position, created_by, deleted_at, assignee:profiles!tasks_assignee_id_fkey(id, full_name, email)";
 
 const taskRowQuery = (supabase: Client) =>
   supabase.from("tasks").select(TASK_SELECT);
@@ -33,6 +33,7 @@ const mapTask = (t: TaskRow) =>
     dueDate: t.due_date,
     position: t.position,
     createdBy: t.created_by,
+    deletedAt: t.deleted_at,
     assignee: t.assignee
       ? {
           id: t.assignee.id,
@@ -47,8 +48,11 @@ export const getTaskList = cache(async (listId: string) => {
 
   const { data } = await supabase
     .from("task_lists")
-    .select(`id, project_id, name, position, tasks(${TASK_SELECT})`)
+    .select(
+      `id, project_id, name, position, created_by, deleted_at, tasks(${TASK_SELECT})`,
+    )
     .eq("id", listId)
+    .is("deleted_at", null)
     .order("position", { referencedTable: "tasks", ascending: true })
     .maybeSingle();
 
@@ -59,7 +63,9 @@ export const getTaskList = cache(async (listId: string) => {
     projectId: data.project_id,
     name: data.name,
     position: data.position,
-    tasks: data.tasks.map(mapTask),
+    createdBy: data.created_by,
+    deletedAt: data.deleted_at,
+    tasks: data.tasks.filter(t => !t.deleted_at).map(mapTask),
   } satisfies TaskListWithTasks;
 });
 
@@ -138,19 +144,37 @@ export const getMyTasks = cache(async (workspaceId: string) => {
 
   const { data } = await supabase
     .from("tasks")
-    .select(`${TASK_SELECT}, project:projects!inner(name, workspace_id)`)
+    .select(
+      `${TASK_SELECT}, project:projects!inner(name, workspace_id, deleted_at)`,
+    )
     .eq("assignee_id", user.id)
     .eq("project.workspace_id", workspaceId)
+    .is("project.deleted_at", null)
+    .is("deleted_at", null)
     .not("status", "in", `(${TASK_STATUSES.DONE},${TASK_STATUSES.CANCELLED})`)
     .order("due_date", { ascending: true, nullsFirst: false });
 
-  return (
-    data?.map(
+  const rows = data ?? [];
+  const listIds = [...new Set(rows.map(t => t.list_id))];
+
+  const { data: trashedLists } =
+    listIds.length > 0
+      ? await supabase
+          .from("task_lists")
+          .select("id")
+          .in("id", listIds)
+          .not("deleted_at", "is", null)
+      : { data: [] };
+
+  const trashedListIds = new Set((trashedLists ?? []).map(l => l.id));
+
+  return rows
+    .filter(t => !trashedListIds.has(t.list_id))
+    .map(
       ({ project, ...t }) =>
         ({
           ...mapTask(t),
           projectName: project.name,
         }) satisfies MyTask,
-    ) ?? []
-  );
+    );
 });

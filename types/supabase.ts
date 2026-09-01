@@ -227,6 +227,7 @@ export type Database = {
           color: string
           created_at: string | null
           created_by: string | null
+          deleted_at: string | null
           description: string | null
           icon: string
           id: string
@@ -241,6 +242,7 @@ export type Database = {
           color?: string
           created_at?: string | null
           created_by?: string | null
+          deleted_at?: string | null
           description?: string | null
           icon?: string
           id?: string
@@ -255,6 +257,7 @@ export type Database = {
           color?: string
           created_at?: string | null
           created_by?: string | null
+          deleted_at?: string | null
           description?: string | null
           icon?: string
           id?: string
@@ -362,6 +365,8 @@ export type Database = {
       task_lists: {
         Row: {
           created_at: string | null
+          created_by: string | null
+          deleted_at: string | null
           id: string
           name: string
           position: number
@@ -370,6 +375,8 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          created_by?: string | null
+          deleted_at?: string | null
           id?: string
           name: string
           position?: number
@@ -378,6 +385,8 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          created_by?: string | null
+          deleted_at?: string | null
           id?: string
           name?: string
           position?: number
@@ -399,6 +408,7 @@ export type Database = {
           assignee_id: string | null
           created_at: string | null
           created_by: string | null
+          deleted_at: string | null
           description: string | null
           due_date: string | null
           id: string
@@ -415,6 +425,7 @@ export type Database = {
           assignee_id?: string | null
           created_at?: string | null
           created_by?: string | null
+          deleted_at?: string | null
           description?: string | null
           due_date?: string | null
           id?: string
@@ -431,6 +442,7 @@ export type Database = {
           assignee_id?: string | null
           created_at?: string | null
           created_by?: string | null
+          deleted_at?: string | null
           description?: string | null
           due_date?: string | null
           id?: string

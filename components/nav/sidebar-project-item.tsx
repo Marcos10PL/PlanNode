@@ -31,11 +31,16 @@ import {
   getProjectManageMenuItems,
   isActivePath,
 } from "@/utils";
-import { generateListRoute, generateProjectRoute } from "@/utils/helpers";
+import {
+  generateListRoute,
+  generateProjectRoute,
+  generateProjectTrashRoute,
+} from "@/utils/helpers";
 import { DragDropProvider } from "@dnd-kit/react";
 import { ChevronRight, MoreHorizontal, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Ref } from "react";
 import { useProjectSidebarActions } from "./project-sidebar-context";
 import { SortableTaskListItem } from "./sortable-task-list-item";
@@ -61,6 +66,7 @@ export function SidebarProjectItem({
   const tProjects = useTranslations("projects");
   const tTasks = useTranslations("tasks");
   const pathname = usePathname();
+  const router = useRouter();
   const {
     canEdit,
     isActive,
@@ -88,6 +94,7 @@ export function SidebarProjectItem({
     isCompleted,
     onToggleCompleted: toggleCompleted,
     onEdit: () => onEditProject(project),
+    onViewTrash: () => router.push(generateProjectTrashRoute(project.id)),
     onDelete: () => onDeleteProject(project),
     t: tProjects,
   });

@@ -32,6 +32,7 @@ export async function createTaskListAction(
     project_id: projectId,
     name: parsed.data.name,
     position: (lastList?.position ?? -1) + 1,
+    created_by: user.id,
   });
 
   if (insertError) return { error: ERRORS.SERVER_ERROR };

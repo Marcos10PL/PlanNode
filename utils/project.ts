@@ -135,6 +135,7 @@ export const getProjectManageMenuItems = ({
   isCompleted,
   onToggleCompleted,
   onEdit,
+  onViewTrash,
   onDelete,
   t,
 }: {
@@ -144,6 +145,7 @@ export const getProjectManageMenuItems = ({
   isCompleted: boolean;
   onToggleCompleted: () => void;
   onEdit: () => void;
+  onViewTrash: () => void;
   onDelete: () => void;
   t: Translations;
 }): ManageMenuItem[] => [
@@ -163,6 +165,11 @@ export const getProjectManageMenuItems = ({
           label: isCompleted ? t("mark_active") : t("mark_completed"),
           icon: CheckCircle2,
           onClick: onToggleCompleted,
+        },
+        {
+          label: t("trash.trigger"),
+          icon: Trash2,
+          onClick: onViewTrash,
         },
         {
           label: t("delete.trigger"),

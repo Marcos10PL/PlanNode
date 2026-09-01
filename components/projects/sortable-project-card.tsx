@@ -20,11 +20,7 @@ export function SortableProjectCard({
   dragEnabled,
 }: Props) {
   return (
-    <SortableEntityCard
-      id={project.id}
-      index={index}
-      disabled={!dragEnabled}
-    >
+    <SortableEntityCard id={project.id} index={index} disabled={!dragEnabled}>
       {dragHandle => (
         <ProjectCard
           project={project}

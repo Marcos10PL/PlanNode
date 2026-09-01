@@ -13,9 +13,13 @@ import {
   getProjectIcon,
   getProjectManageMenuItems,
 } from "@/utils";
-import { generateProjectRoute } from "@/utils/helpers";
+import {
+  generateProjectRoute,
+  generateProjectTrashRoute,
+} from "@/utils/helpers";
 import { Lock } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ProjectModal } from "./project-modal";
 
@@ -33,6 +37,7 @@ export function ProjectCard({
   dragHandle,
 }: Props) {
   const t = useTranslations("projects");
+  const router = useRouter();
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
@@ -54,6 +59,7 @@ export function ProjectCard({
     isCompleted,
     onToggleCompleted: toggleCompleted,
     onEdit: () => setEditOpen(true),
+    onViewTrash: () => router.push(generateProjectTrashRoute(project.id)),
     onDelete: () => setDeleteOpen(true),
     t,
   });

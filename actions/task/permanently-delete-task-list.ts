@@ -1,14 +1,14 @@
 "use server";
 
 import { ERRORS } from "@/const";
-import { canEditProject, getUserContext } from "@/lib/supabase/server";
+import { getUserContext, isProjectManager } from "@/lib/supabase/server";
 import {
   generateProjectRoute,
   generateProjectTrashRoute,
 } from "@/utils/helpers";
 import { revalidatePath } from "next/cache";
 
-export async function deleteTaskListAction(listId: string) {
+export async function permanentlyDeleteTaskListAction(listId: string) {
   const { supabase, user } = await getUserContext();
 
   if (!user) return { error: ERRORS.UNAUTHENTICATED };
@@ -21,23 +21,15 @@ export async function deleteTaskListAction(listId: string) {
 
   if (fetchError || !list) return { error: ERRORS.SERVER_ERROR };
 
-  if (!(await canEditProject(supabase, list.project_id, user.id)))
+  if (!(await isProjectManager(supabase, list.project_id, user.id)))
     return { error: ERRORS.INSUFFICIENT_ROLE };
 
-  const { count } = await supabase
+  const { error: deleteError } = await supabase
     .from("task_lists")
-    .select("*", { count: "exact", head: true })
-    .eq("project_id", list.project_id)
-    .is("deleted_at", null);
-
-  if ((count ?? 0) <= 1) return { error: ERRORS.CANNOT_DELETE_LAST_LIST };
-
-  const { error: updateError } = await supabase
-    .from("task_lists")
-    .update({ deleted_at: new Date().toISOString() })
+    .delete()
     .eq("id", listId);
 
-  if (updateError) return { error: ERRORS.SERVER_ERROR };
+  if (deleteError) return { error: ERRORS.SERVER_ERROR };
 
   revalidatePath(generateProjectRoute(list.project_id));
   revalidatePath(generateProjectTrashRoute(list.project_id));

@@ -17,16 +17,18 @@ import { useDeleteProject } from "@/hooks/use-delete-project";
 import { useDeleteTaskList } from "@/hooks/use-delete-task-list";
 import { usePathname } from "@/i18n/navigation";
 import { ProjectWithProgress } from "@/types/dto";
-import { isActivePath, isActiveSubPath } from "@/utils";
+import { cn, isActivePath, isActiveSubPath } from "@/utils";
 import { generateProjectRoute } from "@/utils/helpers";
 import { move } from "@dnd-kit/helpers";
 import { type DragEndEvent } from "@dnd-kit/react";
-import { CheckCircle2, FolderOpenDot, Plus, Star } from "lucide-react";
+import { CheckCircle2, FolderOpenDot, Plus, Star, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useWorkspaces } from "../providers/workspace-provider";
+import { SectionSeparator } from "../ui/section-separator";
 import {
   ProjectSidebarActionsProvider,
   type ListTarget,
@@ -371,6 +373,21 @@ export function SidebarProjects({
             sectionKey="completed"
             emptyMessage={t("sidebar.empty_completed")}
           />
+
+          <SectionSeparator className="mb-1" />
+
+          <SidebarGroup>
+            <SidebarMenuButton asChild tooltip={t("sidebar.trash")}>
+              <Link
+                href={LINKS.PROJECTS_TRASH}
+                className={cn(isActive(LINKS.PROJECTS_TRASH))}
+                onClick={() => setOpenMobile(false)}
+              >
+                <Trash2 className="mr-1" />
+                {t("sidebar.trash")}
+              </Link>
+            </SidebarMenuButton>
+          </SidebarGroup>
         </>
       )}
 

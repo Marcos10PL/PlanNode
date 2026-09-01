@@ -65,7 +65,7 @@ export default async function ProjectPage({ params }: Props) {
   return (
     <>
       <div className="flex flex-col gap-2 mt-4 mb-6">
-        <div className="flex flex-col md:flex-row-reverse md:items-center gap-x-2 min-w-0 md:max-w-fit">
+        <div className="flex flex-col md:flex-row-reverse md:items-center md:justify-end gap-x-2 min-w-0 max-w-full">
           <div className="flex items-center gap-2 min-w-0 self-end w-full md:w-fit">
             <ProjectIcon className={`${iconClassName} md:hidden mr-auto`} />
             {project.isPrivate && (
@@ -82,7 +82,7 @@ export default async function ProjectPage({ params }: Props) {
           </div>
           <div className="flex items-center gap-2 min-w-0">
             <ProjectIcon className={`${iconClassName} hidden md:block`} />
-            <h1 className="min-w-0">{project.name}</h1>
+            <h1 className="min-w-0 truncate">{project.name}</h1>
           </div>
         </div>
       </div>

@@ -8,7 +8,7 @@ import {
 } from "@/utils/helpers";
 import { revalidatePath } from "next/cache";
 
-export async function deleteTaskAction(taskId: string) {
+export async function restoreTaskAction(taskId: string) {
   const { supabase, user } = await getUserContext();
 
   if (!user) return { error: ERRORS.UNAUTHENTICATED };
@@ -29,12 +29,12 @@ export async function deleteTaskAction(taskId: string) {
     .select("id")
     .eq("parent_task_id", taskId);
 
-  const idsToTrash = [taskId, ...(subtasks ?? []).map(s => s.id)];
+  const idsToRestore = [taskId, ...(subtasks ?? []).map(s => s.id)];
 
   const { error: updateError } = await supabase
     .from("tasks")
-    .update({ deleted_at: new Date().toISOString() })
-    .in("id", idsToTrash);
+    .update({ deleted_at: null })
+    .in("id", idsToRestore);
 
   if (updateError) return { error: ERRORS.SERVER_ERROR };
 
