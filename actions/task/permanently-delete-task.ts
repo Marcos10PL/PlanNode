@@ -1,42 +1,36 @@
 "use server";
 
 import { ERRORS, LINKS } from "@/const";
-import { canEditProject, getUserContext } from "@/lib/supabase/server";
+import { getUserContext, isProjectManager } from "@/lib/supabase/server";
 import {
   generateProjectRoute,
   generateProjectTrashRoute,
 } from "@/utils/helpers";
 import { revalidatePath } from "next/cache";
 
-export async function deleteTaskAction(taskId: string) {
+export async function permanentlyDeleteTaskAction(taskId: string) {
   const { supabase, user } = await getUserContext();
 
   if (!user) return { error: ERRORS.UNAUTHENTICATED };
 
   const { data: task, error: fetchError } = await supabase
     .from("tasks")
-    .select("project_id")
+    .select("project_id, created_by")
     .eq("id", taskId)
     .single();
 
   if (fetchError || !task) return { error: ERRORS.SERVER_ERROR };
 
-  if (!(await canEditProject(supabase, task.project_id, user.id)))
+  const isManager = await isProjectManager(supabase, task.project_id, user.id);
+  if (!isManager && task.created_by !== user.id)
     return { error: ERRORS.INSUFFICIENT_ROLE };
 
-  const { data: subtasks } = await supabase
+  const { error: deleteError } = await supabase
     .from("tasks")
-    .select("id")
-    .eq("parent_task_id", taskId);
+    .delete()
+    .eq("id", taskId);
 
-  const idsToTrash = [taskId, ...(subtasks ?? []).map(s => s.id)];
-
-  const { error: updateError } = await supabase
-    .from("tasks")
-    .update({ deleted_at: new Date().toISOString() })
-    .in("id", idsToTrash);
-
-  if (updateError) return { error: ERRORS.SERVER_ERROR };
+  if (deleteError) return { error: ERRORS.SERVER_ERROR };
 
   revalidatePath(generateProjectRoute(task.project_id));
   revalidatePath(generateProjectTrashRoute(task.project_id));

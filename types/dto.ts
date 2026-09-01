@@ -112,6 +112,7 @@ export type Project = ToCamelCase<
     | "color"
     | "created_by"
     | "created_at"
+    | "deleted_at"
   >
 > & {
   isFavorite: boolean;
@@ -146,15 +147,42 @@ export type Task = ToCamelCase<
     | "due_date"
     | "position"
     | "created_by"
+    | "deleted_at"
   >
 > & {
   assignee: TaskAssignee | null;
 };
 
 export type TaskListWithTasks = ToCamelCase<
-  Pick<TaskListTable, "id" | "project_id" | "name" | "position">
+  Pick<
+    TaskListTable,
+    "id" | "project_id" | "name" | "position" | "created_by" | "deleted_at"
+  >
 > & {
   tasks: Task[];
+};
+
+export type TrashedTaskList = ToCamelCase<
+  Pick<
+    TaskListTable,
+    "id" | "project_id" | "name" | "created_by" | "deleted_at"
+  >
+>;
+
+export type TrashedTask = ToCamelCase<
+  Pick<
+    TaskTable,
+    | "id"
+    | "project_id"
+    | "list_id"
+    | "parent_task_id"
+    | "title"
+    | "created_by"
+    | "deleted_at"
+  >
+> & {
+  listName: string;
+  parentTitle: string | null;
 };
 
 export type ProjectListSummary = {

@@ -21,6 +21,9 @@
     "no_due_date": "Brak terminu",
     "clear_date": "Wyczyść datę",
     "sort_by": "Sortuj:",
+    "loading_more": "Ładowanie...",
+    "restore": "Przywróć",
+    "deleted_at": "Usunięto {date}",
     "editor_link_add": "Dodaj",
     "editor_link_save": "Zapisz",
     "editor_link_placeholder": "https://...",
@@ -426,6 +429,7 @@
     "empty_favorites": "Brak ulubionych projektów",
     "empty_active": "Brak aktywnych projektów",
     "empty_completed": "Brak zakończonych projektów",
+    "trash": "Kosz",
     "no_workspaces": "Utwórz przestrzeń roboczą, aby móc tworzyć projekty i dodawać zadania."
   },
   "dashboard": {
@@ -441,6 +445,7 @@
     "title": "Projekty (aktywne)",
     "title_favorites": "Projekty (ulubione)",
     "title_completed": "Projekty (zakończone)",
+    "title_trash": "Kosz — projekty",
     "empty": "Brak projektów",
     "private_badge": "Prywatny",
     "favorite": "Dodaj do ulubionych",
@@ -499,11 +504,35 @@
       "error": "Nie udało się zaktualizować projektu"
     },
     "delete": {
-      "trigger": "Usuń projekt",
-      "confirm_title": "Usuń projekt",
-      "confirm_description": "Czy na pewno chcesz usunąć ten projekt? Wszystkie listy i zadania zostaną usunięte. Tej operacji nie można cofnąć.",
-      "success": "Projekt usunięty",
-      "error": "Nie udało się usunąć projektu"
+      "trigger": "Przenieś do kosza",
+      "confirm_title": "Przenieś projekt do kosza",
+      "confirm_description": "Przenieść ten projekt do kosza? Jego listy zadań i zadania zostaną ukryte do czasu przywrócenia.",
+      "success": "Projekt przeniesiony do kosza",
+      "error": "Nie udało się przenieść projektu do kosza"
+    },
+    "trash": {
+      "trigger": "Pokaż kosz",
+      "sort": {
+        "deleted_newest": "Najnowsze",
+        "deleted_oldest": "Najstarsze",
+        "name": "Nazwa"
+      },
+      "restore_success": "Projekt przywrócony",
+      "restore_error": "Nie udało się przywrócić projektu",
+      "delete_permanently": {
+        "trigger": "Usuń na zawsze",
+        "confirm_title": "Usuń projekt na zawsze",
+        "confirm_description": "Ten projekt i wszystko w nim zawarte zostanie trwale usunięte. Tej operacji nie można cofnąć.",
+        "success": "Projekt trwale usunięty",
+        "error": "Nie udało się trwale usunąć projektu"
+      },
+      "clear_all": {
+        "trigger": "Wyczyść kosz",
+        "confirm_title": "Wyczyść kosz",
+        "confirm_description": "Wszystkie projekty w koszu zostaną trwale usunięte. Tej operacji nie można cofnąć.",
+        "success": "Kosz wyczyszczony",
+        "error": "Nie udało się wyczyścić kosza"
+      }
     },
     "members": {
       "trigger": "Zarządzaj członkami",
@@ -594,12 +623,12 @@
       "error": "Nie udało się zmienić nazwy listy"
     },
     "list_delete": {
-      "trigger": "Usuń listę",
-      "confirm_title": "Usuń listę zadań",
-      "confirm_description": "Czy na pewno chcesz usunąć tę listę? Wszystkie zadania na niej zostaną usunięte.",
-      "success": "Lista usunięta",
-      "error": "Nie udało się usunąć listy",
-      "last_list_error": "Nie można usunąć ostatniej listy w projekcie"
+      "trigger": "Przenieś do kosza",
+      "confirm_title": "Przenieś listę do kosza",
+      "confirm_description": "Przenieść tę listę do kosza? Jej zadania zostaną ukryte do czasu przywrócenia.",
+      "success": "Lista przeniesiona do kosza",
+      "error": "Nie udało się przenieść listy do kosza",
+      "last_list_error": "Nie można przenieść do kosza ostatniej listy w projekcie"
     },
     "create": {
       "title": "Dodaj zadanie",
@@ -639,11 +668,41 @@
       "tab_activity": "Aktywność"
     },
     "delete": {
-      "trigger": "Usuń zadanie",
-      "confirm_title": "Usuń zadanie",
-      "confirm_description": "Czy na pewno chcesz usunąć to zadanie?",
-      "success": "Zadanie usunięte",
-      "error": "Nie udało się usunąć zadania"
+      "trigger": "Przenieś do kosza",
+      "confirm_title": "Przenieś zadanie do kosza",
+      "confirm_description": "Przenieść to zadanie do kosza? Będziesz mógł je później przywrócić.",
+      "success": "Zadanie przeniesione do kosza",
+      "error": "Nie udało się przenieść zadania do kosza"
+    },
+    "trash": {
+      "title_prefix": "Kosz",
+      "empty": "Kosz jest pusty",
+      "lists_heading": "Listy",
+      "tasks_heading": "Zadania",
+      "no_lists": "Brak usuniętych list",
+      "no_tasks": "Brak usuniętych zadań",
+      "restore_success": "Przywrócono",
+      "restore_error": "Nie udało się przywrócić",
+      "subtask_of": "podzadanie \"{title}\"",
+      "in_list": "w liście: {name}",
+      "sort": {
+        "deleted_newest": "Najnowsze",
+        "deleted_oldest": "Najstarsze",
+        "name": "Nazwa"
+      },
+      "delete_permanently": {
+        "confirm_title": "Usuń na zawsze",
+        "confirm_description": "To zostanie trwale usunięte. Tej operacji nie można cofnąć.",
+        "success": "Trwale usunięto",
+        "error": "Nie udało się trwale usunąć"
+      },
+      "clear_all": {
+        "trigger": "Wyczyść kosz",
+        "confirm_title": "Wyczyść kosz",
+        "confirm_description": "Wszystkie listy i zadania w koszu zostaną trwale usunięte. Tej operacji nie można cofnąć.",
+        "success": "Kosz wyczyszczony",
+        "error": "Nie udało się wyczyścić kosza"
+      }
     },
     "view_activity": "Zobacz aktywność",
     "activity": {

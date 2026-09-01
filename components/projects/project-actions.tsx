@@ -8,6 +8,7 @@ import { useToggleProjectCompleted } from "@/hooks/use-toggle-project-completed"
 import { useToggleProjectFavorite } from "@/hooks/use-toggle-project-favorite";
 import { Project } from "@/types/dto";
 import { getProjectManageMenuItems } from "@/utils";
+import { generateProjectTrashRoute } from "@/utils/helpers";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -48,6 +49,7 @@ export function ProjectActions({
     isCompleted,
     onToggleCompleted: toggleCompleted,
     onEdit: () => setEditOpen(true),
+    onViewTrash: () => router.push(generateProjectTrashRoute(project.id)),
     onDelete: () => setDeleteOpen(true),
     t: tProjects,
   });

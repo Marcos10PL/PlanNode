@@ -14,6 +14,7 @@ CREATE TABLE public.projects (
   color text NOT NULL DEFAULT 'neutral',
   position integer NOT NULL DEFAULT 0,
   created_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  deleted_at timestamptz,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );
@@ -40,6 +41,8 @@ CREATE TABLE public.task_lists (
   project_id uuid NOT NULL REFERENCES public.projects(id) ON DELETE CASCADE,
   name text NOT NULL,
   position integer NOT NULL DEFAULT 0,
+  created_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  deleted_at timestamptz,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now(),
 
@@ -59,6 +62,7 @@ CREATE TABLE public.tasks (
   due_date date,
   position integer NOT NULL DEFAULT 0,
   created_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  deleted_at timestamptz,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now(),
 
@@ -170,9 +174,9 @@ CREATE POLICY "Non-guest members can update accessible projects"
 ON public.projects FOR UPDATE
 USING (public.can_edit_project(id, (SELECT auth.uid())));
 
-CREATE POLICY "Non-guest members can delete accessible projects"
+CREATE POLICY "Managers can delete projects"
 ON public.projects FOR DELETE
-USING (public.can_edit_project(id, (SELECT auth.uid())));
+USING (public.is_project_manager(id, (SELECT auth.uid())));
 
 -- Policies: project_favorites
 CREATE POLICY "Users can see their own favorites"
@@ -221,15 +225,18 @@ USING (public.can_access_project(project_id, (SELECT auth.uid())));
 
 CREATE POLICY "Non-guest members can create task lists"
 ON public.task_lists FOR INSERT
-WITH CHECK (public.can_edit_project(project_id, (SELECT auth.uid())));
+WITH CHECK (
+  public.can_edit_project(project_id, (SELECT auth.uid()))
+  AND created_by = (SELECT auth.uid())
+);
 
 CREATE POLICY "Non-guest members can update task lists"
 ON public.task_lists FOR UPDATE
 USING (public.can_edit_project(project_id, (SELECT auth.uid())));
 
-CREATE POLICY "Non-guest members can delete task lists"
+CREATE POLICY "Managers can delete task lists"
 ON public.task_lists FOR DELETE
-USING (public.can_edit_project(project_id, (SELECT auth.uid())));
+USING (public.is_project_manager(project_id, (SELECT auth.uid())));
 
 -- Policies: tasks
 CREATE POLICY "Users with project access can see tasks"
@@ -252,9 +259,12 @@ WITH CHECK (
   AND (assignee_id IS NULL OR public.can_access_project(project_id, assignee_id))
 );
 
-CREATE POLICY "Non-guest members can delete tasks"
+CREATE POLICY "Managers or creators can delete tasks"
 ON public.tasks FOR DELETE
-USING (public.can_edit_project(project_id, (SELECT auth.uid())));
+USING (
+  public.is_project_manager(project_id, (SELECT auth.uid()))
+  OR created_by = (SELECT auth.uid())
+);
 
 -- Policies: task_events
 CREATE POLICY "Users with project access can see task events"
@@ -386,8 +396,8 @@ BEGIN
   INSERT INTO public.project_members (project_id, id, added_by_id)
   VALUES (v_project_id, auth.uid(), auth.uid());
 
-  INSERT INTO public.task_lists (project_id, name, position)
-  VALUES (v_project_id, p_list_name, 0);
+  INSERT INTO public.task_lists (project_id, name, position, created_by)
+  VALUES (v_project_id, p_list_name, 0, auth.uid());
 
   RETURN v_project_id;
 END;
@@ -428,8 +438,8 @@ BEGIN
   INSERT INTO public.project_members (project_id, id, added_by_id)
   VALUES (v_project_id, auth.uid(), auth.uid());
 
-  INSERT INTO public.task_lists (project_id, name, position)
-  VALUES (v_project_id, p_list_name, 0)
+  INSERT INTO public.task_lists (project_id, name, position, created_by)
+  VALUES (v_project_id, p_list_name, 0, auth.uid())
   RETURNING id INTO v_list_id;
 
   INSERT INTO public.tasks (project_id, list_id, title, description, status, position, created_by)

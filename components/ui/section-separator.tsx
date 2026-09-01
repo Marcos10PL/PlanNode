@@ -1,7 +1,7 @@
 import { cn } from "@/utils";
 
 type Props = {
-  title: string;
+  title?: string;
   className?: string;
 };
 

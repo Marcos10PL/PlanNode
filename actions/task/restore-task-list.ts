@@ -8,7 +8,7 @@ import {
 } from "@/utils/helpers";
 import { revalidatePath } from "next/cache";
 
-export async function deleteTaskListAction(listId: string) {
+export async function restoreTaskListAction(listId: string) {
   const { supabase, user } = await getUserContext();
 
   if (!user) return { error: ERRORS.UNAUTHENTICATED };
@@ -24,17 +24,9 @@ export async function deleteTaskListAction(listId: string) {
   if (!(await canEditProject(supabase, list.project_id, user.id)))
     return { error: ERRORS.INSUFFICIENT_ROLE };
 
-  const { count } = await supabase
-    .from("task_lists")
-    .select("*", { count: "exact", head: true })
-    .eq("project_id", list.project_id)
-    .is("deleted_at", null);
-
-  if ((count ?? 0) <= 1) return { error: ERRORS.CANNOT_DELETE_LAST_LIST };
-
   const { error: updateError } = await supabase
     .from("task_lists")
-    .update({ deleted_at: new Date().toISOString() })
+    .update({ deleted_at: null })
     .eq("id", listId);
 
   if (updateError) return { error: ERRORS.SERVER_ERROR };

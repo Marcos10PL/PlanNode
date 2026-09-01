@@ -21,6 +21,7 @@ export const LINKS = {
   PROJECTS: "/app/projects",
   PROJECTS_FAVORITES: "/app/projects/favorites",
   PROJECTS_COMPLETED: "/app/projects/completed",
+  PROJECTS_TRASH: "/app/projects/trash",
   PROFILE_SETTINGS: "/app/settings/profile",
   PROFILE_WORKSPACES: "/app/settings/workspaces",
   TEAM: "/app/settings/team",
@@ -72,6 +73,9 @@ export const COOKIES = {
   PROJECT_SORT: "project_sort",
   PROJECT_SORT_FAVORITES: "project_sort_favorites",
   PROJECT_SORT_COMPLETED: "project_sort_completed",
+  PROJECTS_TRASH_SORT: "projects_trash_sort",
+  LISTS_TRASH_SORT: "lists_trash_sort",
+  TASKS_TRASH_SORT: "tasks_trash_sort",
   SIDEBAR_EXPANDED_PROJECTS: "sidebar_expanded_projects",
 } as const;
 
@@ -182,6 +186,24 @@ export const TASK_VIEWS = {
 } as const;
 
 export type TaskView = (typeof TASK_VIEWS)[keyof typeof TASK_VIEWS];
+
+export const TRASH_SORTS = {
+  DELETED_NEWEST: "deleted_newest",
+  DELETED_OLDEST: "deleted_oldest",
+  NAME: "name",
+} as const;
+
+export type TrashSort = (typeof TRASH_SORTS)[keyof typeof TRASH_SORTS];
+
+export const TRASH_PAGE_SIZE = 20;
+
+export const TRASH_PANEL_TABS = {
+  LISTS: "lists",
+  TASKS: "tasks",
+} as const;
+
+export type TrashPanelTab =
+  (typeof TRASH_PANEL_TABS)[keyof typeof TRASH_PANEL_TABS];
 
 export const TASK_MODAL_TABS = {
   DETAILS: "details",

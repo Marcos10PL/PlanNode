@@ -14,6 +14,10 @@ export const generateListRoute = (projectId: string, listId: string) => {
   return `${generateProjectRoute(projectId)}/lists/${listId}`;
 };
 
+export const generateProjectTrashRoute = (projectId: string) => {
+  return `${generateProjectRoute(projectId)}/trash`;
+};
+
 export const generateAbsoluteUrl = (path: string) => {
   return `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}${path}`;
 };

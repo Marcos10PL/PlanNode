@@ -21,6 +21,9 @@
     "no_due_date": "No due date",
     "clear_date": "Clear date",
     "sort_by": "Sort by:",
+    "loading_more": "Loading more...",
+    "restore": "Restore",
+    "deleted_at": "Deleted {date}",
     "editor_link_add": "Add",
     "editor_link_save": "Save",
     "editor_link_placeholder": "https://...",
@@ -426,6 +429,7 @@
     "empty_favorites": "No favorite projects",
     "empty_active": "No active projects",
     "empty_completed": "No completed projects",
+    "trash": "Trash",
     "no_workspaces": "Create a workspace to start adding projects and tasks."
   },
   "dashboard": {
@@ -441,6 +445,7 @@
     "title": "Projects (active)",
     "title_favorites": "Projects (favorites)",
     "title_completed": "Projects (completed)",
+    "title_trash": "Trash — projects",
     "empty": "No projects yet",
     "private_badge": "Private",
     "favorite": "Add to favorites",
@@ -499,11 +504,35 @@
       "error": "Could not update project"
     },
     "delete": {
-      "trigger": "Delete project",
-      "confirm_title": "Delete project",
-      "confirm_description": "Are you sure you want to delete this project? All task lists and tasks will be deleted. This action cannot be undone.",
-      "success": "Project deleted",
-      "error": "Could not delete project"
+      "trigger": "Move to trash",
+      "confirm_title": "Move project to trash",
+      "confirm_description": "Move this project to trash? Its task lists and tasks will be hidden until you restore it.",
+      "success": "Project moved to trash",
+      "error": "Could not move project to trash"
+    },
+    "trash": {
+      "trigger": "View trash",
+      "sort": {
+        "deleted_newest": "Newest",
+        "deleted_oldest": "Oldest",
+        "name": "Name"
+      },
+      "restore_success": "Project restored",
+      "restore_error": "Could not restore project",
+      "delete_permanently": {
+        "trigger": "Delete forever",
+        "confirm_title": "Delete project forever",
+        "confirm_description": "This project and everything in it will be permanently deleted. This action cannot be undone.",
+        "success": "Project permanently deleted",
+        "error": "Could not permanently delete project"
+      },
+      "clear_all": {
+        "trigger": "Empty trash",
+        "confirm_title": "Empty trash",
+        "confirm_description": "All projects in the trash will be permanently deleted. This action cannot be undone.",
+        "success": "Trash emptied",
+        "error": "Could not empty trash"
+      }
     },
     "members": {
       "trigger": "Manage members",
@@ -594,12 +623,12 @@
       "error": "Could not rename list"
     },
     "list_delete": {
-      "trigger": "Delete list",
-      "confirm_title": "Delete task list",
-      "confirm_description": "Are you sure you want to delete this list? All tasks in it will be deleted.",
-      "success": "List deleted",
-      "error": "Could not delete list",
-      "last_list_error": "You cannot delete the last list in a project"
+      "trigger": "Move to trash",
+      "confirm_title": "Move list to trash",
+      "confirm_description": "Move this list to trash? Its tasks will be hidden until you restore it.",
+      "success": "List moved to trash",
+      "error": "Could not move list to trash",
+      "last_list_error": "You cannot move the last list in a project to trash"
     },
     "create": {
       "title": "Add task",
@@ -639,11 +668,41 @@
       "tab_activity": "Activity"
     },
     "delete": {
-      "trigger": "Delete task",
-      "confirm_title": "Delete task",
-      "confirm_description": "Are you sure you want to delete this task?",
-      "success": "Task deleted",
-      "error": "Could not delete task"
+      "trigger": "Move to trash",
+      "confirm_title": "Move task to trash",
+      "confirm_description": "Move this task to trash? You can restore it later.",
+      "success": "Task moved to trash",
+      "error": "Could not move task to trash"
+    },
+    "trash": {
+      "title_prefix": "Trash",
+      "empty": "Trash is empty",
+      "lists_heading": "Lists",
+      "tasks_heading": "Tasks",
+      "no_lists": "No deleted lists",
+      "no_tasks": "No deleted tasks",
+      "restore_success": "Restored",
+      "restore_error": "Could not restore",
+      "subtask_of": "subtask of \"{title}\"",
+      "in_list": "in list: {name}",
+      "sort": {
+        "deleted_newest": "Newest",
+        "deleted_oldest": "Oldest",
+        "name": "Name"
+      },
+      "delete_permanently": {
+        "confirm_title": "Delete forever",
+        "confirm_description": "This will be permanently deleted. This action cannot be undone.",
+        "success": "Permanently deleted",
+        "error": "Could not permanently delete"
+      },
+      "clear_all": {
+        "trigger": "Empty trash",
+        "confirm_title": "Empty trash",
+        "confirm_description": "All lists and tasks in the trash will be permanently deleted. This action cannot be undone.",
+        "success": "Trash emptied",
+        "error": "Could not empty trash"
+      }
     },
     "view_activity": "View activity",
     "activity": {

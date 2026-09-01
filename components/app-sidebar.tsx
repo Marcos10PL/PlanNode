@@ -1,5 +1,6 @@
 "use client";
 
+import { SectionSeparator } from "@/components/ui/section-separator";
 import {
   Sidebar,
   SidebarContent,
@@ -9,7 +10,6 @@ import {
   SidebarMenuButton,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { SectionSeparator } from "@/components/ui/section-separator";
 import { LINKS } from "@/const";
 import { usePathname } from "@/i18n/navigation";
 import { ProjectWithProgress } from "@/types/dto";
