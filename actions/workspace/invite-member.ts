@@ -101,7 +101,7 @@ export async function inviteMemberAction(
       p_user_id: invitedProfile.id,
       p_type: NOTIFICATION_TYPES.WORKSPACE_INVITATION,
       p_metadata: {
-        inviterName: callerProfile.full_name,
+        inviterId: user.id,
         workspaceName: workspace.name,
         invitationId: invitation.id,
       },

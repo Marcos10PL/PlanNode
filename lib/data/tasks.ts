@@ -1,5 +1,6 @@
-import { TASK_STATUSES } from "@/const";
+import { TASK_EVENT_TYPES, TASK_STATUSES } from "@/const";
 import {
+  AssigneeChangedMetadata,
   MyTask,
   Task,
   TaskComment,
@@ -9,7 +10,11 @@ import {
 } from "@/types/dto";
 import type { QueryData } from "@supabase/supabase-js";
 import { cache } from "react";
-import { Client, requireUserContext } from "../supabase/server";
+import {
+  Client,
+  requireUserContext,
+  resolveProfilesByIds,
+} from "../supabase/server";
 
 const TASK_SELECT =
   "id, project_id, list_id, parent_task_id, title, description, status, priority, assignee_id, due_date, position, created_by, deleted_at, assignee:profiles!tasks_assignee_id_fkey(id, full_name, email)";
@@ -77,17 +82,35 @@ const taskEventRowQuery = (supabase: Client) =>
 
 type TaskEventRow = QueryData<ReturnType<typeof taskEventRowQuery>>[number];
 
-const mapTaskEvent = (e: TaskEventRow) =>
-  ({
+const mapTaskEvent = (
+  e: TaskEventRow,
+  profileMap: Map<string, { full_name: string; email: string }>,
+) => {
+  let metadata = e.metadata as TaskEvent["metadata"];
+
+  if (e.type === TASK_EVENT_TYPES.ASSIGNEE_CHANGED) {
+    const { fromId, toId } = metadata as AssigneeChangedMetadata;
+    metadata = {
+      fromId,
+      fromName: fromId ? (profileMap.get(fromId)?.full_name ?? null) : null,
+      fromEmail: fromId ? (profileMap.get(fromId)?.email ?? null) : null,
+      toId,
+      toName: toId ? (profileMap.get(toId)?.full_name ?? null) : null,
+      toEmail: toId ? (profileMap.get(toId)?.email ?? null) : null,
+    } satisfies AssigneeChangedMetadata;
+  }
+
+  return {
     id: e.id,
     taskId: e.task_id,
     type: e.type,
-    metadata: e.metadata as TaskEvent["metadata"],
+    metadata,
     createdAt: e.created_at,
     user: e.user
       ? { id: e.user.id, fullName: e.user.full_name, email: e.user.email }
       : null,
-  }) satisfies TaskEvent;
+  } satisfies TaskEvent;
+};
 
 const TASK_COMMENT_SELECT =
   "id, task_id, content, created_at, updated_at, user:profiles!task_comments_user_id_fkey(id, full_name, email)";
@@ -123,9 +146,21 @@ export const getTaskTimeline = cache(async (taskId: string) => {
       .eq("task_id", taskId),
   ]);
 
+  const assigneeChangeIds = (events ?? []).flatMap(e =>
+    e.type === TASK_EVENT_TYPES.ASSIGNEE_CHANGED
+      ? [
+          (e.metadata as AssigneeChangedMetadata).fromId,
+          (e.metadata as AssigneeChangedMetadata).toId,
+        ]
+      : [],
+  );
+  const profileMap = await resolveProfilesByIds(supabase, assigneeChangeIds);
+
   const items: TaskTimelineItem[] = [
-    ...(events?.map(e => ({ kind: "event" as const, ...mapTaskEvent(e) })) ??
-      []),
+    ...(events?.map(e => ({
+      kind: "event" as const,
+      ...mapTaskEvent(e, profileMap),
+    })) ?? []),
     ...(comments?.map(c => ({
       kind: "comment" as const,
       ...mapTaskComment(c),

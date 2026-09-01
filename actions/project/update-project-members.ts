@@ -92,7 +92,7 @@ export async function updateProjectMembersAction(
                 p_type: NOTIFICATION_TYPES.PROJECT_MEMBER_ADDED,
                 p_metadata: {
                   projectName: project.name,
-                  addedByName: adderProfile.full_name,
+                  addedById: user.id,
                   projectId,
                 },
                 p_link: generateProjectRoute(projectId),

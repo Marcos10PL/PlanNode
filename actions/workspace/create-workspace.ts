@@ -58,6 +58,7 @@ export async function createWorkspaceAction(data: CreateWorkspaceSchema) {
       name: workspace.name,
       description: workspace.description,
       ownerId: workspace.owner_id,
+      memberCount: 1,
     } satisfies Workspace,
   };
 }

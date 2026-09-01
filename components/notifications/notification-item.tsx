@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { ConfirmModal } from "../ui/confirm-modal";
+import { InfoPopover } from "../ui/info-popover";
 
 type Props = {
   notification: Notification;
@@ -83,10 +84,28 @@ export function NotificationItem({
       <div className={cn("flex-1 min-w-0", !isUnread && "opacity-65")}>
         <div className="flex items-center gap-2 mb-0.5">
           <p className="text-sm">
-            {t(
-              `${notification.type}_title`,
-              (notification.metadata as Record<string, string>) ?? {},
-            )}
+            {t.rich(`${notification.type}_title`, {
+              ...((notification.metadata as Record<string, string>) ?? {}),
+              actor: chunks => (
+                <span
+                  className={cn(
+                    "inline-flex items-center gap-0.5",
+                    notification.metadata?.actorDeleted && "italic pr-0.5",
+                  )}
+                >
+                  {chunks}
+                  {notification.metadata?.actorEmail && (
+                    <InfoPopover
+                      label={t("show_email")}
+                      variant="ghost"
+                      className="size-5 text-muted-foreground [&_svg]:size-3.5"
+                    >
+                      {notification.metadata.actorEmail}
+                    </InfoPopover>
+                  )}
+                </span>
+              ),
+            })}
           </p>
           {isUnread && (
             <Badge className="shrink-0 text-xs py-0">{t("new_badge")}</Badge>

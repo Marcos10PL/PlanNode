@@ -8,8 +8,9 @@ import { useUser } from "@/components/providers/user-provider";
 import { Button } from "@/components/ui/button";
 import { ControlledInputField } from "@/components/ui/controlled-input-field";
 import { ControlledPasswordField } from "@/components/ui/controlled-password-field";
+import { Link } from "@/components/ui/link";
 import { Separator } from "@/components/ui/separator";
-import { ERRORS, VALIDATION_MAX } from "@/const";
+import { ERRORS, LINKS, VALIDATION_MAX } from "@/const";
 import { profileSettingsSchema, ProfileSettingsSchema } from "@/schema";
 import { formatDate } from "@/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,13 +19,19 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { SubHeader } from "../sub-header";
+import { DeleteAccountModal } from "./delete-account-modal";
 
-export function ProfileForm() {
+type Props = {
+  blockingWorkspaces: { id: string; name: string }[];
+};
+
+export function ProfileForm({ blockingWorkspaces }: Props) {
   const { profile, user } = useUser();
   const t = useTranslations("profile_settings");
   const locale = useLocale();
   const [pendingEmail, setPendingEmail] = useState(user.new_email ?? null);
   const [isCancellingEmail, setIsCancellingEmail] = useState(false);
+  const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
 
   const form = useForm<ProfileSettingsSchema>({
     resolver: zodResolver(
@@ -231,7 +238,50 @@ export function ProfileForm() {
             {form.formState.isSubmitting ? t("submitting") : t("submit")}
           </Button>
         </div>
+
+        <Separator />
       </form>
+
+      <div className="mt-6">
+        <div className="flex flex-col gap-4 border border-destructive/40 bg-destructive/5 p-4 rounded-lg">
+          <div>
+            <h3 className="text-sm font-medium">{t("delete_account")}</h3>
+            <p className="text-sm text-muted-foreground">
+              {t("danger_zone_description")}
+            </p>
+          </div>
+
+          {blockingWorkspaces.length > 0 ? (
+            <div className="flex flex-col gap-2">
+              <p className="text-sm text-muted-foreground">
+                {t("delete_account_blocked_description")}
+              </p>
+              <ul className="list-disc pl-5 text-sm">
+                {blockingWorkspaces.map(w => (
+                  <li key={w.id}>{w.name}</li>
+                ))}
+              </ul>
+              <Link href={LINKS.PROFILE_WORKSPACES} className="text-sm mt-2">
+                {t("delete_account_blocked_delete_link")}
+              </Link>
+            </div>
+          ) : (
+            <Button
+              type="button"
+              variant="destructive"
+              className="w-full md:w-fit ml-auto"
+              onClick={() => setDeleteAccountOpen(true)}
+            >
+              {t("delete_account")}
+            </Button>
+          )}
+        </div>
+      </div>
+
+      <DeleteAccountModal
+        open={deleteAccountOpen}
+        onOpenChange={setDeleteAccountOpen}
+      />
     </>
   );
 }

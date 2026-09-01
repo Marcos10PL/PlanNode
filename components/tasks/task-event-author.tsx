@@ -3,6 +3,7 @@
 import { useUser } from "@/components/providers/user-provider";
 import { InfoPopover } from "@/components/ui/info-popover";
 import { TaskEventUser } from "@/types/dto";
+import { cn } from "@/utils";
 import { useTranslations } from "next-intl";
 
 type Props = {
@@ -16,7 +17,7 @@ export function TaskEventAuthor({ user }: Props) {
 
   return (
     <>
-      <span className="truncate">
+      <span className={cn("truncate", !user && "italic")}>
         {isCurrentUser ? t("you") : (user?.fullName ?? t("unknown_user"))}
       </span>
       {!isCurrentUser && user?.email && (

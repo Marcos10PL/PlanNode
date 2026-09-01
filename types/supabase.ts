@@ -677,6 +677,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      get_owned_workspace_count: {
+        Args: { p_user_id: string }
+        Returns: number
+      }
       get_workspace_member_role: {
         Args: { p_user_id: string; p_workspace_id: string }
         Returns: Database["public"]["Enums"]["workspace_role"]
@@ -697,6 +701,10 @@ export type Database = {
       }
       reorder_tasks: {
         Args: { p_changes: Json; p_list_id: string }
+        Returns: undefined
+      }
+      transfer_workspace_ownership: {
+        Args: { p_new_owner_id: string; p_workspace_id: string }
         Returns: undefined
       }
     }

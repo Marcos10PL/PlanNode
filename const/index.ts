@@ -50,6 +50,7 @@ export const ERRORS = {
   INSUFFICIENT_ROLE: "insufficient_role",
   CANNOT_REMOVE_OWNER: "cannot_remove_owner",
   CANNOT_LEAVE_AS_OWNER: "cannot_leave_as_owner",
+  CANNOT_DELETE_ACCOUNT_AS_SOLE_OWNER: "cannot_delete_account_as_sole_owner",
   PROJECT_NOT_FOUND: "project_not_found",
   INVALID_ASSIGNEE: "invalid_assignee",
   CANNOT_DELETE_LAST_LIST: "cannot_delete_last_list",

@@ -85,7 +85,7 @@ export async function updateMemberRoleAction(
           p_type: NOTIFICATION_TYPES.WORKSPACE_ROLE_CHANGED,
           p_metadata: {
             workspaceName: workspace.name,
-            changedByName: callerProfile.full_name,
+            changedById: user.id,
             newRole: parsed.data.role,
           },
           p_link: LINKS.TEAM,

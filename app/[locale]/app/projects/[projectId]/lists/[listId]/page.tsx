@@ -1,5 +1,5 @@
 import { TaskListSection } from "@/components/tasks/task-list-section";
-import { COOKIES, TASK_SORTS, TASK_VIEWS } from "@/const";
+import { COOKIES, MANAGER_ROLES, TASK_SORTS, TASK_VIEWS } from "@/const";
 import {
   getProject,
   getProjectMemberIds,
@@ -47,7 +47,9 @@ export default async function TaskListPage({ params }: Props) {
   let assignableMembers = members;
   if (project.isPrivate) {
     const projectMemberIds = await getProjectMemberIds(project.id);
-    assignableMembers = members.filter(m => projectMemberIds.includes(m.id));
+    assignableMembers = members.filter(
+      m => MANAGER_ROLES.includes(m.role) || projectMemberIds.includes(m.id),
+    );
   }
 
   const defaultSort = parseCookieValue(

@@ -2,7 +2,7 @@ import { NotificationList } from "@/components/notifications/notification-list";
 import { NotificationSettingsButton } from "@/components/notifications/notification-settings-button";
 import { NotificationsActions } from "@/components/notifications/notifications-actions";
 import { SubHeader } from "@/components/sub-header";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Alert } from "@/components/ui/alert";
 import {
   getNotificationPreferences,
   getNotifications,
@@ -42,10 +42,10 @@ export default async function NotificationsPage() {
 
       {allDisabled && (
         <div className="mb-2">
-          <Alert variant="destructive">
-            <AlertTitle>{t("all_disabled_title")}</AlertTitle>
-            <AlertDescription>{t("all_disabled_description")}</AlertDescription>
-          </Alert>
+          <Alert
+            title={t("all_disabled_title")}
+            description={t("all_disabled_description")}
+          />
         </div>
       )}
 

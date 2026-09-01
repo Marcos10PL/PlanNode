@@ -25,42 +25,52 @@ export type AppConfig = ToCamelCase<{
   [APP_CONFIG_KEYS.MAX_WORKSPACES_PER_USER]: number;
 }>;
 
+type ResolvedActor = {
+  actorEmail?: string | null;
+  actorDeleted?: boolean;
+};
+
 export type WorkspaceInvitationMetadata = {
-  inviterName: string;
+  inviterId: string;
+  inviterName?: string | null;
   workspaceName: string;
   invitationId: string;
-};
+} & ResolvedActor;
 
 export type Workspace = ToCamelCase<
   Pick<WorkspaceTable, "id" | "name" | "description" | "owner_id">
->;
+> & { memberCount: number };
 
 export type Profile = ToCamelCase<ProfileTable>;
 
 export type TaskAssignedMetadata = {
   taskTitle: string;
   projectName: string;
-  assignerName: string;
+  assignerId: string;
+  assignerName?: string | null;
   taskId: string;
-};
+} & ResolvedActor;
 
 export type ProjectMemberAddedMetadata = {
   projectName: string;
-  addedByName: string;
+  addedById: string;
+  addedByName?: string | null;
   projectId: string;
-};
+} & ResolvedActor;
 
 export type TaskCommentAddedMetadata = {
   taskTitle: string;
-  commenterName: string;
+  commenterId: string;
+  commenterName?: string | null;
   taskId: string;
-};
+} & ResolvedActor;
 
 export type WorkspaceRoleChangedMetadata = {
   workspaceName: string;
-  changedByName: string;
+  changedById: string;
+  changedByName?: string | null;
   newRole: string;
-};
+} & ResolvedActor;
 
 export type Notification = ToCamelCase<
   Pick<
@@ -208,10 +218,12 @@ export type PriorityChangedMetadata = {
 };
 
 export type AssigneeChangedMetadata = {
-  fromName: string | null;
-  fromEmail: string | null;
-  toName: string | null;
-  toEmail: string | null;
+  fromId: string | null;
+  fromName?: string | null;
+  fromEmail?: string | null;
+  toId: string | null;
+  toName?: string | null;
+  toEmail?: string | null;
 };
 
 export type DueDateChangedMetadata = {

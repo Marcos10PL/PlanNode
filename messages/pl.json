@@ -163,7 +163,20 @@
     "email_change_cancel_failed": "Nie udało się anulować zmiany maila",
     "password_update_success": "Hasło zostało zmienione",
     "password_update_failed": "Nie udało się zmienić hasła",
-    "password_same_as_old": "Nowe hasło musi różnić się od obecnego"
+    "password_same_as_old": "Nowe hasło musi różnić się od obecnego",
+    "danger_zone_title": "Strefa zagrożenia",
+    "danger_zone_description": "Usunięcie konta jest trwałe i nie można go cofnąć.",
+    "delete_account": "Usuń konto",
+    "delete_account_title": "Usuń konto",
+    "delete_account_description": "Twoje konto zostanie trwale usunięte. Nie będziesz się już mógł ponownie zalogować na ten profil. Wpisz hasło, aby potwierdzić.",
+    "delete_account_confirm_label": "Hasło",
+    "delete_account_cancel": "Anuluj",
+    "delete_account_submit": "Usuń konto",
+    "delete_account_submitting": "Usuwanie...",
+    "delete_account_error": "Nie udało się usunąć konta",
+    "delete_account_blocked_error": "Jesteś jedynym właścicielem przestrzeni roboczej z innymi członkami",
+    "delete_account_blocked_description": "Jesteś jedynym właścicielem następujących przestrzeni roboczych, w których są inni członkowie. Przekaż własność lub usuń przestrzeń roboczą przed usunięciem konta:",
+    "delete_account_blocked_delete_link": "Przejdź do przestrzeni roboczych"
   },
   "landing": {
     "hero": {
@@ -290,7 +303,8 @@
       "submitting": "Usuwanie...",
       "success": "Przestrzeń robocza została usunięta",
       "error": "Nie udało się usunąć przestrzeni roboczej",
-      "cancel": "Anuluj"
+      "cancel": "Anuluj",
+      "other_members_warning": "Ta przestrzeń robocza ma jeszcze innych członków ({count}), którzy stracą do niej dostęp. Pamiętaj, że możesz ją zachować, przekazując własność na innego członka."
     }
   },
   "settings": {
@@ -367,7 +381,19 @@
     "role_info_label": "Kliknij, żeby zobaczyć informacje o rolach",
     "role_admin_description": "Może zapraszać członków, zmieniać role i zarządzać treścią. Nie może usunąć przestrzeni.",
     "role_member_description": "Standardowy dostęp do treści przestrzeni. Nie może zarządzać członkami.",
-    "role_guest_description": "Ograniczony dostęp tylko do wybranych zasobów."
+    "role_guest_description": "Ograniczony dostęp tylko do wybranych zasobów.",
+    "transfer_ownership": "Zmień właściciela",
+    "transfer_ownership_confirm_title": "Przekaż własność",
+    "transfer_ownership_confirm_description": "Czy na pewno chcesz ustawić {name} jako właściciela tej przestrzeni roboczej? Ty staniesz się administratorem.",
+    "transfer_ownership_success": "Własność przekazana",
+    "transfer_ownership_error": "Nie udało się przekazać własności",
+    "transfer_ownership_limit_reached": "Ten członek posiada już maksymalną liczbę przestrzeni roboczych",
+    "transfer_ownership_description": "Wybierz członka przestrzeni \"{name}\", który stanie się nowym właścicielem. Ty staniesz się administratorem.",
+    "transfer_ownership_loading": "Wczytywanie członków...",
+    "transfer_ownership_no_other_members": "Ta przestrzeń robocza nie ma innych członków, którym można przekazać własność.",
+    "transfer_ownership_cancel": "Anuluj",
+    "transfer_ownership_submit": "Przekaż własność",
+    "transfer_ownership_submitting": "Przekazywanie..."
   },
   "notifications": {
     "title": "Powiadomienia",
@@ -381,11 +407,12 @@
     "new_badge": "Nowe",
     "delete": "Usuń",
     "view": "Przejdź",
-    "workspace_invitation_title": "{inviterName} zaprasza Cię do \"{workspaceName}\"",
-    "task_assigned_title": "{assignerName} przypisał(a) Ci zadanie „{taskTitle}” w „{projectName}”",
-    "project_member_added_title": "{addedByName} dodał(a) Cię do projektu „{projectName}”",
-    "task_comment_added_title": "{commenterName} skomentował(a) zadanie „{taskTitle}”",
-    "workspace_role_changed_title": "{changedByName} zmienił(a) Twoją rolę w „{workspaceName}”",
+    "workspace_invitation_title": "<actor>{inviterName}</actor> zaprasza Cię do \"{workspaceName}\"",
+    "task_assigned_title": "<actor>{assignerName}</actor> przypisał(a) Ci zadanie „{taskTitle}” w „{projectName}”",
+    "project_member_added_title": "<actor>{addedByName}</actor> dodał(a) Cię do projektu „{projectName}”",
+    "task_comment_added_title": "<actor>{commenterName}</actor> skomentował(a) zadanie „{taskTitle}”",
+    "workspace_role_changed_title": "<actor>{changedByName}</actor> zmienił(a) Twoją rolę w „{workspaceName}”",
+    "show_email": "Kliknij, żeby zobaczyć e-mail",
     "loading_more": "Ładowanie...",
     "all_disabled_title": "Wszystkie powiadomienia są wyłączone",
     "all_disabled_description": "Nie dostaniesz żadnych powiadomień mailowych ani w aplikacji. Możesz je włączyć z powrotem w ustawieniach powiadomień.",
@@ -708,7 +735,7 @@
     "activity": {
       "loading": "Ładowanie...",
       "empty": "Brak aktywności",
-      "unknown_user": "Nieznany użytkownik",
+      "unknown_user": "Konto usunięte",
       "you": "Ty",
       "task_created": "Utworzono zadanie",
       "status_changed": "Zmieniono status z „{from}” na „{to}”",
