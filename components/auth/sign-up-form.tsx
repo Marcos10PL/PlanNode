@@ -17,6 +17,7 @@ import { cn } from "@/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Link } from "../ui/link";
@@ -30,6 +31,7 @@ export function SignUpForm({
   const tCommon = useTranslations("common");
 
   const router = useRouter();
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   const form = useForm<RegisterSchema>({
     resolver: zodResolver(registerSchema(useTranslations("fields.errors"))),
@@ -52,6 +54,7 @@ export function SignUpForm({
         }
         return;
       }
+      setIsRedirecting(true);
       router.replace(
         `${LINKS.SIGN_UP_SUCCESS}?email=${encodeURIComponent(data.email)}`,
       );
@@ -106,9 +109,11 @@ export function SignUpForm({
             <Button
               type="submit"
               className="w-full"
-              disabled={form.formState.isSubmitting}
+              disabled={form.formState.isSubmitting || isRedirecting}
             >
-              {form.formState.isSubmitting ? t("submitting") : t("submit")}
+              {form.formState.isSubmitting || isRedirecting
+                ? t("submitting")
+                : t("submit")}
             </Button>
 
             <div className="mt-4 text-center text-sm">
