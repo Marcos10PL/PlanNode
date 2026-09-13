@@ -50,6 +50,7 @@
       "submit": "Login",
       "submitting": "Logging in...",
       "logged_in_successfully": "Logged in successfully",
+      "account_deleted_success": "Your account has been deleted",
       "no_account": "Don't have an account?",
       "invalid_credentials": "Invalid email or password",
       "email_not_confirmed": "Please confirm your email before signing in",
@@ -205,7 +206,7 @@
       "after_items": [
         "All tasks in one organized place",
         "Clear ownership and accountability",
-        "Reminders before deadlines are missed",
+        "Overdue tasks visible at a glance",
         "One shared hub for the whole team"
       ]
     },
@@ -220,7 +221,7 @@
         {
           "icon": "clock",
           "title": "Deadline tracking",
-          "description": "Set milestones and get notified before deadlines slip. Stay on schedule."
+          "description": "Set due dates and see what's overdue or coming up next, all on one dashboard."
         },
         {
           "icon": "users",

@@ -6,8 +6,8 @@ import { TaskListsGrid } from "@/components/tasks/task-lists-grid";
 import { Badge } from "@/components/ui/badge";
 import { FormattedDate } from "@/components/ui/formatted-date";
 import { TaskProgress } from "@/components/ui/task-progress";
-import { COOKIES } from "@/const";
 import {
+  getActiveWorkspaceId,
   getProject,
   getProjectMemberIds,
   getProjects,
@@ -21,7 +21,6 @@ import {
 } from "@/utils";
 import { List, Lock, Play } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
-import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { createElement } from "react";
 
@@ -34,10 +33,10 @@ export default async function ProjectPage({ params }: Props) {
   const t = await getTranslations("projects");
   const locale = await getLocale();
 
-  const cookieStore = await cookies();
-  const activeWorkspaceId = cookieStore.get(COOKIES.ACTIVE_WORKSPACE_ID)?.value;
-
-  const project = await getProject(projectId);
+  const [activeWorkspaceId, project] = await Promise.all([
+    getActiveWorkspaceId(),
+    getProject(projectId),
+  ]);
 
   if (
     !project ||

@@ -38,5 +38,5 @@ export async function deleteAccountAction(data: DeleteAccountSchema) {
   if (error) return { error: ERRORS.SERVER_ERROR };
 
   await supabase.auth.signOut();
-  redirect(LINKS.LOGIN);
+  redirect(`${LINKS.LOGIN}?accountDeleted=1`);
 }

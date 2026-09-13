@@ -1,6 +1,7 @@
 import { TaskListSection } from "@/components/tasks/task-list-section";
-import { COOKIES, MANAGER_ROLES, TASK_SORTS, TASK_VIEWS } from "@/const";
+import { MANAGER_ROLES, TASK_SORTS, TASK_VIEWS } from "@/const";
 import {
+  getActiveWorkspaceId,
   getProject,
   getProjectMemberIds,
   getTaskList,
@@ -24,9 +25,9 @@ export default async function TaskListPage({ params }: Props) {
   const { projectId, listId } = await params;
 
   const cookieStore = await cookies();
-  const activeWorkspaceId = cookieStore.get(COOKIES.ACTIVE_WORKSPACE_ID)?.value;
 
-  const [project, list] = await Promise.all([
+  const [activeWorkspaceId, project, list] = await Promise.all([
+    getActiveWorkspaceId(),
     getProject(projectId),
     getTaskList(listId),
   ]);
