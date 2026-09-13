@@ -17,8 +17,8 @@ import { loginSchema, LoginSchema } from "@/schema";
 import { cn } from "@/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { FieldError } from "../ui/field";
@@ -32,7 +32,15 @@ export function LoginForm({
   const tAuth = useTranslations("auth");
   const tCommon = useTranslations("common");
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isRedirecting, setIsRedirecting] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get("accountDeleted") === "1") {
+      toast.success(t("account_deleted_success"));
+      router.replace(LINKS.LOGIN);
+    }
+  }, [searchParams, t, router]);
 
   const form = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema(useTranslations("fields.errors"))),

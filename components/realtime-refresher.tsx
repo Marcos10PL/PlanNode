@@ -77,8 +77,16 @@ export function RealtimeRefresher() {
 
     init();
 
+    const {
+      data: { subscription: authSubscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.access_token)
+        supabase.realtime.setAuth(session.access_token);
+    });
+
     return () => {
       disposed = true;
+      authSubscription.unsubscribe();
       if (retryTimeout) clearTimeout(retryTimeout);
       if (refreshTimeout) clearTimeout(refreshTimeout);
       if (channel) supabase.removeChannel(channel);

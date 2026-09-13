@@ -50,6 +50,7 @@
       "submit": "Zaloguj się",
       "submitting": "Logowanie...",
       "logged_in_successfully": "Zalogowano pomyślnie",
+      "account_deleted_success": "Twoje konto zostało usunięte",
       "no_account": "Nie masz konta?",
       "invalid_credentials": "Nieprawidłowy email lub hasło",
       "email_not_confirmed": "Potwierdź adres email przed zalogowaniem",
@@ -205,7 +206,7 @@
       "after_items": [
         "Wszystkie zadania w jednym, uporządkowanym miejscu",
         "Jasno określona odpowiedzialność każdego członka",
-        "Przypomnienia zanim przekroczysz deadline",
+        "Zaległe zadania widoczne na pierwszy rzut oka",
         "Jeden wspólny hub dla całego zespołu"
       ]
     },
@@ -220,7 +221,7 @@
         {
           "icon": "clock",
           "title": "Śledzenie terminów",
-          "description": "Ustawiaj kamienie milowe i otrzymuj powiadomienia zanim przekroczysz deadline. Bądź na bieżąco."
+          "description": "Ustawiaj terminy zadań i miej zaległe oraz nadchodzące terminy na jednym pulpicie. Bądź na bieżąco."
         },
         {
           "icon": "users",
