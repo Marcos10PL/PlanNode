@@ -13,6 +13,7 @@ Collaborative project & task management application built with Next.js and Supab
 - [Available Scripts](#available-scripts)
 - [Project Structure](#project-structure)
 - [Architecture](#architecture)
+- [Known Limitations](#known-limitations)
 - [Deployment](#deployment)
 - [Troubleshooting](#troubleshooting)
 
@@ -260,6 +261,16 @@ pnpm generate-seed
 
 There is no test runner configured in this repo (no Jest/Vitest/Playwright).
 
+### Adding a new shadcn/ui component
+
+`components/ui/` is generated via the shadcn CLI, configured in `components.json` (style `new-york`, base color `neutral`, RSC-aware). Add a new primitive with:
+
+```bash
+pnpm dlx shadcn@latest add <component>
+```
+
+This drops the component's source directly into `components/ui/` (not a package dependency) — customize it in place like any other file in the repo. Prefer this over writing raw HTML elements (`<button>`, `<input>`, etc.) for anything already covered by shadcn.
+
 ---
 
 ## Project Structure
@@ -355,7 +366,10 @@ Server Component
 
 - **Data fetching** — async server components calling `lib/data/` functions (server Supabase client, wrapped in React's `cache()` to dedupe per-request)
 - **Mutations** — Next.js server actions in `actions/`; failures return `{ error }` (never thrown), success paths call `revalidatePath`/`redirect`. Callers should check the returned `error` rather than wrapping the action in `try/catch` — `redirect()` works by throwing internally, so a `try/catch` around it will incorrectly treat a successful redirect as a failure.
-- **Real-time** — client components subscribe to `postgres_changes` on `notifications`, `tasks`, and `task_lists` via the browser Supabase client and call `router.refresh()` on events to re-render server components with fresh data. There's no separate client-side cache to invalidate — a refresh is the whole mechanism.
+- **Real-time** — `components/realtime-refresher.tsx` (mounted once in `DashboardShell`) subscribes to `postgres_changes` on `notifications`, `tasks`, and `task_lists` via the browser Supabase client and calls `router.refresh()` to re-render server components with fresh data. There's no separate client-side cache to invalidate — a refresh is the whole mechanism. Two details that weren't obvious the first time around:
+  - A single bulk write (e.g. reordering N tasks) fires N separate `postgres_changes` events, one per row — the refresh call is debounced (400ms) so that burst collapses into a single `router.refresh()` instead of N. Server actions that mutate a realtime-covered table (`reorderTasksAction`, `reorderTaskListsAction`) deliberately don't also call `revalidatePath` — that would double the refresh for the acting user. Actions on tables *not* covered by realtime (e.g. `projects` — see below) still call `revalidatePath` themselves, since nothing else would refresh the acting user's own view otherwise.
+  - The realtime socket's auth is a JWT set once via `supabase.realtime.setAuth(token)`; if it's never refreshed, events silently stop being authorized by RLS once that token expires (default 1h) — with no error or channel-close event to signal it. `RealtimeRefresher` re-pushes the token on every `onAuthStateChange` event (Supabase refreshes the underlying session token automatically before it expires) to keep the channel alive for the life of the tab.
+  - `projects` itself is **not** currently in the realtime table list, so changes to a project (rename, favorite, mark completed) aren't pushed live to other viewers — they catch up via the same component's plain "refresh on window focus" listener instead, or their own next navigation.
 
 ### Authorization Model
 
@@ -394,6 +408,16 @@ Auth emails specifically are routed through a custom **Send Email** hook (`app/a
 ### Internationalization
 
 All UI strings live in `messages/en.json` and `messages/pl.json`. The active locale is part of the URL. Users can switch language from the sidebar; their preference is persisted to the `profiles.locale` column.
+
+---
+
+## Known Limitations
+
+- **No automated tests.** No Jest/Vitest/Playwright configured — correctness is verified manually plus RLS as a second, database-level line of defense. A conscious scope trade-off, not an oversight.
+- **Dragging a task across status columns doesn't move it**, in both the Kanban board and the list view. This is a deliberate `event.preventDefault()` block, not a missing feature — `@dnd-kit/react` 0.5.0 combined with React 19 crashes on cross-group drag (a confirmed upstream bug, still open, no stable fix released). Changing a task's status works fine via the task modal/status dropdown; only the drag gesture itself is restricted.
+- **No due-date reminders.** Tasks have due dates and overdue/upcoming ones surface on the "My Tasks" dashboard, but nothing proactively notifies you before a deadline passes — that would need a scheduled job (e.g. `pg_cron` or an external scheduler) and hasn't been built.
+- **Realtime coverage is asymmetric.** `tasks`, `task_lists`, and `notifications` push live updates to every open tab; `projects` does not (renaming, favoriting, or completing a project only reaches other viewers on their next refresh or window focus). An easy gap to close (one more table in the realtime publication) rather than a structural limitation.
+- **Realtime is refresh-based, not patch-based.** Any change to a watched table triggers a full server refetch of the current page's data rather than merging just the changed row into client state. Simple and correctness-by-construction, but not the most bandwidth-efficient approach at a larger scale than this app targets.
 
 ---
 
