@@ -1,6 +1,7 @@
 import { ProjectTrashPanel } from "@/components/projects/project-trash-panel";
 import { COOKIES, TRASH_SORTS } from "@/const";
 import {
+  getActiveWorkspaceId,
   getProject,
   getTrashedTaskLists,
   getTrashedTasksInProject,
@@ -22,9 +23,11 @@ export default async function ProjectTrashPage({ params }: Props) {
   const t = await getTranslations("tasks.trash");
 
   const cookieStore = await cookies();
-  const activeWorkspaceId = cookieStore.get(COOKIES.ACTIVE_WORKSPACE_ID)?.value;
 
-  const project = await getProject(projectId);
+  const [activeWorkspaceId, project] = await Promise.all([
+    getActiveWorkspaceId(),
+    getProject(projectId),
+  ]);
 
   if (
     !project ||
