@@ -15,13 +15,9 @@ type ProjectSort = (typeof PROJECT_SORTS)[keyof typeof PROJECT_SORTS];
 const SORTERS = {
   [PROJECT_SORTS.CUSTOM]: projects => projects,
   [PROJECT_SORTS.NEWEST]: projects =>
-    [...projects].sort((a, b) =>
-      (b.createdAt ?? "").localeCompare(a.createdAt ?? ""),
-    ),
+    [...projects].sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
   [PROJECT_SORTS.DATE]: projects =>
-    [...projects].sort((a, b) =>
-      (a.createdAt ?? "").localeCompare(b.createdAt ?? ""),
-    ),
+    [...projects].sort((a, b) => a.createdAt.localeCompare(b.createdAt)),
   [PROJECT_SORTS.NAME]: projects =>
     [...projects].sort((a, b) => a.name.localeCompare(b.name)),
   [PROJECT_SORTS.PROGRESS]: projects =>

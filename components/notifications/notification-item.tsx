@@ -86,16 +86,16 @@ export function NotificationItem({
         <div className="flex items-center gap-2 mb-0.5">
           <p className="text-sm">
             {t.rich(`${notification.type}_title`, {
-              ...((notification.metadata as Record<string, string>) ?? {}),
+              ...(notification.metadata as Record<string, string>),
               actor: chunks => (
                 <span
                   className={cn(
                     "inline-flex items-center gap-0.5",
-                    notification.metadata?.actorDeleted && "italic pr-0.5",
+                    notification.metadata.actorDeleted && "italic pr-0.5",
                   )}
                 >
                   {chunks}
-                  {notification.metadata?.actorEmail && (
+                  {notification.metadata.actorEmail && (
                     <InfoPopover
                       label={t("show_email")}
                       variant="ghost"

@@ -15,15 +15,15 @@ CREATE TABLE public.projects (
   position integer NOT NULL DEFAULT 0,
   created_by uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
   deleted_at timestamptz,
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
 );
 
 CREATE TABLE public.project_members (
   id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   project_id uuid NOT NULL REFERENCES public.projects(id) ON DELETE CASCADE,
   added_by_id uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
-  created_at timestamptz DEFAULT now(),
+  created_at timestamptz NOT NULL DEFAULT now(),
 
   PRIMARY KEY (project_id, id)
 );
@@ -43,8 +43,8 @@ CREATE TABLE public.task_lists (
   position integer NOT NULL DEFAULT 0,
   created_by uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
   deleted_at timestamptz,
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now(),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
 
   UNIQUE (id, project_id)
 );
@@ -63,8 +63,8 @@ CREATE TABLE public.tasks (
   position integer NOT NULL DEFAULT 0,
   created_by uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
   deleted_at timestamptz,
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now(),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
 
   FOREIGN KEY (list_id, project_id) REFERENCES public.task_lists(id, project_id) ON DELETE CASCADE
 );

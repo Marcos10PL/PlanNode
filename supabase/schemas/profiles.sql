@@ -6,11 +6,11 @@ CREATE TYPE public.locale AS ENUM ('pl', 'en');
 CREATE TABLE public.profiles (
   id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   full_name text NOT NULL,
-  role public.user_role DEFAULT 'user',
+  role public.user_role NOT NULL DEFAULT 'user',
   email text UNIQUE NOT NULL,
   locale public.locale NOT NULL DEFAULT 'pl',
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
 );
 
 -- RLS

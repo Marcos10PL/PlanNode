@@ -113,7 +113,7 @@ export type Database = {
           created_at: string
           id: string
           link: string | null
-          metadata: Json | null
+          metadata: Json
           read_at: string | null
           type: Database["public"]["Enums"]["notification_type"]
           user_id: string
@@ -122,7 +122,7 @@ export type Database = {
           created_at?: string
           id?: string
           link?: string | null
-          metadata?: Json | null
+          metadata?: Json
           read_at?: string | null
           type: Database["public"]["Enums"]["notification_type"]
           user_id: string
@@ -131,7 +131,7 @@ export type Database = {
           created_at?: string
           id?: string
           link?: string | null
-          metadata?: Json | null
+          metadata?: Json
           read_at?: string | null
           type?: Database["public"]["Enums"]["notification_type"]
           user_id?: string
@@ -148,31 +148,31 @@ export type Database = {
       }
       profiles: {
         Row: {
-          created_at: string | null
+          created_at: string
           email: string
           full_name: string
           id: string
           locale: Database["public"]["Enums"]["locale"]
-          role: Database["public"]["Enums"]["user_role"] | null
-          updated_at: string | null
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           email: string
           full_name: string
           id: string
           locale?: Database["public"]["Enums"]["locale"]
-          role?: Database["public"]["Enums"]["user_role"] | null
-          updated_at?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           email?: string
           full_name?: string
           id?: string
           locale?: Database["public"]["Enums"]["locale"]
-          role?: Database["public"]["Enums"]["user_role"] | null
-          updated_at?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
         }
         Relationships: []
       }
@@ -212,19 +212,19 @@ export type Database = {
       project_members: {
         Row: {
           added_by_id: string | null
-          created_at: string | null
+          created_at: string
           id: string
           project_id: string
         }
         Insert: {
           added_by_id?: string | null
-          created_at?: string | null
+          created_at?: string
           id: string
           project_id: string
         }
         Update: {
           added_by_id?: string | null
-          created_at?: string | null
+          created_at?: string
           id?: string
           project_id?: string
         }
@@ -255,7 +255,7 @@ export type Database = {
       projects: {
         Row: {
           color: string
-          created_at: string | null
+          created_at: string
           created_by: string | null
           deleted_at: string | null
           description: string | null
@@ -265,12 +265,12 @@ export type Database = {
           is_private: boolean
           name: string
           position: number
-          updated_at: string | null
+          updated_at: string
           workspace_id: string
         }
         Insert: {
           color?: string
-          created_at?: string | null
+          created_at?: string
           created_by?: string | null
           deleted_at?: string | null
           description?: string | null
@@ -280,12 +280,12 @@ export type Database = {
           is_private?: boolean
           name: string
           position?: number
-          updated_at?: string | null
+          updated_at?: string
           workspace_id: string
         }
         Update: {
           color?: string
-          created_at?: string | null
+          created_at?: string
           created_by?: string | null
           deleted_at?: string | null
           description?: string | null
@@ -295,7 +295,7 @@ export type Database = {
           is_private?: boolean
           name?: string
           position?: number
-          updated_at?: string | null
+          updated_at?: string
           workspace_id?: string
         }
         Relationships: [
@@ -401,34 +401,34 @@ export type Database = {
       }
       task_lists: {
         Row: {
-          created_at: string | null
+          created_at: string
           created_by: string | null
           deleted_at: string | null
           id: string
           name: string
           position: number
           project_id: string
-          updated_at: string | null
+          updated_at: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           created_by?: string | null
           deleted_at?: string | null
           id?: string
           name: string
           position?: number
           project_id: string
-          updated_at?: string | null
+          updated_at?: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           created_by?: string | null
           deleted_at?: string | null
           id?: string
           name?: string
           position?: number
           project_id?: string
-          updated_at?: string | null
+          updated_at?: string
         }
         Relationships: [
           {
@@ -450,7 +450,7 @@ export type Database = {
       tasks: {
         Row: {
           assignee_id: string | null
-          created_at: string | null
+          created_at: string
           created_by: string | null
           deleted_at: string | null
           description: string | null
@@ -463,11 +463,11 @@ export type Database = {
           project_id: string
           status: Database["public"]["Enums"]["task_status"]
           title: string
-          updated_at: string | null
+          updated_at: string
         }
         Insert: {
           assignee_id?: string | null
-          created_at?: string | null
+          created_at?: string
           created_by?: string | null
           deleted_at?: string | null
           description?: string | null
@@ -480,11 +480,11 @@ export type Database = {
           project_id: string
           status?: Database["public"]["Enums"]["task_status"]
           title: string
-          updated_at?: string | null
+          updated_at?: string
         }
         Update: {
           assignee_id?: string | null
-          created_at?: string | null
+          created_at?: string
           created_by?: string | null
           deleted_at?: string | null
           description?: string | null
@@ -497,7 +497,7 @@ export type Database = {
           project_id?: string
           status?: Database["public"]["Enums"]["task_status"]
           title?: string
-          updated_at?: string | null
+          updated_at?: string
         }
         Relationships: [
           {
@@ -539,35 +539,35 @@ export type Database = {
       }
       workspace_invitations: {
         Row: {
-          created_at: string | null
+          created_at: string
           email: string
           expires_at: string
           id: string
           invited_by_id: string | null
-          role: Database["public"]["Enums"]["workspace_role"] | null
-          status: Database["public"]["Enums"]["invitation_status"] | null
+          role: Database["public"]["Enums"]["workspace_role"]
+          status: Database["public"]["Enums"]["invitation_status"]
           token: string
           workspace_id: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           email: string
           expires_at: string
           id?: string
           invited_by_id?: string | null
-          role?: Database["public"]["Enums"]["workspace_role"] | null
-          status?: Database["public"]["Enums"]["invitation_status"] | null
+          role?: Database["public"]["Enums"]["workspace_role"]
+          status?: Database["public"]["Enums"]["invitation_status"]
           token: string
           workspace_id: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           email?: string
           expires_at?: string
           id?: string
           invited_by_id?: string | null
-          role?: Database["public"]["Enums"]["workspace_role"] | null
-          status?: Database["public"]["Enums"]["invitation_status"] | null
+          role?: Database["public"]["Enums"]["workspace_role"]
+          status?: Database["public"]["Enums"]["invitation_status"]
           token?: string
           workspace_id?: string
         }
@@ -590,33 +590,30 @@ export type Database = {
       }
       workspace_members: {
         Row: {
-          created_at: string | null
+          created_at: string
           id: string
-          invited_at: string | null
           invited_by_id: string | null
-          joined_at: string | null
+          joined_at: string
           role: Database["public"]["Enums"]["workspace_role"]
-          updated_at: string | null
+          updated_at: string
           workspace_id: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           id: string
-          invited_at?: string | null
           invited_by_id?: string | null
-          joined_at?: string | null
+          joined_at: string
           role?: Database["public"]["Enums"]["workspace_role"]
-          updated_at?: string | null
+          updated_at?: string
           workspace_id: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           id?: string
-          invited_at?: string | null
           invited_by_id?: string | null
-          joined_at?: string | null
+          joined_at?: string
           role?: Database["public"]["Enums"]["workspace_role"]
-          updated_at?: string | null
+          updated_at?: string
           workspace_id?: string
         }
         Relationships: [
@@ -645,28 +642,28 @@ export type Database = {
       }
       workspaces: {
         Row: {
-          created_at: string | null
+          created_at: string
           description: string | null
           id: string
           name: string
           owner_id: string
-          updated_at: string | null
+          updated_at: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           description?: string | null
           id?: string
           name: string
           owner_id: string
-          updated_at?: string | null
+          updated_at?: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           description?: string | null
           id?: string
           name?: string
           owner_id?: string
-          updated_at?: string | null
+          updated_at?: string
         }
         Relationships: [
           {

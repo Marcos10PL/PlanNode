@@ -45,8 +45,8 @@ export const getNotifications = cache(
 
     const actorIds = rows.map(n => {
       const keys = ACTOR_KEYS[n.type];
-      const metadata = n.metadata as Record<string, unknown> | null;
-      return keys ? (metadata?.[keys.id] as string | undefined) : undefined;
+      const metadata = n.metadata as Record<string, unknown>;
+      return keys ? (metadata[keys.id] as string | undefined) : undefined;
     });
     const [profileMap, tTasksActivity] = await Promise.all([
       resolveProfilesByIds(supabase, actorIds),
@@ -56,11 +56,11 @@ export const getNotifications = cache(
 
     const notifications = rows.map(n => {
       const keys = ACTOR_KEYS[n.type];
-      const metadata = n.metadata as Record<string, unknown> | null;
+      const metadata = n.metadata as Record<string, unknown>;
 
-      const hasActorId = !!keys && !!metadata && keys.id in metadata;
+      const hasActorId = !!keys && keys.id in metadata;
       const actorProfile = hasActorId
-        ? profileMap.get(metadata![keys!.id] as string)
+        ? profileMap.get(metadata[keys!.id] as string)
         : undefined;
       const resolvedMetadata = hasActorId
         ? {

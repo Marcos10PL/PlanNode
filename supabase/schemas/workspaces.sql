@@ -8,8 +8,8 @@ CREATE TABLE public.workspaces (
   owner_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   name text NOT NULL,
   description text,
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
 );
 
 CREATE TABLE public.workspace_members (
@@ -17,10 +17,9 @@ CREATE TABLE public.workspace_members (
   workspace_id uuid NOT NULL REFERENCES public.workspaces(id) ON DELETE CASCADE,
   role public.workspace_role DEFAULT 'member' NOT NULL,
   invited_by_id uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
-  joined_at timestamptz,
-  invited_at timestamptz DEFAULT now(),
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now(),
+  joined_at timestamptz NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
 
   PRIMARY KEY (workspace_id, id)
 );
@@ -29,12 +28,12 @@ CREATE TABLE public.workspace_invitations (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   workspace_id uuid NOT NULL REFERENCES public.workspaces(id) ON DELETE CASCADE,
   email text NOT NULL,
-  role public.workspace_role DEFAULT 'member',
-  status public.invitation_status DEFAULT 'pending',
+  role public.workspace_role NOT NULL DEFAULT 'member',
+  status public.invitation_status NOT NULL DEFAULT 'pending',
   invited_by_id uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
   token text UNIQUE NOT NULL,
   expires_at timestamptz NOT NULL,
-  created_at timestamptz DEFAULT now()
+  created_at timestamptz NOT NULL DEFAULT now()
 );
 
 CREATE UNIQUE INDEX workspace_invitations_workspace_id_email_pending_key

@@ -83,8 +83,7 @@ export type Notification = ToCamelCase<
     | TaskAssignedMetadata
     | ProjectMemberAddedMetadata
     | TaskCommentAddedMetadata
-    | WorkspaceRoleChangedMetadata
-    | null;
+    | WorkspaceRoleChangedMetadata;
 };
 
 export type NotificationPreference = ToCamelCase<

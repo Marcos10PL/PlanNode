@@ -12,7 +12,7 @@ CREATE TABLE public.notifications (
   id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id    uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   type       public.notification_type NOT NULL,
-  metadata   jsonb,
+  metadata   jsonb NOT NULL DEFAULT '{}',
   link       text,
   read_at    timestamptz,
   created_at timestamptz DEFAULT now() NOT NULL
@@ -66,7 +66,7 @@ GRANT ALL ON public.notification_preferences TO service_role;
 CREATE OR REPLACE FUNCTION public.create_notification(
   p_user_id  uuid,
   p_type     public.notification_type,
-  p_metadata jsonb    DEFAULT NULL,
+  p_metadata jsonb    DEFAULT '{}',
   p_link     text     DEFAULT NULL
 )
 RETURNS void
