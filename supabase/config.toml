@@ -62,6 +62,7 @@ schema_paths = [
   "./schemas/email_templates.sql",
   "./schemas/notifications.sql",
   "./schemas/projects.sql",
+  "./schemas/limits.sql",
 ]
 
 [db.seed]

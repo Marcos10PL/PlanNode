@@ -5,7 +5,6 @@ import {
   ERRORS,
   LINKS,
   NOTIFICATION_TYPES,
-  TASK_EVENT_TYPES,
   TASK_MODAL_TABS,
 } from "@/const";
 import { canEditProject, getUserContext } from "@/lib/supabase/server";
@@ -85,13 +84,6 @@ export async function createTaskAction(
     .single();
 
   if (insertError || !task) return { error: ERRORS.SERVER_ERROR };
-
-  await supabase.from("task_events").insert({
-    task_id: task.id,
-    user_id: user.id,
-    type: TASK_EVENT_TYPES.TASK_CREATED,
-    metadata: {},
-  });
 
   if (assigneeId && assigneeId !== user.id) {
     const [

@@ -61,3 +61,8 @@ export const isHtmlContentEmpty = (html: string) => {
 export const getHtmlTextLength = (html: string) => {
   return html.replace(/<[^>]*>/g, "").length;
 };
+
+export const isInternalPath = (path: string) =>
+  path.startsWith("/") &&
+  !path.startsWith("//") &&
+  !path.startsWith("/" + String.fromCharCode(92));

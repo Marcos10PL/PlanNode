@@ -15,6 +15,6 @@ CREATE POLICY "Authenticated users can read app_config"
 
 -- Permissions
 REVOKE ALL ON public.app_config FROM anon;
-REVOKE INSERT, UPDATE, DELETE ON public.app_config FROM authenticated;
+REVOKE ALL ON public.app_config FROM authenticated;
 GRANT SELECT ON public.app_config TO authenticated;
 GRANT ALL ON public.app_config TO service_role;

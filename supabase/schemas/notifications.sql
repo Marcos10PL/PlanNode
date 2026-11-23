@@ -15,9 +15,17 @@ CREATE TABLE public.notifications (
   metadata   jsonb NOT NULL DEFAULT '{}',
   link       text,
   read_at    timestamptz,
-  created_at timestamptz DEFAULT now() NOT NULL
+  created_at timestamptz DEFAULT now() NOT NULL,
+
+  -- the client router follows link, so internal paths only
+  CONSTRAINT notifications_link_internal
+    CHECK (
+      link IS NULL
+      OR (left(link, 1) = '/' AND left(link, 2) NOT IN ('//', '/' || chr(92)))
+    )
 );
 
+-- Indexes
 CREATE INDEX idx_notifications_user_id ON public.notifications (user_id);
 CREATE INDEX idx_notifications_unread ON public.notifications (user_id, read_at) WHERE read_at IS NULL;
 
@@ -36,7 +44,14 @@ CREATE POLICY "users can delete own notifications"
 ON public.notifications FOR DELETE TO authenticated
 USING (user_id = (SELECT auth.uid()));
 
--- Preferences
+-- Permissions
+REVOKE ALL ON public.notifications FROM anon;
+REVOKE ALL ON public.notifications FROM authenticated;
+GRANT SELECT, DELETE ON public.notifications TO authenticated;
+GRANT UPDATE (read_at) ON public.notifications TO authenticated;
+GRANT ALL ON public.notifications TO service_role;
+
+-- Table
 CREATE TABLE public.notification_preferences (
   user_id        uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   type           public.notification_type NOT NULL,
@@ -45,6 +60,7 @@ CREATE TABLE public.notification_preferences (
   PRIMARY KEY (user_id, type)
 );
 
+-- RLS
 ALTER TABLE public.notification_preferences ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "users see own notification preferences"
@@ -59,10 +75,13 @@ CREATE POLICY "users update own notification preferences"
 ON public.notification_preferences FOR UPDATE TO authenticated
 USING (user_id = (SELECT auth.uid()));
 
+-- Permissions
 REVOKE ALL ON public.notification_preferences FROM anon;
+REVOKE ALL ON public.notification_preferences FROM authenticated;
 GRANT SELECT, INSERT, UPDATE ON public.notification_preferences TO authenticated;
 GRANT ALL ON public.notification_preferences TO service_role;
 
+-- RPC: sender must be the user, a workspace-mate, or an inviting owner/admin
 CREATE OR REPLACE FUNCTION public.create_notification(
   p_user_id  uuid,
   p_type     public.notification_type,
@@ -102,8 +121,9 @@ AS $$
 $$;
 
 GRANT EXECUTE ON FUNCTION public.create_notification(uuid, public.notification_type, jsonb, text) TO authenticated;
-REVOKE EXECUTE ON FUNCTION public.create_notification(uuid, public.notification_type, jsonb, text) FROM anon;
+REVOKE EXECUTE ON FUNCTION public.create_notification(uuid, public.notification_type, jsonb, text) FROM PUBLIC, anon;
 
+-- RPC: does the user want emails of this type
 CREATE OR REPLACE FUNCTION public.get_email_notification_enabled(
   p_user_id uuid,
   p_type    public.notification_type
@@ -122,16 +142,9 @@ AS $$
 $$;
 
 GRANT EXECUTE ON FUNCTION public.get_email_notification_enabled(uuid, public.notification_type) TO authenticated;
-REVOKE EXECUTE ON FUNCTION public.get_email_notification_enabled(uuid, public.notification_type) FROM anon;
+REVOKE EXECUTE ON FUNCTION public.get_email_notification_enabled(uuid, public.notification_type) FROM PUBLIC, anon;
 
-REVOKE ALL ON public.notifications FROM anon;
-REVOKE INSERT ON public.notifications FROM authenticated;
-GRANT SELECT, UPDATE, DELETE ON public.notifications TO authenticated;
-GRANT ALL ON public.notifications TO service_role;
-
--- p_workspace_id is required so the caller's manager rights can be checked
--- even after the invitation row itself has already been deleted (revoking
--- an invitation deletes the invitation row before cleaning up its notification).
+-- RPC: p_workspace_id is needed because the invitation row is already gone
 CREATE OR REPLACE FUNCTION public.delete_invitation_notification(
   p_invitation_id uuid,
   p_workspace_id  uuid
@@ -147,7 +160,8 @@ AS $$
 $$;
 
 GRANT EXECUTE ON FUNCTION public.delete_invitation_notification(uuid, uuid) TO authenticated;
-REVOKE EXECUTE ON FUNCTION public.delete_invitation_notification(uuid, uuid) FROM anon;
+REVOKE EXECUTE ON FUNCTION public.delete_invitation_notification(uuid, uuid) FROM PUBLIC, anon;
 
+-- Realtime
 ALTER publication supabase_realtime
 ADD TABLE public.notifications;

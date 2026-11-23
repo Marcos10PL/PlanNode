@@ -1,7 +1,7 @@
 -- Table
 CREATE TABLE public.email_templates (
   id         serial PRIMARY KEY,
-  name       varchar(100) NOT NULL UNIQUE,
+  name       text NOT NULL UNIQUE,
   subject    text NOT NULL,
   html       text NOT NULL,
   variables  text[] NOT NULL DEFAULT ARRAY[]::text[],
@@ -21,5 +21,6 @@ USING (public.is_admin()) WITH CHECK (public.is_admin());
 
 -- Permissions
 REVOKE ALL ON public.email_templates FROM anon;
+REVOKE ALL ON public.email_templates FROM authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.email_templates TO authenticated;
 GRANT ALL ON public.email_templates TO service_role;

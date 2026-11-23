@@ -675,6 +675,7 @@ export type Database = {
         Args: { p_project_id: string; p_user_id: string }
         Returns: boolean
       }
+      can_view_profile: { Args: { p_profile_id: string }; Returns: boolean }
       cancel_email_change: { Args: never; Returns: undefined }
       create_notification: {
         Args: {
@@ -719,13 +720,12 @@ export type Database = {
         Args: { p_invitation_id: string; p_workspace_id: string }
         Returns: undefined
       }
-      delete_notification: {
-        Args: { p_invitation_id: string }
-        Returns: undefined
-      }
-      delete_notification_by_invitation_id: {
-        Args: { p_invitation_id: string }
-        Returns: undefined
+      find_profile_by_email: {
+        Args: { p_email: string; p_workspace_id: string }
+        Returns: {
+          id: string
+          locale: Database["public"]["Enums"]["locale"]
+        }[]
       }
       get_email_notification_enabled: {
         Args: {

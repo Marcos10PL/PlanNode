@@ -87,16 +87,7 @@ CREATE TABLE public.task_comments (
   updated_at timestamptz NOT NULL DEFAULT now()
 );
 
--- RLS
-ALTER TABLE public.projects ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.project_favorites ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.project_members ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.task_lists ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.tasks ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.task_events ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.task_comments ENABLE ROW LEVEL SECURITY;
-
--- Helper functions
+-- RPC: can the user see this project
 CREATE OR REPLACE FUNCTION public.can_access_project(p_project_id uuid, p_user_id uuid)
 RETURNS boolean AS $$
   SELECT EXISTS (
@@ -114,6 +105,7 @@ RETURNS boolean AS $$
   );
 $$ LANGUAGE sql SECURITY DEFINER SET search_path = '';
 
+-- RPC: can the user edit this project
 CREATE OR REPLACE FUNCTION public.can_edit_project(p_project_id uuid, p_user_id uuid)
 RETURNS boolean AS $$
   SELECT public.can_access_project(p_project_id, p_user_id)
@@ -123,6 +115,7 @@ RETURNS boolean AS $$
     ) IN ('owner', 'admin', 'member');
 $$ LANGUAGE sql SECURITY DEFINER SET search_path = '';
 
+-- RPC: is the user an owner/admin of the project's workspace
 CREATE OR REPLACE FUNCTION public.is_project_manager(p_project_id uuid, p_user_id uuid)
 RETURNS boolean AS $$
   SELECT public.get_workspace_member_role(
@@ -131,6 +124,7 @@ RETURNS boolean AS $$
   ) IN ('owner', 'admin');
 $$ LANGUAGE sql SECURITY DEFINER SET search_path = '';
 
+-- Policy helper: did the user create this project
 CREATE OR REPLACE FUNCTION public.is_project_creator(p_project_id uuid, p_user_id uuid)
 RETURNS boolean AS $$
   SELECT EXISTS (
@@ -139,7 +133,15 @@ RETURNS boolean AS $$
   );
 $$ LANGUAGE sql SECURITY DEFINER SET search_path = '';
 
--- Policies: projects
+-- RLS
+ALTER TABLE public.projects ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.project_favorites ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.project_members ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.task_lists ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.tasks ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.task_events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.task_comments ENABLE ROW LEVEL SECURITY;
+
 CREATE POLICY "Members can see accessible projects"
 ON public.projects FOR SELECT
 USING (
@@ -178,7 +180,6 @@ CREATE POLICY "Managers can delete projects"
 ON public.projects FOR DELETE
 USING (public.is_project_manager(id, (SELECT auth.uid())));
 
--- Policies: project_favorites
 CREATE POLICY "Users can see their own favorites"
 ON public.project_favorites FOR SELECT
 USING (user_id = (SELECT auth.uid()));
@@ -199,7 +200,6 @@ CREATE POLICY "Users can remove their own favorites"
 ON public.project_favorites FOR DELETE
 USING (user_id = (SELECT auth.uid()));
 
--- Policies: project_members
 CREATE POLICY "Users with project access can see project members"
 ON public.project_members FOR SELECT
 USING (public.can_access_project(project_id, (SELECT auth.uid())));
@@ -211,6 +211,7 @@ WITH CHECK (
   OR (
     id = (SELECT auth.uid())
     AND public.is_project_creator(project_id, (SELECT auth.uid()))
+    AND public.can_edit_project(project_id, (SELECT auth.uid()))
   )
 );
 
@@ -218,7 +219,6 @@ CREATE POLICY "Admins/owners can remove project members"
 ON public.project_members FOR DELETE
 USING (public.is_project_manager(project_id, (SELECT auth.uid())));
 
--- Policies: task_lists
 CREATE POLICY "Users with project access can see task lists"
 ON public.task_lists FOR SELECT
 USING (public.can_access_project(project_id, (SELECT auth.uid())));
@@ -238,7 +238,6 @@ CREATE POLICY "Managers can delete task lists"
 ON public.task_lists FOR DELETE
 USING (public.is_project_manager(project_id, (SELECT auth.uid())));
 
--- Policies: tasks
 CREATE POLICY "Users with project access can see tasks"
 ON public.tasks FOR SELECT
 USING (public.can_access_project(project_id, (SELECT auth.uid())));
@@ -266,7 +265,6 @@ USING (
   OR created_by = (SELECT auth.uid())
 );
 
--- Policies: task_events
 CREATE POLICY "Users with project access can see task events"
 ON public.task_events FOR SELECT
 USING (
@@ -277,18 +275,6 @@ USING (
   )
 );
 
-CREATE POLICY "Non-guest members can create task events"
-ON public.task_events FOR INSERT
-WITH CHECK (
-  user_id = (SELECT auth.uid())
-  AND EXISTS (
-    SELECT 1 FROM public.tasks t
-    WHERE t.id = task_events.task_id
-      AND public.can_edit_project(t.project_id, (SELECT auth.uid()))
-  )
-);
-
--- Policies: task_comments
 CREATE POLICY "Users with project access can see task comments"
 ON public.task_comments FOR SELECT
 USING (
@@ -326,44 +312,62 @@ USING (
   )
 );
 
--- RPC: bulk-update task positions (and optionally status) in a single UPDATE,
--- logging a status_changed task_event for any row whose status actually
--- changed (mirrors what update-task.ts does for status changes made via the
--- task modal, so a Kanban drag is not silently missing from the activity log)
+-- RPC: bulk-update task positions/status in one UPDATE
 CREATE OR REPLACE FUNCTION public.reorder_tasks(p_list_id uuid, p_changes jsonb)
 RETURNS void AS $$
-  WITH changes AS (
-    SELECT * FROM jsonb_to_recordset(p_changes) AS c(id uuid, position integer, status public.task_status)
-  ),
-  before AS (
-    SELECT t.id, t.status AS old_status
-    FROM public.tasks t
-    JOIN changes c ON c.id = t.id
-    WHERE t.list_id = p_list_id
-  ),
-  updated AS (
-    UPDATE public.tasks t
-    SET position = c.position,
-        status = COALESCE(c.status, t.status)
-    FROM changes c
-    WHERE t.id = c.id
-      AND t.list_id = p_list_id
-    RETURNING t.id, t.status AS new_status
-  ),
-  logged AS (
-    INSERT INTO public.task_events (task_id, user_id, type, metadata)
-    SELECT u.id, auth.uid(), 'status_changed',
-           jsonb_build_object('from', b.old_status, 'to', u.new_status)
-    FROM updated u
-    JOIN before b ON b.id = u.id
-    WHERE b.old_status IS DISTINCT FROM u.new_status
-    RETURNING 1
-  )
-  SELECT count(*) FROM logged;
+  UPDATE public.tasks t
+  SET position = c.position,
+      status = COALESCE(c.status, t.status)
+  FROM jsonb_to_recordset(p_changes) AS c(id uuid, position integer, status public.task_status)
+  WHERE t.id = c.id
+    AND t.list_id = p_list_id;
 $$ LANGUAGE sql SET search_path = '';
 
--- Trigger: subtasks are limited to one level of nesting and must stay
--- within the same list/project as their parent
+-- Trigger: the activity log is written only by the database
+CREATE OR REPLACE FUNCTION public.log_task_events()
+RETURNS TRIGGER AS $$
+DECLARE
+  v_user uuid := auth.uid();
+BEGIN
+  IF v_user IS NULL OR pg_trigger_depth() > 1 THEN
+    RETURN NEW;
+  END IF;
+
+  IF TG_OP = 'INSERT' THEN
+    INSERT INTO public.task_events (task_id, user_id, type, metadata)
+    VALUES (NEW.id, v_user, 'task_created', '{}');
+    RETURN NEW;
+  END IF;
+
+  IF NEW.status IS DISTINCT FROM OLD.status THEN
+    INSERT INTO public.task_events (task_id, user_id, type, metadata)
+    VALUES (NEW.id, v_user, 'status_changed', jsonb_build_object('from', OLD.status, 'to', NEW.status));
+  END IF;
+
+  IF NEW.priority IS DISTINCT FROM OLD.priority THEN
+    INSERT INTO public.task_events (task_id, user_id, type, metadata)
+    VALUES (NEW.id, v_user, 'priority_changed', jsonb_build_object('from', OLD.priority, 'to', NEW.priority));
+  END IF;
+
+  IF NEW.due_date IS DISTINCT FROM OLD.due_date THEN
+    INSERT INTO public.task_events (task_id, user_id, type, metadata)
+    VALUES (NEW.id, v_user, 'due_date_changed', jsonb_build_object('from', OLD.due_date, 'to', NEW.due_date));
+  END IF;
+
+  IF NEW.assignee_id IS DISTINCT FROM OLD.assignee_id THEN
+    INSERT INTO public.task_events (task_id, user_id, type, metadata)
+    VALUES (NEW.id, v_user, 'assignee_changed', jsonb_build_object('fromId', OLD.assignee_id, 'toId', NEW.assignee_id));
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
+
+CREATE OR REPLACE TRIGGER log_task_events_trigger
+  AFTER INSERT OR UPDATE ON public.tasks
+  FOR EACH ROW EXECUTE PROCEDURE public.log_task_events();
+
+-- Trigger: subtasks nest one level and stay in their parent's list and project
 CREATE OR REPLACE FUNCTION public.validate_subtask_parent()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -389,8 +393,7 @@ CREATE OR REPLACE TRIGGER validate_subtask_parent_trigger
   BEFORE INSERT OR UPDATE ON public.tasks
   FOR EACH ROW EXECUTE PROCEDURE public.validate_subtask_parent();
 
--- Creates a project, its default task list and the creator's project_members
--- row in a single transaction, so a project can never end up without a list.
+-- RPC: creates a project with its default list and creator membership
 CREATE OR REPLACE FUNCTION public.create_project_with_default_list(
   p_workspace_id uuid,
   p_name         text,
@@ -415,9 +418,6 @@ BEGIN
   )
   RETURNING id INTO v_project_id;
 
-  -- inserted before task_lists: for a private project, can_access_project()
-  -- (used by the task_lists INSERT policy) needs either a manager role or an
-  -- existing project_members row — the creator's own row must exist first
   INSERT INTO public.project_members (project_id, id, added_by_id)
   VALUES (v_project_id, auth.uid(), auth.uid());
 
@@ -428,7 +428,7 @@ BEGIN
 END;
 $$;
 
--- Seeds a new user's first workspace with one onboarding project (list + 3 example tasks across statuses)
+-- RPC: seeds a new user's first workspace with one onboarding project
 CREATE OR REPLACE FUNCTION public.create_onboarding_workspace(
   p_workspace_name      text,
   p_project_name        text,
@@ -479,11 +479,9 @@ $$;
 
 REVOKE EXECUTE ON FUNCTION public.create_onboarding_workspace(
   text, text, text, text, text, text, text, text, text
-) FROM anon;
+) FROM PUBLIC, anon;
 
--- Only workspace owners/admins may change an existing project's is_private
--- flag (symmetric with the INSERT policy above). Other fields on a project
--- a member can already edit stay editable — this only guards the one column.
+-- Only workspace owners/admins may change is_private
 CREATE OR REPLACE FUNCTION public.enforce_private_project_change()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -575,26 +573,37 @@ REVOKE ALL ON public.task_lists FROM anon;
 REVOKE ALL ON public.tasks FROM anon;
 REVOKE ALL ON public.task_events FROM anon;
 REVOKE ALL ON public.task_comments FROM anon;
-REVOKE EXECUTE ON FUNCTION public.can_access_project(uuid, uuid) FROM anon;
-REVOKE EXECUTE ON FUNCTION public.can_edit_project(uuid, uuid) FROM anon;
-REVOKE EXECUTE ON FUNCTION public.is_project_manager(uuid, uuid) FROM anon;
-REVOKE EXECUTE ON FUNCTION public.is_project_creator(uuid, uuid) FROM anon;
+REVOKE EXECUTE ON FUNCTION public.can_access_project(uuid, uuid) FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.can_edit_project(uuid, uuid) FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.is_project_manager(uuid, uuid) FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.is_project_creator(uuid, uuid) FROM PUBLIC, anon;
 REVOKE EXECUTE ON FUNCTION public.create_project_with_default_list(
   uuid, text, text, boolean, text, text, integer, text
-) FROM anon;
-REVOKE EXECUTE ON FUNCTION public.reorder_tasks(uuid, jsonb) FROM anon;
-REVOKE EXECUTE ON FUNCTION public.validate_subtask_parent() FROM anon;
-REVOKE EXECUTE ON FUNCTION public.enforce_private_project_change() FROM anon;
-REVOKE EXECUTE ON FUNCTION public.clear_assignee_on_project_member_removed() FROM anon;
-REVOKE EXECUTE ON FUNCTION public.clear_assignee_on_workspace_member_removed() FROM anon;
-
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.projects TO authenticated;
+) FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.reorder_tasks(uuid, jsonb) FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.log_task_events() FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.validate_subtask_parent() FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.enforce_private_project_change() FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.clear_assignee_on_project_member_removed() FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.clear_assignee_on_workspace_member_removed() FROM PUBLIC, anon;
+REVOKE ALL ON public.projects FROM authenticated;
+REVOKE ALL ON public.project_favorites FROM authenticated;
+REVOKE ALL ON public.project_members FROM authenticated;
+REVOKE ALL ON public.task_lists FROM authenticated;
+REVOKE ALL ON public.tasks FROM authenticated;
+REVOKE ALL ON public.task_events FROM authenticated;
+REVOKE ALL ON public.task_comments FROM authenticated;
+GRANT SELECT, INSERT, DELETE ON public.projects TO authenticated;
+GRANT UPDATE (name, description, is_private, is_completed, icon, color, position, deleted_at) ON public.projects TO authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.project_favorites TO authenticated;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.project_members TO authenticated;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.task_lists TO authenticated;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.tasks TO authenticated;
-GRANT SELECT, INSERT ON public.task_events TO authenticated;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.task_comments TO authenticated;
+GRANT SELECT, INSERT, DELETE ON public.project_members TO authenticated;
+GRANT SELECT, INSERT, DELETE ON public.task_lists TO authenticated;
+GRANT UPDATE (name, position, deleted_at) ON public.task_lists TO authenticated;
+GRANT SELECT, INSERT, DELETE ON public.tasks TO authenticated;
+GRANT UPDATE (title, description, status, priority, assignee_id, due_date, position, deleted_at) ON public.tasks TO authenticated;
+GRANT SELECT ON public.task_events TO authenticated;
+GRANT SELECT, INSERT, DELETE ON public.task_comments TO authenticated;
+GRANT UPDATE (content) ON public.task_comments TO authenticated;
 GRANT ALL ON public.projects TO service_role;
 GRANT ALL ON public.project_favorites TO service_role;
 GRANT ALL ON public.project_members TO service_role;
@@ -603,8 +612,10 @@ GRANT ALL ON public.tasks TO service_role;
 GRANT ALL ON public.task_events TO service_role;
 GRANT ALL ON public.task_comments TO service_role;
 
+-- Realtime
 ALTER TABLE public.task_comments REPLICA IDENTITY FULL;
 
+ALTER PUBLICATION supabase_realtime ADD TABLE public.projects;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.tasks;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.task_lists;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.task_events;

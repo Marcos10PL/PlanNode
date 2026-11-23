@@ -44,11 +44,11 @@ export async function inviteMemberAction(
 
   const { email, role } = parsed.data;
 
-  const { data: invitedProfile } = await supabase
-    .from("profiles")
-    .select("id, locale")
-    .eq("email", email)
-    .single();
+  const { data: invitedProfiles } = await supabase.rpc(
+    "find_profile_by_email",
+    { p_workspace_id: workspaceId, p_email: email },
+  );
+  const invitedProfile = invitedProfiles?.[0];
 
   if (invitedProfile) {
     const { data: existingMember } = await supabase

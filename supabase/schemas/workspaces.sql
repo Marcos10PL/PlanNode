@@ -34,16 +34,12 @@ CREATE TABLE public.workspace_invitations (
   created_at timestamptz NOT NULL DEFAULT now()
 );
 
+-- One pending invitation per email and workspace
 CREATE UNIQUE INDEX workspace_invitations_workspace_id_email_pending_key
   ON public.workspace_invitations (workspace_id, email)
   WHERE status = 'pending';
 
--- RLS
-ALTER TABLE public.workspaces ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.workspace_members ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.workspace_invitations ENABLE ROW LEVEL SECURITY;
-
--- Helper functions
+-- Policy helper: is the user a member of this workspace
 CREATE OR REPLACE FUNCTION public.is_workspace_member(p_workspace_id uuid, p_user_id uuid)
 RETURNS boolean AS $$
   SELECT EXISTS (
@@ -53,6 +49,7 @@ RETURNS boolean AS $$
   );
 $$ LANGUAGE sql SECURITY DEFINER SET search_path = '';
 
+-- RPC: the user's role in a workspace (NULL if not a member)
 CREATE OR REPLACE FUNCTION public.get_workspace_member_role(p_workspace_id uuid, p_user_id uuid)
 RETURNS public.workspace_role AS $$
   SELECT role FROM public.workspace_members
@@ -61,17 +58,54 @@ RETURNS public.workspace_role AS $$
   LIMIT 1;
 $$ LANGUAGE sql SECURITY DEFINER SET search_path = '';
 
+-- Helper: id of the workspace owner
 CREATE OR REPLACE FUNCTION public.get_workspace_owner(p_workspace_id uuid)
 RETURNS uuid AS $$
   SELECT owner_id FROM public.workspaces WHERE id = p_workspace_id;
 $$ LANGUAGE sql SECURITY DEFINER SET search_path = '';
 
+-- RPC: how many workspaces the user owns
 CREATE OR REPLACE FUNCTION public.get_owned_workspace_count(p_user_id uuid)
 RETURNS integer AS $$
   SELECT count(*)::integer FROM public.workspaces WHERE owner_id = p_user_id;
 $$ LANGUAGE sql SECURITY DEFINER SET search_path = '';
 
--- Policies: workspaces
+-- Policy helper: can the user see this profile
+CREATE OR REPLACE FUNCTION public.can_view_profile(p_profile_id uuid)
+RETURNS boolean AS $$
+  SELECT p_profile_id = auth.uid()
+    OR EXISTS (
+      SELECT 1 FROM public.workspace_members me
+      JOIN public.workspace_members other ON other.workspace_id = me.workspace_id
+      WHERE me.id = auth.uid() AND other.id = p_profile_id
+    )
+    OR EXISTS (
+      SELECT 1 FROM public.workspace_invitations wi
+      JOIN public.profiles me ON me.email = wi.email
+      WHERE me.id = auth.uid()
+        AND wi.invited_by_id = p_profile_id
+        AND wi.status = 'pending'
+        AND wi.expires_at > now()
+    );
+$$ LANGUAGE sql SECURITY DEFINER STABLE SET search_path = '';
+
+-- RPC: find an invitee by email (owners/admins only)
+CREATE OR REPLACE FUNCTION public.find_profile_by_email(p_workspace_id uuid, p_email text)
+RETURNS TABLE (id uuid, locale public.locale) AS $$
+  SELECT p.id, p.locale FROM public.profiles p
+  WHERE p.email = p_email
+    AND public.get_workspace_member_role(p_workspace_id, auth.uid()) IN ('owner', 'admin');
+$$ LANGUAGE sql SECURITY DEFINER STABLE SET search_path = '';
+
+-- RLS
+ALTER TABLE public.workspaces ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.workspace_members ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.workspace_invitations ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view profiles they share a workspace with"
+ON public.profiles FOR SELECT TO authenticated
+USING (public.can_view_profile(id));
+
 CREATE POLICY "Users can see workspaces they are members of"
 ON public.workspaces FOR SELECT
 USING (
@@ -106,16 +140,10 @@ CREATE POLICY "Only workspace owner can delete workspace"
 ON public.workspaces FOR DELETE
 USING (owner_id = (SELECT auth.uid()));
 
--- Policies: workspace_members
 CREATE POLICY "Members can see other members in same workspace"
 ON public.workspace_members FOR SELECT
 USING (public.is_workspace_member(workspace_id, (SELECT auth.uid())));
 
--- 'owner' is intentionally excluded from every member-facing INSERT/UPDATE
--- check below: the only two legitimate ways to hold that role are the
--- add_workspace_owner trigger (workspace creation) and
--- transfer_workspace_ownership() (both SECURITY DEFINER, both bypass RLS as
--- the table owner). No direct client-facing write path may ever set it.
 CREATE POLICY "Admins/owners can add members"
 ON public.workspace_members FOR INSERT
 WITH CHECK (
@@ -123,7 +151,6 @@ WITH CHECK (
   AND role != 'owner'::public.workspace_role
 );
 
--- Allows invited users to accept their invitation by inserting their own membership
 CREATE POLICY "Invited users can join workspace"
 ON public.workspace_members FOR INSERT
 WITH CHECK (
@@ -133,6 +160,7 @@ WITH CHECK (
     SELECT 1 FROM public.workspace_invitations wi
     JOIN public.profiles p ON p.email = wi.email
     WHERE wi.workspace_id = workspace_members.workspace_id
+      AND wi.role = workspace_members.role
       AND p.id = (SELECT auth.uid())
       AND wi.status = 'pending'
       AND wi.expires_at > now()
@@ -162,7 +190,6 @@ USING (
   AND role != 'owner'::public.workspace_role
 );
 
--- Policies: workspace_invitations
 CREATE POLICY "Admins/owners can see invitations"
 ON public.workspace_invitations FOR SELECT
 USING (
@@ -175,6 +202,8 @@ ON public.workspace_invitations FOR INSERT
 WITH CHECK (
   public.get_workspace_member_role(workspace_id, (SELECT auth.uid())) IN ('owner', 'admin')
   AND role != 'owner'::public.workspace_role
+  AND invited_by_id = (SELECT auth.uid())
+  AND status = 'pending'
 );
 
 CREATE POLICY "Invited users can update their invitation status"
@@ -206,14 +235,15 @@ CREATE OR REPLACE TRIGGER on_workspace_created
   AFTER INSERT ON public.workspaces
   FOR EACH ROW EXECUTE PROCEDURE public.add_workspace_owner();
 
--- Atomically transfers ownership. Only the current owner may call this. The
--- target must already be a member (any role). Previous owner becomes 'admin'.
+-- RPC: owner-only, the target must be a member, the previous owner becomes admin
 CREATE OR REPLACE FUNCTION public.transfer_workspace_ownership(
   p_workspace_id uuid,
   p_new_owner_id uuid
 )
 RETURNS void
 LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
 AS $$
 BEGIN
   IF public.get_workspace_owner(p_workspace_id) IS DISTINCT FROM auth.uid() THEN
@@ -249,22 +279,14 @@ BEGIN
 END;
 $$;
 
--- Trigger: update updated_at on workspace/member changes
-CREATE OR REPLACE FUNCTION public.set_workspaces_updated_at()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.updated_at = NOW();
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SET search_path = '';
-
+-- Triggers: update updated_at
 CREATE OR REPLACE TRIGGER set_workspaces_updated_at
   BEFORE UPDATE ON public.workspaces
-  FOR EACH ROW EXECUTE PROCEDURE public.set_workspaces_updated_at();
+  FOR EACH ROW EXECUTE PROCEDURE public.set_updated_at();
 
 CREATE OR REPLACE TRIGGER set_workspace_members_updated_at
   BEFORE UPDATE ON public.workspace_members
-  FOR EACH ROW EXECUTE PROCEDURE public.set_workspaces_updated_at();
+  FOR EACH ROW EXECUTE PROCEDURE public.set_updated_at();
 
 -- Indexes
 CREATE INDEX idx_workspaces_owner_id ON public.workspaces(owner_id);
@@ -279,17 +301,23 @@ CREATE INDEX idx_workspace_invitations_status ON public.workspace_invitations(st
 REVOKE ALL ON public.workspaces FROM anon;
 REVOKE ALL ON public.workspace_members FROM anon;
 REVOKE ALL ON public.workspace_invitations FROM anon;
-REVOKE EXECUTE ON FUNCTION public.is_workspace_member(uuid, uuid) FROM anon;
-REVOKE EXECUTE ON FUNCTION public.get_workspace_member_role(uuid, uuid) FROM anon;
-REVOKE EXECUTE ON FUNCTION public.get_workspace_owner(uuid) FROM anon;
-REVOKE EXECUTE ON FUNCTION public.get_owned_workspace_count(uuid) FROM anon;
-REVOKE EXECUTE ON FUNCTION public.add_workspace_owner() FROM anon;
-REVOKE EXECUTE ON FUNCTION public.set_workspaces_updated_at() FROM anon;
-REVOKE EXECUTE ON FUNCTION public.transfer_workspace_ownership(uuid, uuid) FROM anon;
-
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.workspaces TO authenticated;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.workspace_members TO authenticated;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.workspace_invitations TO authenticated;
+REVOKE EXECUTE ON FUNCTION public.is_workspace_member(uuid, uuid) FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.get_workspace_member_role(uuid, uuid) FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.get_workspace_owner(uuid) FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.get_owned_workspace_count(uuid) FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.can_view_profile(uuid) FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.find_profile_by_email(uuid, text) FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.add_workspace_owner() FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.transfer_workspace_ownership(uuid, uuid) FROM PUBLIC, anon;
+REVOKE ALL ON public.workspaces FROM authenticated;
+REVOKE ALL ON public.workspace_members FROM authenticated;
+REVOKE ALL ON public.workspace_invitations FROM authenticated;
+GRANT SELECT, INSERT, DELETE ON public.workspaces TO authenticated;
+GRANT UPDATE (name, description) ON public.workspaces TO authenticated;
+GRANT SELECT, INSERT, DELETE ON public.workspace_members TO authenticated;
+GRANT UPDATE (role) ON public.workspace_members TO authenticated;
+GRANT SELECT, INSERT, DELETE ON public.workspace_invitations TO authenticated;
+GRANT UPDATE (status) ON public.workspace_invitations TO authenticated;
 GRANT ALL ON public.workspaces TO service_role;
 GRANT ALL ON public.workspace_members TO service_role;
 GRANT ALL ON public.workspace_invitations TO service_role;

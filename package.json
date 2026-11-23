@@ -7,7 +7,9 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "migration:diff": "supabase db diff -f",
+    "generate-limits": "tsx scripts/generate-limits.ts",
+    "check-limits": "tsx scripts/generate-limits.ts --check",
+    "migration:diff": "tsx scripts/generate-limits.ts && supabase db diff -f",
     "migration:push": "supabase db push",
     "generate-types": "supabase gen types typescript --local > types/supabase.ts",
     "generate-seed": "tsx scripts/generate-seed.ts"

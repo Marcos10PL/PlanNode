@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 
 const TABLES = [
+  "projects",
   "tasks",
   "task_lists",
   "notifications",

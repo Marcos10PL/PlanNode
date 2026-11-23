@@ -58,7 +58,12 @@ export const ERRORS = {
     "cannot_restore_while_ancestor_trashed",
 } as const;
 
+export const VALIDATION_MIN = {
+  NAME: 1,
+} as const;
+
 export const VALIDATION_MAX = {
+  EMAIL: 320,
   FULL_NAME: 100,
   WORKSPACE_NAME: 50,
   WORKSPACE_DESCRIPTION: 500,
@@ -68,6 +73,12 @@ export const VALIDATION_MAX = {
   TASK_TITLE: 200,
   TASK_DESCRIPTION: 5000,
   TASK_COMMENT: 2000,
+} as const;
+
+// ceilings for the stored HTML
+export const VALIDATION_MAX_HTML = {
+  TASK_DESCRIPTION: 100_000,
+  TASK_COMMENT: 40_000,
 } as const;
 
 export const COOKIES = {

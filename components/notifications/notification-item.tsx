@@ -8,6 +8,7 @@ import { FormattedDate } from "@/components/ui/formatted-date";
 import { TooltipIconButton } from "@/components/ui/tooltip-icon-button";
 import { Notification } from "@/types/dto";
 import { cn } from "@/utils";
+import { isInternalPath } from "@/utils/helpers";
 import { ExternalLink } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -59,7 +60,7 @@ export function NotificationItem({
   const handleView = async () => {
     await handleMarkRead();
 
-    if (notification.link) {
+    if (notification.link && isInternalPath(notification.link)) {
       router.push(notification.link);
     }
   };

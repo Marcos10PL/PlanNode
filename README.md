@@ -121,7 +121,7 @@ supabase link --project-ref <your-project-ref>
 supabase db push
 ```
 
-5. Enable Realtime for `notifications`, `tasks`, and `task_lists` (Dashboard → Database → Replication) — these are also declared in the `supabase/schemas/*.sql` files, so `db push` handles it automatically for new projects.
+5. Enable Realtime for `notifications`, `projects`, `tasks`, and `task_lists` (Dashboard → Database → Replication) — these are also declared in the `supabase/schemas/*.sql` files, so `db push` handles it automatically for new projects.
 6. (Optional, for localized transactional emails) Configure the **Send Email** auth hook — see [Environment Variables](#environment-variables) and [Architecture](#architecture) below.
 
 **Option B — Local Supabase**
@@ -189,7 +189,7 @@ The schema is defined declaratively in `supabase/schemas/*.sql` (the source of t
 
 **`task_lists`** / **`tasks`** (`schemas/projects.sql`) — lists belong to a project; tasks belong to a list and optionally to a parent task (one level of subtasks). Both support soft-delete via `deleted_at`.
 
-**`task_events`** / **`task_comments`** (`schemas/projects.sql`) — `task_events` is an append-only activity log (status/priority/assignee/due-date changes, written automatically by the relevant server actions); `task_comments` are user-authored rich-text comments. The UI merges both into a single chronological timeline per task.
+**`task_events`** / **`task_comments`** (`schemas/projects.sql`) — `task_events` is an append-only activity log (status/priority/assignee/due-date changes, written only by the `log_task_events` database trigger; clients have no INSERT privilege on the table); `task_comments` are user-authored rich-text comments. The UI merges both into a single chronological timeline per task.
 
 **`notifications`** / **`notification_preferences`** (`schemas/notifications.sql`) — in-app notifications with Supabase Realtime enabled; rows are created via the `create_notification()` SECURITY DEFINER function (restricted to callers who share a workspace with the recipient, or who manage the workspace an invitation belongs to) so no client ever gets direct INSERT access. `notification_preferences` holds a per-user, per-notification-type email/in-app toggle.
 
@@ -211,6 +211,12 @@ Every table has RLS enabled. Two independent authorization layers are enforced a
 
 - **Platform role** (`profiles.role`) — `admin` users bypass most restrictions via the `is_admin()` helper function
 - **Workspace role** (`workspace_members.role`) — membership and role are checked with `is_workspace_member()` / `get_workspace_member_role()` helper functions; only `owner`/`admin` members can manage invitations, members, and workspace settings, and a member's own role can never be written as `'owner'` through a normal insert/update/delete — that value is only ever set by the workspace-creation trigger or the dedicated `transfer_workspace_ownership()` function, both of which check `workspaces.owner_id` directly rather than the (client-writable) role column.
+- **Least privilege** — `authenticated` gets only the privileges the app needs. `UPDATE` is granted per column on tables with trusted columns (e.g. `workspaces.owner_id`, `profiles.email`, `tasks.created_by` cannot be written through the Data API), and `task_events` is read-only for clients. Functions are not executable by `anon`.
+- **Profile visibility** — a user sees only their own profile, their workspace-mates' and the inviter of a pending invitation. Looking up an invitee by email goes through `find_profile_by_email()` (owners/admins only).
+
+### Validation limits
+
+Length limits live in `const/index.ts` (`VALIDATION_MAX`, `VALIDATION_MIN`, `VALIDATION_MAX_HTML`) and are used by the zod schemas. `scripts/generate-limits.ts` mirrors them as CHECK constraints in `supabase/schemas/limits.sql`, so the database enforces them even for requests that bypass the app.
 
 ### Running migrations
 
@@ -225,7 +231,7 @@ supabase db reset
 pnpm migration:push
 ```
 
-> `migration:diff` doesn't reliably pick up privilege-only changes (`GRANT`/`REVOKE`) on functions that already existed before the diff, or `ALTER PUBLICATION`/`REPLICA IDENTITY` statements — always read the generated migration file before applying it.
+> `migration:diff` doesn't reliably pick up privilege-only changes (`GRANT`/`REVOKE`) on functions that already existed before the diff, or `ALTER PUBLICATION`/`REPLICA IDENTITY` statements — always read the generated migration file before applying it. It also never emits column-level `GRANT UPDATE (...)` or `REVOKE EXECUTE ... FROM PUBLIC`; copy those from the schema files into the migration by hand.
 
 ### Regenerating types
 
@@ -254,10 +260,12 @@ pnpm generate-seed
 | `pnpm start`           | Start the production server                                |
 | `pnpm lint`            | Run ESLint                                                 |
 | `pnpm typecheck`       | TypeScript type checking (`tsc --noEmit`)                  |
-| `pnpm migration:diff`  | Generate a migration from `supabase/schemas/*.sql`         |
+| `pnpm migration:diff`  | Generate a migration from `supabase/schemas/*.sql` (runs `generate-limits` first) |
 | `pnpm migration:push`  | Push pending migrations to the linked Supabase project     |
 | `pnpm generate-types`  | Regenerate `types/supabase.ts` from the local DB           |
 | `pnpm generate-seed`   | Regenerate `supabase/seed.sql` from `scripts/generate-seed.ts` |
+| `pnpm generate-limits` | Regenerate `supabase/schemas/limits.sql` (CHECK constraints) from `const/index.ts` |
+| `pnpm check-limits`    | Fail if `limits.sql` is out of date                        |
 
 There is no test runner configured in this repo (no Jest/Vitest/Playwright).
 
@@ -366,10 +374,9 @@ Server Component
 
 - **Data fetching** — async server components calling `lib/data/` functions (server Supabase client, wrapped in React's `cache()` to dedupe per-request)
 - **Mutations** — Next.js server actions in `actions/`; failures return `{ error }` (never thrown), success paths call `revalidatePath`/`redirect`. Callers should check the returned `error` rather than wrapping the action in `try/catch` — `redirect()` works by throwing internally, so a `try/catch` around it will incorrectly treat a successful redirect as a failure.
-- **Real-time** — `components/realtime-refresher.tsx` (mounted once in `DashboardShell`) subscribes to `postgres_changes` on `notifications`, `tasks`, and `task_lists` via the browser Supabase client and calls `router.refresh()` to re-render server components with fresh data. There's no separate client-side cache to invalidate — a refresh is the whole mechanism. Two details that weren't obvious the first time around:
+- **Real-time** — `components/realtime-refresher.tsx` (mounted once in `DashboardShell`) subscribes to `postgres_changes` on `notifications`, `projects`, `tasks`, and `task_lists` via the browser Supabase client and calls `router.refresh()` to re-render server components with fresh data. There's no separate client-side cache to invalidate — a refresh is the whole mechanism. Two details that weren't obvious the first time around:
   - A single bulk write (e.g. reordering N tasks) fires N separate `postgres_changes` events, one per row — the refresh call is debounced (400ms) so that burst collapses into a single `router.refresh()` instead of N. Server actions that mutate a realtime-covered table (`reorderTasksAction`, `reorderTaskListsAction`) deliberately don't also call `revalidatePath` — that would double the refresh for the acting user. Actions on tables *not* covered by realtime (e.g. `projects` — see below) still call `revalidatePath` themselves, since nothing else would refresh the acting user's own view otherwise.
   - The realtime socket's auth is a JWT set once via `supabase.realtime.setAuth(token)`; if it's never refreshed, events silently stop being authorized by RLS once that token expires (default 1h) — with no error or channel-close event to signal it. `RealtimeRefresher` re-pushes the token on every `onAuthStateChange` event (Supabase refreshes the underlying session token automatically before it expires) to keep the channel alive for the life of the tab.
-  - `projects` itself is **not** currently in the realtime table list, so changes to a project (rename, favorite, mark completed) aren't pushed live to other viewers — they catch up via the same component's plain "refresh on window focus" listener instead, or their own next navigation.
 
 ### Authorization Model
 
@@ -383,7 +390,7 @@ Two role layers, both enforced in the database via RLS (see [Database](#database
 - A project has one or more task lists; each list holds tasks, which can each have one level of subtasks (rendered as full task rows, not a separate lightweight type).
 - Each list view offers a **Kanban board** (drag cards between status columns) and a **list view** (grouped by status, filterable, sortable) — both backed by the same `reorderTasksAction`/`reorderTaskListsAction` server actions, using `dnd-kit` for the drag interactions.
 - Task descriptions and comments are authored as rich text via Tiptap and sanitized (`isomorphic-dompurify`, so sanitization also runs correctly during server-side rendering, not just in the browser) before being rendered with `dangerouslySetInnerHTML`.
-- Every status/priority/assignee/due-date change writes a row to `task_events`; the UI merges that log with `task_comments` into one chronological timeline per task.
+- Every status/priority/assignee/due-date change writes a row to `task_events` (via a database trigger); the UI merges that log with `task_comments` into one chronological timeline per task.
 
 ### Invitations
 
@@ -416,8 +423,8 @@ All UI strings live in `messages/en.json` and `messages/pl.json`. The active loc
 - **No automated tests.** No Jest/Vitest/Playwright configured — correctness is verified manually plus RLS as a second, database-level line of defense. A conscious scope trade-off, not an oversight.
 - **Dragging a task across status columns doesn't move it**, in both the Kanban board and the list view. This is a deliberate `event.preventDefault()` block, not a missing feature — `@dnd-kit/react` 0.5.0 combined with React 19 crashes on cross-group drag (a confirmed upstream bug, still open, no stable fix released). Changing a task's status works fine via the task modal/status dropdown; only the drag gesture itself is restricted.
 - **No due-date reminders.** Tasks have due dates and overdue/upcoming ones surface on the "My Tasks" dashboard, but nothing proactively notifies you before a deadline passes — that would need a scheduled job (e.g. `pg_cron` or an external scheduler) and hasn't been built.
-- **Realtime coverage is asymmetric.** `tasks`, `task_lists`, and `notifications` push live updates to every open tab; `projects` does not (renaming, favoriting, or completing a project only reaches other viewers on their next refresh or window focus). An easy gap to close (one more table in the realtime publication) rather than a structural limitation.
 - **Realtime is refresh-based, not patch-based.** Any change to a watched table triggers a full server refetch of the current page's data rather than merging just the changed row into client state. Simple and correctness-by-construction, but not the most bandwidth-efficient approach at a larger scale than this app targets.
+- **Notification text is sender-controlled.** `create_notification()` checks who may send to whom, but not the content of `metadata`, so a workspace-mate could send a notification with arbitrary text (links are restricted to internal paths by a CHECK constraint). Closing this properly means calling it only from the server with the service-role client.
 
 ---
 
@@ -452,7 +459,7 @@ Sending real transactional email (as opposed to Supabase's local Inbucket catch-
 
 - Use a Supabase cloud project for production
 - Link it locally (`supabase link --project-ref <ref>`) and apply migrations with `pnpm migration:push` (`supabase db push`)
-- Confirm Realtime is enabled for `notifications`, `tasks`, and `task_lists` (Dashboard → Database → Replication) — declared in the schema, but double-check on first deploy
+- Confirm Realtime is enabled for `notifications`, `projects`, `tasks`, and `task_lists` (Dashboard → Database → Replication) — declared in the schema, but double-check on first deploy
 - Seed `app_config` and `email_templates` (run `pnpm generate-seed` and apply the resulting `supabase/seed.sql` if it wasn't already applied against the production project)
 - If using the Send Email hook, create it in Dashboard → Authentication → Hooks pointed at `https://<your-domain>/api/auth/send-email-hook`, with a secret matching `SEND_EMAIL_HOOK_SECRET`
 
