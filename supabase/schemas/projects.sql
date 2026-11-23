@@ -13,7 +13,7 @@ CREATE TABLE public.projects (
   icon text NOT NULL DEFAULT 'folder-kanban',
   color text NOT NULL DEFAULT 'neutral',
   position integer NOT NULL DEFAULT 0,
-  created_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  created_by uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
   deleted_at timestamptz,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
@@ -22,14 +22,14 @@ CREATE TABLE public.projects (
 CREATE TABLE public.project_members (
   id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   project_id uuid NOT NULL REFERENCES public.projects(id) ON DELETE CASCADE,
-  added_by_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  added_by_id uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
   created_at timestamptz DEFAULT now(),
 
   PRIMARY KEY (project_id, id)
 );
 
 CREATE TABLE public.project_favorites (
-  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  user_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   project_id uuid NOT NULL REFERENCES public.projects(id) ON DELETE CASCADE,
   position integer NOT NULL DEFAULT 0,
 
@@ -41,7 +41,7 @@ CREATE TABLE public.task_lists (
   project_id uuid NOT NULL REFERENCES public.projects(id) ON DELETE CASCADE,
   name text NOT NULL,
   position integer NOT NULL DEFAULT 0,
-  created_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  created_by uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
   deleted_at timestamptz,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now(),
@@ -61,7 +61,7 @@ CREATE TABLE public.tasks (
   assignee_id uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
   due_date date,
   position integer NOT NULL DEFAULT 0,
-  created_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  created_by uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
   deleted_at timestamptz,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now(),

@@ -8,20 +8,14 @@ export const getInvitationByToken = cache(async (token: string) => {
 
   const { data } = await supabase
     .from("workspace_invitations")
-    .select("*, workspace:workspaces(name)")
+    .select(
+      "*, workspace:workspaces(name), inviter:profiles!invited_by_id(full_name)",
+    )
     .eq("token", token)
     .eq("status", INVITATION_STATUSES.PENDING)
     .single();
 
   if (!data) return null;
-
-  const { data: inviter } = data.invited_by_id
-    ? await supabase
-        .from("profiles")
-        .select("full_name, email")
-        .eq("id", data.invited_by_id)
-        .single()
-    : { data: null };
 
   return {
     id: data.id,
@@ -29,7 +23,7 @@ export const getInvitationByToken = cache(async (token: string) => {
     role: data.role,
     expiresAt: data.expires_at,
     workspaceName: data.workspace?.name ?? null,
-    inviterName: inviter?.full_name ?? null,
+    inviterName: data.inviter?.full_name ?? null,
   } satisfies InvitationDetails;
 });
 

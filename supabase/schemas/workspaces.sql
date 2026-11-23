@@ -5,7 +5,7 @@ CREATE TYPE public.invitation_status AS ENUM ('pending', 'accepted', 'declined')
 -- Tables
 CREATE TABLE public.workspaces (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  owner_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  owner_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   name text NOT NULL,
   description text,
   created_at timestamptz DEFAULT now(),
@@ -16,7 +16,7 @@ CREATE TABLE public.workspace_members (
   id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   workspace_id uuid NOT NULL REFERENCES public.workspaces(id) ON DELETE CASCADE,
   role public.workspace_role DEFAULT 'member' NOT NULL,
-  invited_by_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  invited_by_id uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
   joined_at timestamptz,
   invited_at timestamptz DEFAULT now(),
   created_at timestamptz DEFAULT now(),
@@ -31,7 +31,7 @@ CREATE TABLE public.workspace_invitations (
   email text NOT NULL,
   role public.workspace_role DEFAULT 'member',
   status public.invitation_status DEFAULT 'pending',
-  invited_by_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  invited_by_id uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
   token text UNIQUE NOT NULL,
   expires_at timestamptz NOT NULL,
   created_at timestamptz DEFAULT now()

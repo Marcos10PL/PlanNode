@@ -10,7 +10,7 @@ CREATE TYPE public.notification_type AS ENUM (
 -- Table
 CREATE TABLE public.notifications (
   id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id    uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  user_id    uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   type       public.notification_type NOT NULL,
   metadata   jsonb,
   link       text,
@@ -38,7 +38,7 @@ USING (user_id = (SELECT auth.uid()));
 
 -- Preferences
 CREATE TABLE public.notification_preferences (
-  user_id        uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  user_id        uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   type           public.notification_type NOT NULL,
   email_enabled  boolean NOT NULL DEFAULT true,
   in_app_enabled boolean NOT NULL DEFAULT true,
