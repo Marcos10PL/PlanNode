@@ -9,7 +9,7 @@ export const getWorkspaceMembers = cache(async (workspaceId: string) => {
 
   const { data: members } = await supabase
     .from("workspace_members")
-    .select("id, workspace_id, role, invited_by_id, joined_at")
+    .select("id, workspace_id, role, joined_at")
     .eq("workspace_id", workspaceId)
     .order("joined_at", { ascending: true });
 

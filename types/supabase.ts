@@ -590,27 +590,21 @@ export type Database = {
       }
       workspace_members: {
         Row: {
-          created_at: string
           id: string
-          invited_by_id: string | null
           joined_at: string
           role: Database["public"]["Enums"]["workspace_role"]
           updated_at: string
           workspace_id: string
         }
         Insert: {
-          created_at?: string
           id: string
-          invited_by_id?: string | null
           joined_at: string
           role?: Database["public"]["Enums"]["workspace_role"]
           updated_at?: string
           workspace_id: string
         }
         Update: {
-          created_at?: string
           id?: string
-          invited_by_id?: string | null
           joined_at?: string
           role?: Database["public"]["Enums"]["workspace_role"]
           updated_at?: string
@@ -620,13 +614,6 @@ export type Database = {
           {
             foreignKeyName: "workspace_members_id_fkey"
             columns: ["id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "workspace_members_invited_by_id_fkey"
-            columns: ["invited_by_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]

@@ -40,8 +40,7 @@ export async function acceptInvitationAction(token: string) {
     .insert({
       id: user.id,
       workspace_id: invitation.workspace_id,
-      role: invitation.role!,
-      invited_by_id: invitation.invited_by_id,
+      role: invitation.role,
       joined_at: new Date().toISOString(),
     });
 

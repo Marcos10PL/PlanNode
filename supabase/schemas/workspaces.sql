@@ -16,9 +16,7 @@ CREATE TABLE public.workspace_members (
   id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   workspace_id uuid NOT NULL REFERENCES public.workspaces(id) ON DELETE CASCADE,
   role public.workspace_role DEFAULT 'member' NOT NULL,
-  invited_by_id uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
   joined_at timestamptz NOT NULL,
-  created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
 
   PRIMARY KEY (workspace_id, id)
@@ -198,8 +196,8 @@ USING (
 CREATE OR REPLACE FUNCTION public.add_workspace_owner()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.workspace_members (workspace_id, id, role, invited_by_id, joined_at)
-  VALUES (NEW.id, NEW.owner_id, 'owner', NEW.owner_id, NOW());
+  INSERT INTO public.workspace_members (workspace_id, id, role, joined_at)
+  VALUES (NEW.id, NEW.owner_id, 'owner', NOW());
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
