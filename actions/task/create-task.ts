@@ -9,7 +9,7 @@ import {
 } from "@/const";
 import { canEditProject, getUserContext } from "@/lib/supabase/server";
 import { createTaskSchema, CreateTaskSchema } from "@/schema";
-import { renderLocalizedEmailTemplate, sendEmail } from "@/utils/email";
+import { renderLocalizedEmailTemplate, sendEmail } from "@/lib/email";
 import {
   generateAbsoluteUrl,
   generateListRoute,

@@ -2,8 +2,8 @@
 
 import { createClient } from "@/lib/supabase/client";
 import { createContext, useContext, useEffect, useState } from "react";
-import { useUser } from "./user-provider";
-import { useWorkspaces } from "./workspace-provider";
+import { useUser } from "@/components/providers/user-provider";
+import { useWorkspaces } from "@/components/providers/workspace-provider";
 
 type PresenceContextValue = {
   isOnline: (userId: string) => boolean;

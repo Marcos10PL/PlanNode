@@ -324,6 +324,7 @@ This drops the component's source directly into `components/ui/` (not a package 
 │   ├── profile/                    # Profile settings forms, delete-account modal
 │   ├── projects/                   # Project cards, modals, trash views
 │   ├── providers/                  # Context providers, DashboardShell
+│   ├── realtime/                   # Realtime refresher and presence provider
 │   ├── settings/                   # Settings navigation
 │   ├── tasks/                      # Kanban board, task rows/cards, comments, activity timeline
 │   ├── workspaces/                 # Workspace switcher, CRUD modals, team management
@@ -337,6 +338,7 @@ This drops the component's source directly into `components/ui/` (not a package 
 │   └── workspace/                  # Create/update/delete workspace, invites, members, roles
 ├── lib/
 │   ├── data/                       # Server-side data fetching, wrapped in React's cache()
+│   ├── email/                      # Email templates rendering and sending (Resend)
 │   └── supabase/                   # Supabase clients (browser, server, middleware, service-role)
 ├── schema/                         # Zod validation schemas
 ├── types/                          # TypeScript types, DTOs, and generated Supabase types
@@ -344,7 +346,7 @@ This drops the component's source directly into `components/ui/` (not a package 
 ├── messages/                       # i18n translation files (en.json, pl.json)
 ├── i18n/                           # next-intl routing config
 ├── const/                          # App-wide constants (routes, roles, statuses, error codes)
-├── utils/                          # Formatters, helpers, email/sanitize/workspace utilities
+├── utils/                          # Formatters, helpers, sanitize/workspace utilities
 ├── scripts/                        # One-off scripts (e.g. seed generation)
 └── supabase/
     ├── schemas/                    # Declarative SQL schema (source of truth)
@@ -380,7 +382,7 @@ Server Component
 
 - **Data fetching** — async server components calling `lib/data/` functions (server Supabase client, wrapped in React's `cache()` to dedupe per-request)
 - **Mutations** — Next.js server actions in `actions/`; failures return `{ error }` (never thrown), success paths call `revalidatePath`/`redirect`. Callers should check the returned `error` rather than wrapping the action in `try/catch` — `redirect()` works by throwing internally, so a `try/catch` around it will incorrectly treat a successful redirect as a failure.
-- **Real-time** — `components/realtime-refresher.tsx` (mounted once in `DashboardShell`) subscribes to `postgres_changes` on `notifications`, `projects`, `tasks`, and `task_lists` via the browser Supabase client and calls `router.refresh()` to re-render server components with fresh data. There's no separate client-side cache to invalidate — a refresh is the whole mechanism. Two details that weren't obvious the first time around:
+- **Real-time** — `components/realtime/realtime-refresher.tsx` (mounted once in `DashboardShell`) subscribes to `postgres_changes` on `notifications`, `projects`, `tasks`, and `task_lists` via the browser Supabase client and calls `router.refresh()` to re-render server components with fresh data. There's no separate client-side cache to invalidate — a refresh is the whole mechanism. Two details that weren't obvious the first time around:
   - A single bulk write (e.g. reordering N tasks) fires N separate `postgres_changes` events, one per row — the refresh call is debounced (400ms) so that burst collapses into a single `router.refresh()` instead of N. Server actions that mutate a realtime-covered table (`reorderTasksAction`, `reorderTaskListsAction`) deliberately don't also call `revalidatePath` — that would double the refresh for the acting user. Actions on tables *not* covered by realtime (e.g. `projects` — see below) still call `revalidatePath` themselves, since nothing else would refresh the acting user's own view otherwise.
   - The realtime socket's auth is a JWT set once via `supabase.realtime.setAuth(token)`; if it's never refreshed, events silently stop being authorized by RLS once that token expires (default 1h) — with no error or channel-close event to signal it. `RealtimeRefresher` re-pushes the token on every `onAuthStateChange` event (Supabase refreshes the underlying session token automatically before it expires) to keep the channel alive for the life of the tab.
 
@@ -414,7 +416,7 @@ Supabase Auth with `@supabase/ssr` for session handling in Next.js:
 
 ### Transactional email
 
-All auth emails (signup confirmation, password reset, email change) and every in-app notification's email counterpart go through a single pipeline: `utils/email.ts` renders a row from `email_templates` (per-locale, `{{variable}}` substitution with HTML-escaping) and sends it via Resend.
+All auth emails (signup confirmation, password reset, email change) and every in-app notification's email counterpart go through a single pipeline: `lib/email/index.ts` renders a row from `email_templates` (per-locale, `{{variable}}` substitution with HTML-escaping) and sends it via Resend.
 
 Auth emails specifically are routed through a custom **Send Email** hook (`app/api/auth/send-email-hook/route.ts`) instead of Supabase's built-in mailer, so they can be localized and styled consistently with the rest of the app's emails. The hook verifies the request's Standard Webhooks signature using `SEND_EMAIL_HOOK_SECRET` before doing anything. For local development, this hook is configured in `supabase/config.toml`'s `[auth.hook.send_email]` block (pointed at `http://host.docker.internal:3000/...`, since the local Supabase container can't resolve `localhost` as the host machine); for production, the equivalent hook must be created manually in Supabase Dashboard → Authentication → Hooks, pointed at your deployed domain.
 

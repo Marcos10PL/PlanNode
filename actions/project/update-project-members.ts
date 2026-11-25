@@ -6,7 +6,7 @@ import {
   updateProjectMembersSchema,
   UpdateProjectMembersSchema,
 } from "@/schema";
-import { renderLocalizedEmailTemplate, sendEmail } from "@/utils/email";
+import { renderLocalizedEmailTemplate, sendEmail } from "@/lib/email";
 import { generateAbsoluteUrl, generateProjectRoute } from "@/utils/helpers";
 import { revalidatePath } from "next/cache";
 

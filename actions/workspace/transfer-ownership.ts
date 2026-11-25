@@ -9,7 +9,7 @@ import {
 } from "@/const";
 import { getAppConfig } from "@/lib/data/app-config";
 import { getUserContext } from "@/lib/supabase/server";
-import { renderLocalizedEmailTemplate, sendEmail } from "@/utils/email";
+import { renderLocalizedEmailTemplate, sendEmail } from "@/lib/email";
 import { generateAbsoluteUrl } from "@/utils/helpers";
 import { getRoleLabel } from "@/utils/workspace";
 import { getTranslations } from "next-intl/server";

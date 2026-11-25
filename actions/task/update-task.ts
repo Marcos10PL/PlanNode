@@ -10,7 +10,7 @@ import {
 import { canEditProject, getUserContext } from "@/lib/supabase/server";
 import { updateTaskSchema, UpdateTaskSchema } from "@/schema";
 import { TablesUpdate } from "@/types/supabase";
-import { renderLocalizedEmailTemplate, sendEmail } from "@/utils/email";
+import { renderLocalizedEmailTemplate, sendEmail } from "@/lib/email";
 import {
   generateAbsoluteUrl,
   generateListRoute,

@@ -1,4 +1,4 @@
-import { usePresence } from "@/components/providers/presence-provider";
+import { usePresence } from "@/components/realtime/presence-provider";
 import { Avatar, AvatarBadge, AvatarFallback } from "@/components/ui/avatar";
 
 type Props = {

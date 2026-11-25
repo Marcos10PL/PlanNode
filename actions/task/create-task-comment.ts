@@ -8,7 +8,7 @@ import {
 } from "@/const";
 import { canEditProject, getUserContext } from "@/lib/supabase/server";
 import { createTaskCommentSchema, CreateTaskCommentSchema } from "@/schema";
-import { renderLocalizedEmailTemplate, sendEmail } from "@/utils/email";
+import { renderLocalizedEmailTemplate, sendEmail } from "@/lib/email";
 import { generateAbsoluteUrl, generateListRoute } from "@/utils/helpers";
 
 export async function createTaskCommentAction(

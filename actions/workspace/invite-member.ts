@@ -7,7 +7,7 @@ import {
   MANAGER_ROLES,
   NOTIFICATION_TYPES,
 } from "@/const";
-import { renderLocalizedEmailTemplate, sendEmail } from "@/utils/email";
+import { renderLocalizedEmailTemplate, sendEmail } from "@/lib/email";
 
 import { getUserContext } from "@/lib/supabase/server";
 import { inviteMemberSchema, InviteMemberSchema } from "@/schema";

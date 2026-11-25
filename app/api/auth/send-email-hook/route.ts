@@ -2,7 +2,7 @@ import "server-only";
 
 import { EMAIL_TEMPLATES } from "@/const";
 import { createServiceClient } from "@/lib/supabase/service";
-import { renderLocalizedEmailTemplate, sendEmail } from "@/utils/email";
+import { renderLocalizedEmailTemplate, sendEmail } from "@/lib/email";
 import { generateAbsoluteUrl } from "@/utils/helpers";
 import { NextRequest, NextResponse } from "next/server";
 import { Webhook } from "standardwebhooks";

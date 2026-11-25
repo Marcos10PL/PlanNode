@@ -10,7 +10,7 @@ import {
 } from "@/const";
 import { getUserContext } from "@/lib/supabase/server";
 import { updateMemberRoleSchema, UpdateMemberRoleSchema } from "@/schema";
-import { renderLocalizedEmailTemplate, sendEmail } from "@/utils/email";
+import { renderLocalizedEmailTemplate, sendEmail } from "@/lib/email";
 import { generateAbsoluteUrl } from "@/utils/helpers";
 import { getRoleLabel } from "@/utils/workspace";
 import { getTranslations } from "next-intl/server";

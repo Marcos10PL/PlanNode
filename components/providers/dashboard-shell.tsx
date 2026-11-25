@@ -2,10 +2,10 @@
 import { MyAccount } from "@/components/nav/my-account";
 import { NotificationsIndicator } from "@/components/notifications/notifications-indicator";
 import { AppConfigProvider } from "@/components/providers/app-config-provider";
-import { PresenceProvider } from "@/components/providers/presence-provider";
+import { PresenceProvider } from "@/components/realtime/presence-provider";
 import { UserProvider } from "@/components/providers/user-provider";
 import { WorkspaceProvider } from "@/components/providers/workspace-provider";
-import { RealtimeRefresher } from "@/components/realtime-refresher";
+import { RealtimeRefresher } from "@/components/realtime/realtime-refresher";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { COOKIES, LINKS } from "@/const";
 import { routing } from "@/i18n/routing";
