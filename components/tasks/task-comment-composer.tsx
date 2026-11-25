@@ -33,7 +33,9 @@ export function TaskCommentComposer({ taskId, onChanged }: Props) {
         toast.error(
           result.error === ERRORS.INSUFFICIENT_ROLE
             ? tCommon("insufficient_role")
-            : t("comment_error"),
+            : result.error === ERRORS.COMMENT_LIMIT_REACHED
+              ? tCommon("comment_limit_reached")
+              : t("comment_error"),
         );
         return;
       }

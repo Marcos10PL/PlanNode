@@ -58,7 +58,9 @@ export function TaskListModal({ projectId, list, open, onOpenChange }: Props) {
         toast.error(
           result.error === ERRORS.INSUFFICIENT_ROLE
             ? tCommon("insufficient_role")
-            : t("error"),
+            : result.error === ERRORS.TASK_LIST_LIMIT_REACHED
+              ? tCommon("task_list_limit_reached")
+              : t("error"),
         );
         return;
       }

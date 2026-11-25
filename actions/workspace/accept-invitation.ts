@@ -44,6 +44,9 @@ export async function acceptInvitationAction(token: string) {
       joined_at: new Date().toISOString(),
     });
 
+  if (memberError?.message.includes("member_limit_reached"))
+    return { error: ERRORS.MEMBER_LIMIT_REACHED };
+
   if (memberError) return { error: ERRORS.SERVER_ERROR };
 
   const { error: statusError } = await supabase

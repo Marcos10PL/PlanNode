@@ -35,6 +35,9 @@ export async function createTaskListAction(
     created_by: user.id,
   });
 
+  if (insertError?.message.includes("task_list_limit_reached"))
+    return { error: ERRORS.TASK_LIST_LIMIT_REACHED };
+
   if (insertError) return { error: ERRORS.SERVER_ERROR };
 
   revalidatePath(generateProjectRoute(projectId));

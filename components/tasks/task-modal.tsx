@@ -105,7 +105,9 @@ export function TaskModal({
             ? tCommon("insufficient_role")
             : result.error === ERRORS.INVALID_ASSIGNEE
               ? tTasks("invalid_assignee")
-              : t("error"),
+              : result.error === ERRORS.TASK_LIMIT_REACHED
+                ? tCommon("task_limit_reached")
+                : t("error"),
         );
         return;
       }

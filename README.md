@@ -56,7 +56,7 @@ Collaborative project & task management application built with Next.js and Supab
 - **Projects** — Create, edit, favorite, mark completed, and make private (owner/admin only); active, completed, and favorites views, each with its own sort order
 - **Task Lists** — Multiple lists per project, drag-to-reorder, rename, delete
 - **Tasks** — Title, rich-text description, status (`todo`, `in_progress`, `in_review`, `in_tests`, `done`, `cancelled`, `on_hold`), priority (`low`/`medium`/`high`/`urgent`), due date, single assignee, and **subtasks** (one level deep, rendered as full task rows)
-- **Two views per list** — Kanban board (drag cards between status columns) and list view (grouped by status, with filters and sort); both support drag-and-drop reordering
+- **Two views per list** — Kanban board (cards in status columns) and list view (grouped by status, with filters and sort); both support drag-and-drop reordering within a status group (changing status is done from the task, see [Known Limitations](#known-limitations))
 - **Comments & Activity Log** — Threaded comments (rich text, editable/deletable by their author or a manager) merged into one chronological timeline with an automatic activity log (status/priority/assignee/due-date changes), updated in real time
 - **Dashboard** — Cross-project "My Tasks" overview, grouped by urgency (overdue, today, this week, later)
 - **Trash / Soft Delete** — Projects, lists, and tasks are soft-deleted first (recoverable), with a dedicated trash view per project and workspace-wide; permanent deletion is restricted to workspace managers (or, for tasks, the task's own creator)
@@ -195,7 +195,7 @@ The schema is defined declaratively in `supabase/schemas/*.sql` (the source of t
 
 **`email_templates`** (`schemas/email_templates.sql`) — HTML templates (subject + body + `{{variable}}` placeholders) used for every transactional email, editable by admins.
 
-**`app_config`** (`schemas/app_config.sql`) — key/value store (`jsonb`) for runtime-configurable values such as `max_workspaces_per_user`; readable by all authenticated users, writable only via `service_role`.
+**`app_config`** (`schemas/app_config.sql`) — key/value store (`jsonb`) for runtime-configurable values such as the row limits (see [Row limits](#row-limits)); readable by all authenticated users, writable only via `service_role`.
 
 ### Soft delete (trash)
 
@@ -217,6 +217,12 @@ Every table has RLS enabled. Two independent authorization layers are enforced a
 ### Validation limits
 
 Length limits live in `const/index.ts` (`VALIDATION_MAX`, `VALIDATION_MIN`, `VALIDATION_MAX_HTML`) and are used by the zod schemas. `scripts/generate-limits.ts` mirrors them as CHECK constraints in `supabase/schemas/limits.sql`, so the database enforces them even for requests that bypass the app.
+
+### Row limits
+
+Workspaces per user, members and pending invitations per workspace, projects per workspace, task lists and tasks (subtasks included) per project, and comments per task are capped by `BEFORE INSERT` triggers that all call one function, `enforce_row_limit()`. Each limit is read from `app_config` (values are set in `scripts/generate-seed.ts`), falling back to a default written into the trigger, so it can be changed without a deploy.
+
+Rows in the trash count towards the limit, so emptying the trash frees the slots. When a limit is hit, the trigger raises an error and the server action turns it into a toast. Expired invitations are neither counted nor shown, and inviting the same email again replaces the expired one.
 
 ### Running migrations
 
@@ -388,7 +394,7 @@ Two role layers, both enforced in the database via RLS (see [Database](#database
 ### Projects, Tasks & Kanban
 
 - A project has one or more task lists; each list holds tasks, which can each have one level of subtasks (rendered as full task rows, not a separate lightweight type).
-- Each list view offers a **Kanban board** (drag cards between status columns) and a **list view** (grouped by status, filterable, sortable) — both backed by the same `reorderTasksAction`/`reorderTaskListsAction` server actions, using `dnd-kit` for the drag interactions.
+- Each list view offers a **Kanban board** (cards in status columns) and a **list view** (grouped by status, filterable, sortable) — both backed by the same `reorderTasksAction`/`reorderTaskListsAction` server actions, using `dnd-kit` for reordering within a status group (dragging across statuses is blocked, see [Known Limitations](#known-limitations)).
 - Task descriptions and comments are authored as rich text via Tiptap and sanitized (`isomorphic-dompurify`, so sanitization also runs correctly during server-side rendering, not just in the browser) before being rendered with `dangerouslySetInnerHTML`.
 - Every status/priority/assignee/due-date change writes a row to `task_events` (via a database trigger); the UI merges that log with `task_comments` into one chronological timeline per task.
 
@@ -424,6 +430,7 @@ All UI strings live in `messages/en.json` and `messages/pl.json`. The active loc
 - **Dragging a task across status columns doesn't move it**, in both the Kanban board and the list view. This is a deliberate `event.preventDefault()` block, not a missing feature — `@dnd-kit/react` 0.5.0 combined with React 19 crashes on cross-group drag (a confirmed upstream bug, still open, no stable fix released). Changing a task's status works fine via the task modal/status dropdown; only the drag gesture itself is restricted.
 - **No due-date reminders.** Tasks have due dates and overdue/upcoming ones surface on the "My Tasks" dashboard, but nothing proactively notifies you before a deadline passes — that would need a scheduled job (e.g. `pg_cron` or an external scheduler) and hasn't been built.
 - **Realtime is refresh-based, not patch-based.** Any change to a watched table triggers a full server refetch of the current page's data rather than merging just the changed row into client state. Simple and correctness-by-construction, but not the most bandwidth-efficient approach at a larger scale than this app targets.
+- **Row limits are soft.** The trigger counts rows before inserting, so several simultaneous inserts into the same workspace or project can overshoot a limit by a few rows. A hard cap would need row locking on every insert, which isn't worth it for limits meant to stop runaway growth, not to enforce exact quotas.
 - **Notification text is sender-controlled.** `create_notification()` checks who may send to whom, but not the content of `metadata`, so a workspace-mate could send a notification with arbitrary text (links are restricted to internal paths by a CHECK constraint). Closing this properly means calling it only from the server with the service-role client.
 
 ---

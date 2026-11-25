@@ -111,7 +111,9 @@ export function ProjectModal({
         toast.error(
           result.error === ERRORS.INSUFFICIENT_ROLE
             ? tCommon("insufficient_role")
-            : t("error"),
+            : result.error === ERRORS.PROJECT_LIMIT_REACHED
+              ? tCommon("project_limit_reached")
+              : t("error"),
         );
         return;
       }

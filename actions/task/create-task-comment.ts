@@ -39,6 +39,9 @@ export async function createTaskCommentAction(
     content: parsed.data.content,
   });
 
+  if (insertError?.message.includes("comment_limit_reached"))
+    return { error: ERRORS.COMMENT_LIMIT_REACHED };
+
   if (insertError) return { error: ERRORS.SERVER_ERROR };
 
   const recipientIds = [...new Set([task.assignee_id, task.created_by])].filter(

@@ -54,6 +54,9 @@ export async function createProjectAction(
     },
   );
 
+  if (insertError?.message.includes("project_limit_reached"))
+    return { error: ERRORS.PROJECT_LIMIT_REACHED };
+
   if (insertError || !projectId) {
     console.error("[create-project] RPC error:", insertError);
     return { error: ERRORS.SERVER_ERROR };

@@ -550,6 +550,30 @@ CREATE OR REPLACE TRIGGER on_workspace_member_removed_clear_assignee
   AFTER DELETE ON public.workspace_members
   FOR EACH ROW EXECUTE PROCEDURE public.clear_assignee_on_workspace_member_removed();
 
+CREATE OR REPLACE TRIGGER enforce_projects_limit
+  BEFORE INSERT ON public.projects
+  FOR EACH ROW EXECUTE PROCEDURE public.enforce_row_limit(
+    'workspace_id', 'max_projects_per_workspace', '50', 'project_limit_reached'
+  );
+
+CREATE OR REPLACE TRIGGER enforce_task_lists_limit
+  BEFORE INSERT ON public.task_lists
+  FOR EACH ROW EXECUTE PROCEDURE public.enforce_row_limit(
+    'project_id', 'max_task_lists_per_project', '30', 'task_list_limit_reached'
+  );
+
+CREATE OR REPLACE TRIGGER enforce_tasks_limit
+  BEFORE INSERT ON public.tasks
+  FOR EACH ROW EXECUTE PROCEDURE public.enforce_row_limit(
+    'project_id', 'max_tasks_per_project', '1000', 'task_limit_reached'
+  );
+
+CREATE OR REPLACE TRIGGER enforce_task_comments_limit
+  BEFORE INSERT ON public.task_comments
+  FOR EACH ROW EXECUTE PROCEDURE public.enforce_row_limit(
+    'task_id', 'max_comments_per_task', '500', 'comment_limit_reached'
+  );
+
 -- Indexes
 CREATE INDEX idx_projects_workspace_id ON public.projects(workspace_id);
 CREATE INDEX idx_projects_workspace_position ON public.projects(workspace_id, position);

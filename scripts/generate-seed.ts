@@ -26,6 +26,12 @@ type EmailTemplate = {
 
 const appConfig: AppConfig[] = [
   { key: "max_workspaces_per_user", value: "15" },
+  { key: "max_projects_per_workspace", value: "50" },
+  { key: "max_task_lists_per_project", value: "30" },
+  { key: "max_tasks_per_project", value: "1000" },
+  { key: "max_members_per_workspace", value: "50" },
+  { key: "max_pending_invitations_per_workspace", value: "50" },
+  { key: "max_comments_per_task", value: "500" },
 ];
 
 const generateAppConfig = () =>

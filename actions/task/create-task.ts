@@ -83,6 +83,9 @@ export async function createTaskAction(
     .select("id")
     .single();
 
+  if (insertError?.message.includes("task_limit_reached"))
+    return { error: ERRORS.TASK_LIMIT_REACHED };
+
   if (insertError || !task) return { error: ERRORS.SERVER_ERROR };
 
   if (assigneeId && assigneeId !== user.id) {

@@ -2,6 +2,7 @@
 
 import { acceptInvitationAction } from "@/actions/workspace/accept-invitation";
 import { declineInvitationAction } from "@/actions/workspace/decline-invitation";
+import { ERRORS } from "@/const";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -26,7 +27,11 @@ export function Actions({ token }: { token: string }) {
     setLoading(true);
     const { error } = await acceptInvitationAction(token);
     if (error) {
-      toast.error(tCommon("unexpected_error"));
+      toast.error(
+        error === ERRORS.MEMBER_LIMIT_REACHED
+          ? tCommon("member_limit_reached")
+          : tCommon("unexpected_error"),
+      );
       setLoading(false);
     }
   };

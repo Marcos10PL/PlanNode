@@ -25,6 +25,8 @@ export function InviteMemberForm({ workspaceId }: { workspaceId: string }) {
       const result = await inviteMemberAction(workspaceId, data);
       if (result?.error === ERRORS.ALREADY_MEMBER) {
         toast.error(t("team.invite_already_member"));
+      } else if (result?.error === ERRORS.INVITATION_LIMIT_REACHED) {
+        toast.error(t("common.invitation_limit_reached"));
       } else if (result?.error) {
         toast.error(t("team.invite_error"));
       } else {

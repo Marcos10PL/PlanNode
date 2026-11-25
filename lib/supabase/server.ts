@@ -1,3 +1,5 @@
+import "server-only";
+
 import { LINKS } from "@/const";
 import { Database } from "@/types/supabase";
 import { createServerClient } from "@supabase/ssr";

@@ -288,6 +288,50 @@ CREATE OR REPLACE TRIGGER set_workspace_members_updated_at
   BEFORE UPDATE ON public.workspace_members
   FOR EACH ROW EXECUTE PROCEDURE public.set_updated_at();
 
+-- Trigger: row limit from app_config (args: scope column, key, default, message, extra condition)
+CREATE OR REPLACE FUNCTION public.enforce_row_limit()
+RETURNS TRIGGER AS $$
+DECLARE
+  v_scope uuid := (to_jsonb(NEW) ->> TG_ARGV[0])::uuid;
+  v_limit integer := COALESCE(
+    (SELECT (value #>> '{}')::integer FROM public.app_config WHERE key = TG_ARGV[1]),
+    TG_ARGV[2]::integer
+  );
+  v_count integer;
+BEGIN
+  EXECUTE format(
+    'SELECT count(*) FROM (SELECT 1 FROM %I.%I WHERE %I = $1 AND (%s) LIMIT $2) s',
+    TG_TABLE_SCHEMA, TG_TABLE_NAME, TG_ARGV[0], COALESCE(TG_ARGV[4], 'true')
+  ) INTO v_count USING v_scope, v_limit;
+
+  IF v_count >= v_limit THEN
+    RAISE EXCEPTION '%', TG_ARGV[3];
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
+
+CREATE OR REPLACE TRIGGER enforce_workspaces_limit
+  BEFORE INSERT ON public.workspaces
+  FOR EACH ROW EXECUTE PROCEDURE public.enforce_row_limit(
+    'owner_id', 'max_workspaces_per_user', '15', 'workspace_limit_reached'
+  );
+
+CREATE OR REPLACE TRIGGER enforce_workspace_members_limit
+  BEFORE INSERT ON public.workspace_members
+  FOR EACH ROW EXECUTE PROCEDURE public.enforce_row_limit(
+    'workspace_id', 'max_members_per_workspace', '50', 'member_limit_reached'
+  );
+
+-- pending, non-expired invitations only
+CREATE OR REPLACE TRIGGER enforce_pending_invitations_limit
+  BEFORE INSERT ON public.workspace_invitations
+  FOR EACH ROW EXECUTE PROCEDURE public.enforce_row_limit(
+    'workspace_id', 'max_pending_invitations_per_workspace', '50',
+    'invitation_limit_reached', 'status = ''pending'' AND expires_at > now()'
+  );
+
 -- Indexes
 CREATE INDEX idx_workspaces_owner_id ON public.workspaces(owner_id);
 CREATE INDEX idx_workspace_members_workspace_id ON public.workspace_members(workspace_id);
@@ -309,6 +353,7 @@ REVOKE EXECUTE ON FUNCTION public.can_view_profile(uuid) FROM PUBLIC, anon;
 REVOKE EXECUTE ON FUNCTION public.find_profile_by_email(uuid, text) FROM PUBLIC, anon;
 REVOKE EXECUTE ON FUNCTION public.add_workspace_owner() FROM PUBLIC, anon;
 REVOKE EXECUTE ON FUNCTION public.transfer_workspace_ownership(uuid, uuid) FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.enforce_row_limit() FROM PUBLIC, anon;
 REVOKE ALL ON public.workspaces FROM authenticated;
 REVOKE ALL ON public.workspace_members FROM authenticated;
 REVOKE ALL ON public.workspace_invitations FROM authenticated;

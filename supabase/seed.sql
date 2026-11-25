@@ -3,6 +3,24 @@
 INSERT INTO public.app_config (key, value) VALUES
         ('max_workspaces_per_user', '15') ON CONFLICT (key) DO NOTHING;
 
+INSERT INTO public.app_config (key, value) VALUES
+        ('max_projects_per_workspace', '50') ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO public.app_config (key, value) VALUES
+        ('max_task_lists_per_project', '30') ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO public.app_config (key, value) VALUES
+        ('max_tasks_per_project', '1000') ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO public.app_config (key, value) VALUES
+        ('max_members_per_workspace', '50') ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO public.app_config (key, value) VALUES
+        ('max_pending_invitations_per_workspace', '50') ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO public.app_config (key, value) VALUES
+        ('max_comments_per_task', '500') ON CONFLICT (key) DO NOTHING;
+
 INSERT INTO public.email_templates (name, subject, html, variables) VALUES (
                 'workspace_invitation_pl',
                 '{{invitedByName}} zaprasza Cię do przestrzeni roboczej "{{workspaceName}}"',

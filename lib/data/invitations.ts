@@ -44,6 +44,7 @@ export const getWorkspaceInvitations = cache(async (workspaceId: string) => {
     .select("*")
     .eq("workspace_id", workspaceId)
     .eq("status", INVITATION_STATUSES.PENDING)
+    .gt("expires_at", new Date().toISOString())
     .order("created_at", { ascending: false });
 
   return (

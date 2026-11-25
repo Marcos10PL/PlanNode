@@ -61,15 +61,27 @@ export async function inviteMemberAction(
     if (existingMember) return { error: ERRORS.ALREADY_MEMBER };
   }
 
+  const nowIso = new Date().toISOString();
+
   const { data: existingInvitation } = await supabase
     .from("workspace_invitations")
     .select("id")
     .eq("workspace_id", workspaceId)
     .eq("email", email)
     .eq("status", "pending")
+    .gt("expires_at", nowIso)
     .single();
 
   if (existingInvitation) return { error: ERRORS.ALREADY_MEMBER };
+
+  // expired invitations stay "pending" and would block the unique index
+  await supabase
+    .from("workspace_invitations")
+    .delete()
+    .eq("workspace_id", workspaceId)
+    .eq("email", email)
+    .eq("status", "pending")
+    .lte("expires_at", nowIso);
 
   const token = crypto.randomUUID();
   const expiresAt = generateExpirationDate(7);
@@ -86,6 +98,9 @@ export async function inviteMemberAction(
     })
     .select("id")
     .single();
+
+  if (insertError?.message.includes("invitation_limit_reached"))
+    return { error: ERRORS.INVITATION_LIMIT_REACHED };
 
   if (insertError || !invitation) return { error: ERRORS.SERVER_ERROR };
 
